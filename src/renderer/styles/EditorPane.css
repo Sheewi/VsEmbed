@@ -1,0 +1,321 @@
+/* EditorPane.css */
+.editor-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--vscode-editor-background);
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-editorGroupHeader-tabsBackground);
+  border-bottom: 1px solid var(--vscode-editorGroupHeader-tabsBorder);
+  min-height: 35px;
+}
+
+.editor-tabs {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.editor-tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+.editor-tabs::-webkit-scrollbar-track {
+  background: var(--vscode-editorGroupHeader-tabsBackground);
+}
+
+.editor-tabs::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+  border-radius: 3px;
+}
+
+.editor-tabs::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: var(--vscode-tab-inactiveBackground);
+  color: var(--vscode-tab-inactiveForeground);
+  border-right: 1px solid var(--vscode-tab-border);
+  cursor: pointer;
+  min-width: 120px;
+  max-width: 200px;
+  transition: background-color 0.2s, color 0.2s;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.editor-tab:hover {
+  background-color: var(--vscode-tab-hoverBackground);
+  color: var(--vscode-tab-hoverForeground);
+}
+
+.editor-tab.active {
+  background-color: var(--vscode-tab-activeBackground);
+  color: var(--vscode-tab-activeForeground);
+  border-bottom: 2px solid var(--vscode-tab-activeBorder);
+}
+
+.editor-tab.dirty .tab-name {
+  font-style: italic;
+}
+
+.tab-name {
+  flex: 1;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dirty-indicator {
+  color: var(--vscode-tab-activeForeground);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.tab-close {
+  background: none;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.tab-close:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+  color: var(--vscode-tab-activeForeground);
+}
+
+.editor-actions {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.action-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.editor-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.monaco-editor {
+  width: 100%;
+  height: 100%;
+}
+
+.editor-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--vscode-progressBar-background);
+  border-top: 2px solid var(--vscode-button-background);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.editor-loading p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 6px;
+  min-width: 400px;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--vscode-dropdown-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--vscode-foreground);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--vscode-foreground);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.modal-content label {
+  display: block;
+  color: var(--vscode-foreground);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.modal-content input {
+  width: 100%;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: var(--vscode-font-family);
+  font-size: 14px;
+  margin-top: 8px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.modal-content input:focus {
+  border-color: var(--vscode-focusBorder);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--vscode-dropdown-border);
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+}
+
+.btn-secondary:hover {
+  background: var(--vscode-button-secondaryHoverBackground);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .editor-tab {
+    min-width: 100px;
+    max-width: 150px;
+    padding: 6px 12px;
+  }
+  
+  .tab-name {
+    font-size: 12px;
+  }
+  
+  .modal {
+    min-width: 320px;
+    margin: 20px;
+  }
+}

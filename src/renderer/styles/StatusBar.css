@@ -1,0 +1,376 @@
+/* StatusBar.css */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--vscode-statusBar-background);
+  color: var(--vscode-statusBar-foreground);
+  border-top: 1px solid var(--vscode-statusBar-border);
+  height: 22px;
+  padding: 0 12px;
+  font-size: 11px;
+  user-select: none;
+  overflow: hidden;
+}
+
+.status-left,
+.status-center,
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+.status-left {
+  flex: 1;
+  justify-content: flex-start;
+}
+
+.status-center {
+  flex: 1;
+  justify-content: center;
+}
+
+.status-right {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  height: 18px;
+  border-radius: 3px;
+  transition: background-color 0.2s, color 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.status-item.clickable {
+  cursor: pointer;
+}
+
+.status-item.clickable:hover {
+  background-color: var(--vscode-statusBarItem-hoverBackground);
+  color: var(--vscode-statusBarItem-hoverForeground);
+}
+
+.status-icon {
+  font-size: 10px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+}
+
+.status-text {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.status-separator {
+  color: var(--vscode-statusBar-foreground);
+  opacity: 0.3;
+  font-size: 10px;
+  margin: 0 4px;
+}
+
+/* Specific status item styles */
+.workspace-status {
+  font-weight: 500;
+}
+
+.workspace-status .status-text {
+  max-width: 100px;
+}
+
+.git-status {
+  color: var(--vscode-statusBar-foreground);
+}
+
+.problems-status .status-text {
+  color: var(--vscode-statusBar-foreground);
+}
+
+.problems-status:hover .status-text {
+  color: var(--vscode-statusBarItem-hoverForeground);
+}
+
+.build-status.success {
+  color: var(--vscode-terminal-ansiGreen);
+}
+
+.build-status.building {
+  color: var(--vscode-terminal-ansiYellow);
+}
+
+.build-status.error {
+  color: var(--vscode-terminal-ansiRed);
+}
+
+.run-status .status-icon {
+  animation: none;
+}
+
+.run-status.running .status-icon {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.ai-status .status-text.processing {
+  color: var(--vscode-terminal-ansiBlue);
+}
+
+.ai-status .status-text.processing::after {
+  content: '';
+  animation: dots 1.5s infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '...'; }
+}
+
+.cursor-position {
+  font-family: var(--vscode-editor-font-family);
+  color: var(--vscode-statusBar-foreground);
+  opacity: 0.8;
+}
+
+.ai-model {
+  color: var(--vscode-statusBar-foreground);
+}
+
+.ai-model .status-text {
+  max-width: 80px;
+}
+
+.notifications-status {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--vscode-errorForeground);
+  color: white;
+  font-size: 8px;
+  font-weight: bold;
+  border-radius: 6px;
+  min-width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.connection-status .status-icon {
+  animation: none;
+}
+
+.connection-status.error .status-icon {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+.memory-usage {
+  color: var(--vscode-statusBar-foreground);
+  opacity: 0.8;
+}
+
+.memory-usage .status-text {
+  font-family: var(--vscode-editor-font-family);
+  min-width: 30px;
+  text-align: right;
+}
+
+.time-display {
+  color: var(--vscode-statusBar-foreground);
+  opacity: 0.8;
+  font-family: var(--vscode-editor-font-family);
+}
+
+.time-display .status-text {
+  min-width: 35px;
+  text-align: right;
+}
+
+/* Active/Selected states */
+.status-item.active {
+  background-color: var(--vscode-statusBarItem-activeBackground);
+  color: var(--vscode-statusBarItem-activeForeground);
+}
+
+/* Error states */
+.status-item.error {
+  background-color: var(--vscode-statusBarItem-errorBackground);
+  color: var(--vscode-statusBarItem-errorForeground);
+}
+
+.status-item.warning {
+  background-color: var(--vscode-statusBarItem-warningBackground);
+  color: var(--vscode-statusBarItem-warningForeground);
+}
+
+/* Loading states */
+.status-item.loading .status-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .status-bar {
+    font-size: 10px;
+    padding: 0 8px;
+  }
+  
+  .status-item {
+    padding: 1px 4px;
+    gap: 3px;
+  }
+  
+  .status-text {
+    font-size: 10px;
+    max-width: 80px;
+  }
+  
+  .workspace-status .status-text {
+    max-width: 60px;
+  }
+  
+  .ai-model .status-text {
+    max-width: 60px;
+  }
+  
+  .status-separator {
+    margin: 0 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .status-bar {
+    height: 20px;
+    font-size: 9px;
+    padding: 0 6px;
+    gap: 4px;
+  }
+  
+  .status-left,
+  .status-center,
+  .status-right {
+    gap: 4px;
+  }
+  
+  .status-item {
+    padding: 1px 3px;
+    gap: 2px;
+  }
+  
+  .status-icon {
+    font-size: 9px;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .status-text {
+    font-size: 9px;
+    max-width: 60px;
+  }
+  
+  /* Hide some items on mobile */
+  .git-status,
+  .cursor-position,
+  .memory-usage {
+    display: none;
+  }
+  
+  .time-display .status-text {
+    min-width: 30px;
+  }
+  
+  .notification-badge {
+    font-size: 7px;
+    min-width: 10px;
+    height: 10px;
+  }
+}
+
+/* Focus states for accessibility */
+.status-item.clickable:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+/* Tooltip-like behavior for truncated text */
+.status-item:hover .status-text {
+  overflow: visible;
+  white-space: nowrap;
+  z-index: 1000;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .status-bar {
+    border-top: 2px solid var(--vscode-statusBar-border);
+  }
+  
+  .status-item.clickable:hover {
+    border: 1px solid var(--vscode-focusBorder);
+  }
+  
+  .notification-badge {
+    border: 1px solid white;
+  }
+}
+
+/* Dark/Light theme specific adjustments */
+.vscode-dark .status-bar {
+  border-top-color: #3c3c3c;
+}
+
+.vscode-light .status-bar {
+  border-top-color: #e5e5e5;
+}
+
+/* Animation performance optimization */
+.status-item.loading .status-icon,
+.run-status.running .status-icon,
+.connection-status.error .status-icon {
+  will-change: transform, opacity;
+}
+
+/* Prevent text selection on status items */
+.status-bar * {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
