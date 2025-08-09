@@ -1,0 +1,4 @@
+
+          .r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}
+          .r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}
+          

@@ -1,0 +1,283 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #1e1e1e;
+  color: #cccccc;
+  overflow: hidden;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+/* VS Code color scheme */
+:root {
+  --vscode-background: #1e1e1e;
+  --vscode-foreground: #cccccc;
+  --vscode-editor-background: #1e1e1e;
+  --vscode-editor-foreground: #d4d4d4;
+  --vscode-sidebar-background: #252526;
+  --vscode-sidebar-foreground: #cccccc;
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-foreground: #cccccc;
+  --vscode-input-border: #3c3c3c;
+  --vscode-button-background: #0e639c;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-hover-background: #1177bb;
+  --vscode-list-hover-background: #2a2d2e;
+  --vscode-border: #3c3c3c;
+  --vscode-panel-background: #1e1e1e;
+  --vscode-panel-border: #3c3c3c;
+  --vscode-statusbar-background: #007acc;
+  --vscode-statusbar-foreground: #ffffff;
+  --vscode-terminal-background: #1e1e1e;
+  --vscode-terminal-foreground: #cccccc;
+  --vscode-success: #89d185;
+  --vscode-warning: #ffcc02;
+  --vscode-error: #f85149;
+  --vscode-info: #3794ff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(121, 121, 121, 0.4);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(121, 121, 121, 0.7);
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Common styles */
+.button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: var(--vscode-button-hover-background);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button.secondary {
+  background-color: transparent;
+  border: 1px solid var(--vscode-border);
+  color: var(--vscode-foreground);
+}
+
+.button.secondary:hover {
+  background-color: var(--vscode-list-hover-background);
+}
+
+.input {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--vscode-button-background);
+  box-shadow: 0 0 0 1px var(--vscode-button-background);
+}
+
+.textarea {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+}
+
+.textarea:focus {
+  border-color: var(--vscode-button-background);
+  box-shadow: 0 0 0 1px var(--vscode-button-background);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon.large {
+  width: 24px;
+  height: 24px;
+}
+
+/* Status indicators */
+.status-success {
+  color: var(--vscode-success);
+}
+
+.status-warning {
+  color: var(--vscode-warning);
+}
+
+.status-error {
+  color: var(--vscode-error);
+}
+
+.status-info {
+  color: var(--vscode-info);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 2px solid transparent;
+  border-top: 2px solid var(--vscode-button-background);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Utility classes */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.gap-2 {
+  gap: 8px;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.p-2 {
+  padding: 8px;
+}
+
+.p-3 {
+  padding: 12px;
+}
+
+.p-4 {
+  padding: 16px;
+}
+
+.m-2 {
+  margin: 8px;
+}
+
+.m-3 {
+  margin: 12px;
+}
+
+.m-4 {
+  margin: 16px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 12px;
+}
+
+.text-lg {
+  font-size: 16px;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.select-none {
+  user-select: none;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.border-b {
+  border-bottom: 1px solid var(--vscode-border);
+}
+
+.border-r {
+  border-right: 1px solid var(--vscode-border);
+}
+
+.rounded {
+  border-radius: 4px;
+}
+
+.shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
