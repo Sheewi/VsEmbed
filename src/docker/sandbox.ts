@@ -5,388 +5,388 @@ import * as fs from 'fs/promises';
 import { ExtensionRecommender } from '../extensions/recommender';
 
 export interface ContainerConfig {
-  name: string;
-  image: string;
-  ports: { host: number; container: number }[];
-  volumes: { host: string; container: string; readonly?: boolean }[];
-  environment: Record<string, string>;
-  resources: {
-    memory: string;
-    cpuLimit: string;
-    networkMode: string;
-  };
-  security: {
-    seccompProfile?: string;
-    capabilities: {
-      add: string[];
-      drop: string[];
-    };
-    user: string;
-    readonlyRootfs: boolean;
-  };
+	name: string;
+	image: string;
+	ports: { host: number; container: number }[];
+	volumes: { host: string; container: string; readonly?: boolean }[];
+	environment: Record<string, string>;
+	resources: {
+		memory: string;
+		cpuLimit: string;
+		networkMode: string;
+	};
+	security: {
+		seccompProfile?: string;
+		capabilities: {
+			add: string[];
+			drop: string[];
+		};
+		user: string;
+		readonlyRootfs: boolean;
+	};
 }
 
 export interface ExtensionSandbox {
-  containerId: string;
-  extensionId: string;
-  status: 'creating' | 'running' | 'stopped' | 'error';
-  config: ContainerConfig;
-  process?: ChildProcess;
-  createdAt: Date;
-  lastAccessed: Date;
-  ports: number[];
-  resources: {
-    cpu: number;
-    memory: number;
-    network: number;
-  };
+	containerId: string;
+	extensionId: string;
+	status: 'creating' | 'running' | 'stopped' | 'error';
+	config: ContainerConfig;
+	process?: ChildProcess;
+	createdAt: Date;
+	lastAccessed: Date;
+	ports: number[];
+	resources: {
+		cpu: number;
+		memory: number;
+		network: number;
+	};
 }
 
 export interface SandboxMetrics {
-  totalContainers: number;
-  runningContainers: number;
-  memoryUsage: number;
-  cpuUsage: number;
-  networkTraffic: number;
-  securityEvents: number;
-  containerHealth: Map<string, boolean>;
+	totalContainers: number;
+	runningContainers: number;
+	memoryUsage: number;
+	cpuUsage: number;
+	networkTraffic: number;
+	securityEvents: number;
+	containerHealth: Map<string, boolean>;
 }
 
 export class DockerManager extends EventEmitter {
-  private containers: Map<string, ExtensionSandbox> = new Map();
-  private imageCache: Map<string, boolean> = new Map();
-  private networkIds: Set<string> = new Set();
-  private metrics: SandboxMetrics;
-  private cleanupInterval?: NodeJS.Timer;
-  private monitoringInterval?: NodeJS.Timer;
+	private containers: Map<string, ExtensionSandbox> = new Map();
+	private imageCache: Map<string, boolean> = new Map();
+	private networkIds: Set<string> = new Set();
+	private metrics: SandboxMetrics;
+	private cleanupInterval?: NodeJS.Timer;
+	private monitoringInterval?: NodeJS.Timer;
 
-  constructor(private recommender: ExtensionRecommender) {
-    super();
-    
-    this.metrics = {
-      totalContainers: 0,
-      runningContainers: 0,
-      memoryUsage: 0,
-      cpuUsage: 0,
-      networkTraffic: 0,
-      securityEvents: 0,
-      containerHealth: new Map()
-    };
+	constructor(private recommender: ExtensionRecommender) {
+		super();
 
-    this.initializeDocker();
-    this.startMonitoring();
-    this.setupCleanup();
-  }
+		this.metrics = {
+			totalContainers: 0,
+			runningContainers: 0,
+			memoryUsage: 0,
+			cpuUsage: 0,
+			networkTraffic: 0,
+			securityEvents: 0,
+			containerHealth: new Map()
+		};
 
-  async createExtensionSandbox(extensionId: string, config?: Partial<ContainerConfig>): Promise<ExtensionSandbox> {
-    const sandboxConfig = await this.buildContainerConfig(extensionId, config);
-    const containerId = this.generateContainerId(extensionId);
+		this.initializeDocker();
+		this.startMonitoring();
+		this.setupCleanup();
+	}
 
-    // Check if extension requires special permissions
-    const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
-    if (extensionInfo?.security?.requiresIsolation) {
-      sandboxConfig.security.capabilities.drop.push('NET_RAW', 'SYS_ADMIN');
-    }
+	async createExtensionSandbox(extensionId: string, config?: Partial<ContainerConfig>): Promise<ExtensionSandbox> {
+		const sandboxConfig = await this.buildContainerConfig(extensionId, config);
+		const containerId = this.generateContainerId(extensionId);
 
-    const sandbox: ExtensionSandbox = {
-      containerId,
-      extensionId,
-      status: 'creating',
-      config: sandboxConfig,
-      createdAt: new Date(),
-      lastAccessed: new Date(),
-      ports: sandboxConfig.ports.map(p => p.host),
-      resources: {
-        cpu: 0,
-        memory: 0,
-        network: 0
-      }
-    };
+		// Check if extension requires special permissions
+		const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
+		if (extensionInfo?.security?.requiresIsolation) {
+			sandboxConfig.security.capabilities.drop.push('NET_RAW', 'SYS_ADMIN');
+		}
 
-    this.containers.set(containerId, sandbox);
-    this.emit('sandboxCreating', { containerId, extensionId });
+		const sandbox: ExtensionSandbox = {
+			containerId,
+			extensionId,
+			status: 'creating',
+			config: sandboxConfig,
+			createdAt: new Date(),
+			lastAccessed: new Date(),
+			ports: sandboxConfig.ports.map(p => p.host),
+			resources: {
+				cpu: 0,
+				memory: 0,
+				network: 0
+			}
+		};
 
-    try {
-      // Build container if image doesn't exist
-      await this.ensureImage(sandboxConfig.image);
+		this.containers.set(containerId, sandbox);
+		this.emit('sandboxCreating', { containerId, extensionId });
 
-      // Create and start container
-      const process = await this.startContainer(sandbox);
-      sandbox.process = process;
-      sandbox.status = 'running';
+		try {
+			// Build container if image doesn't exist
+			await this.ensureImage(sandboxConfig.image);
 
-      this.metrics.totalContainers++;
-      this.metrics.runningContainers++;
+			// Create and start container
+			const process = await this.startContainer(sandbox);
+			sandbox.process = process;
+			sandbox.status = 'running';
 
-      this.emit('sandboxCreated', { containerId, extensionId });
-      return sandbox;
+			this.metrics.totalContainers++;
+			this.metrics.runningContainers++;
 
-    } catch (error) {
-      sandbox.status = 'error';
-      this.emit('sandboxError', { 
-        containerId, 
-        extensionId, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
-  }
+			this.emit('sandboxCreated', { containerId, extensionId });
+			return sandbox;
 
-  async stopSandbox(containerId: string): Promise<void> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox) {
-      throw new Error(`Sandbox ${containerId} not found`);
-    }
+		} catch (error) {
+			sandbox.status = 'error';
+			this.emit('sandboxError', {
+				containerId,
+				extensionId,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
 
-    this.emit('sandboxStopping', { containerId, extensionId: sandbox.extensionId });
+	async stopSandbox(containerId: string): Promise<void> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox) {
+			throw new Error(`Sandbox ${containerId} not found`);
+		}
 
-    try {
-      // Stop container gracefully
-      await this.executeDockerCommand(['stop', '-t', '10', containerId]);
-      
-      // Remove container
-      await this.executeDockerCommand(['rm', containerId]);
+		this.emit('sandboxStopping', { containerId, extensionId: sandbox.extensionId });
 
-      sandbox.status = 'stopped';
-      if (sandbox.status === 'running') {
-        this.metrics.runningContainers--;
-      }
+		try {
+			// Stop container gracefully
+			await this.executeDockerCommand(['stop', '-t', '10', containerId]);
 
-      this.emit('sandboxStopped', { containerId, extensionId: sandbox.extensionId });
+			// Remove container
+			await this.executeDockerCommand(['rm', containerId]);
 
-    } catch (error) {
-      this.emit('sandboxError', { 
-        containerId, 
-        extensionId: sandbox.extensionId,
-        error: error instanceof Error ? error.message : 'Failed to stop container' 
-      });
-      throw error;
-    }
-  }
+			sandbox.status = 'stopped';
+			if (sandbox.status === 'running') {
+				this.metrics.runningContainers--;
+			}
 
-  async restartSandbox(containerId: string): Promise<void> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox) {
-      throw new Error(`Sandbox ${containerId} not found`);
-    }
+			this.emit('sandboxStopped', { containerId, extensionId: sandbox.extensionId });
 
-    await this.stopSandbox(containerId);
-    
-    // Wait a moment for cleanup
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newSandbox = await this.createExtensionSandbox(sandbox.extensionId, sandbox.config);
-    
-    // Update container ID mapping
-    this.containers.delete(containerId);
-    this.containers.set(newSandbox.containerId, newSandbox);
-  }
+		} catch (error) {
+			this.emit('sandboxError', {
+				containerId,
+				extensionId: sandbox.extensionId,
+				error: error instanceof Error ? error.message : 'Failed to stop container'
+			});
+			throw error;
+		}
+	}
 
-  async executeSandboxCommand(containerId: string, command: string[]): Promise<string> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox || sandbox.status !== 'running') {
-      throw new Error(`Sandbox ${containerId} is not running`);
-    }
+	async restartSandbox(containerId: string): Promise<void> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox) {
+			throw new Error(`Sandbox ${containerId} not found`);
+		}
 
-    sandbox.lastAccessed = new Date();
+		await this.stopSandbox(containerId);
 
-    try {
-      const result = await this.executeDockerCommand(['exec', containerId, ...command]);
-      this.emit('commandExecuted', { containerId, command, success: true });
-      return result;
-    } catch (error) {
-      this.emit('commandExecuted', { 
-        containerId, 
-        command, 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
-  }
+		// Wait a moment for cleanup
+		await new Promise(resolve => setTimeout(resolve, 1000));
 
-  async copyToSandbox(containerId: string, hostPath: string, containerPath: string): Promise<void> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox || sandbox.status !== 'running') {
-      throw new Error(`Sandbox ${containerId} is not running`);
-    }
+		const newSandbox = await this.createExtensionSandbox(sandbox.extensionId, sandbox.config);
 
-    try {
-      await this.executeDockerCommand(['cp', hostPath, `${containerId}:${containerPath}`]);
-      this.emit('fileCopied', { containerId, hostPath, containerPath, direction: 'to' });
-    } catch (error) {
-      this.emit('copyError', { 
-        containerId, 
-        hostPath, 
-        containerPath, 
-        direction: 'to',
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
-  }
+		// Update container ID mapping
+		this.containers.delete(containerId);
+		this.containers.set(newSandbox.containerId, newSandbox);
+	}
 
-  async copyFromSandbox(containerId: string, containerPath: string, hostPath: string): Promise<void> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox || sandbox.status !== 'running') {
-      throw new Error(`Sandbox ${containerId} is not running`);
-    }
+	async executeSandboxCommand(containerId: string, command: string[]): Promise<string> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox || sandbox.status !== 'running') {
+			throw new Error(`Sandbox ${containerId} is not running`);
+		}
 
-    try {
-      await this.executeDockerCommand(['cp', `${containerId}:${containerPath}`, hostPath]);
-      this.emit('fileCopied', { containerId, containerPath, hostPath, direction: 'from' });
-    } catch (error) {
-      this.emit('copyError', { 
-        containerId, 
-        containerPath, 
-        hostPath, 
-        direction: 'from',
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
-  }
+		sandbox.lastAccessed = new Date();
 
-  async getSandboxLogs(containerId: string, tail = 100): Promise<string> {
-    const sandbox = this.containers.get(containerId);
-    if (!sandbox) {
-      throw new Error(`Sandbox ${containerId} not found`);
-    }
+		try {
+			const result = await this.executeDockerCommand(['exec', containerId, ...command]);
+			this.emit('commandExecuted', { containerId, command, success: true });
+			return result;
+		} catch (error) {
+			this.emit('commandExecuted', {
+				containerId,
+				command,
+				success: false,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
 
-    try {
-      return await this.executeDockerCommand(['logs', '--tail', tail.toString(), containerId]);
-    } catch (error) {
-      throw new Error(`Failed to get logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
+	async copyToSandbox(containerId: string, hostPath: string, containerPath: string): Promise<void> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox || sandbox.status !== 'running') {
+			throw new Error(`Sandbox ${containerId} is not running`);
+		}
 
-  getSandboxStatus(containerId: string): ExtensionSandbox | undefined {
-    return this.containers.get(containerId);
-  }
+		try {
+			await this.executeDockerCommand(['cp', hostPath, `${containerId}:${containerPath}`]);
+			this.emit('fileCopied', { containerId, hostPath, containerPath, direction: 'to' });
+		} catch (error) {
+			this.emit('copyError', {
+				containerId,
+				hostPath,
+				containerPath,
+				direction: 'to',
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
 
-  listSandboxes(): ExtensionSandbox[] {
-    return Array.from(this.containers.values());
-  }
+	async copyFromSandbox(containerId: string, containerPath: string, hostPath: string): Promise<void> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox || sandbox.status !== 'running') {
+			throw new Error(`Sandbox ${containerId} is not running`);
+		}
 
-  getSandboxesByExtension(extensionId: string): ExtensionSandbox[] {
-    return Array.from(this.containers.values()).filter(s => s.extensionId === extensionId);
-  }
+		try {
+			await this.executeDockerCommand(['cp', `${containerId}:${containerPath}`, hostPath]);
+			this.emit('fileCopied', { containerId, containerPath, hostPath, direction: 'from' });
+		} catch (error) {
+			this.emit('copyError', {
+				containerId,
+				containerPath,
+				hostPath,
+				direction: 'from',
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
 
-  getMetrics(): SandboxMetrics {
-    return { ...this.metrics };
-  }
+	async getSandboxLogs(containerId: string, tail = 100): Promise<string> {
+		const sandbox = this.containers.get(containerId);
+		if (!sandbox) {
+			throw new Error(`Sandbox ${containerId} not found`);
+		}
 
-  private async buildContainerConfig(
-    extensionId: string, 
-    customConfig?: Partial<ContainerConfig>
-  ): Promise<ContainerConfig> {
-    const baseConfig: ContainerConfig = {
-      name: `vsembed-ext-${extensionId.replace(/[^a-zA-Z0-9]/g, '-')}`,
-      image: 'vsembed/extension-runtime:latest',
-      ports: [
-        { host: await this.getAvailablePort(), container: 8080 }
-      ],
-      volumes: [
-        { host: '/tmp/vsembed/workspace', container: '/workspace', readonly: false },
-        { host: '/tmp/vsembed/extensions', container: '/extensions', readonly: true }
-      ],
-      environment: {
-        'EXTENSION_ID': extensionId,
-        'NODE_ENV': 'production',
-        'VSCODE_EXTENSION_API_VERSION': '1.74.0'
-      },
-      resources: {
-        memory: '512m',
-        cpuLimit: '0.5',
-        networkMode: 'vsembed-network'
-      },
-      security: {
-        capabilities: {
-          add: [],
-          drop: ['ALL']
-        },
-        user: '1000:1000',
-        readonlyRootfs: true
-      }
-    };
+		try {
+			return await this.executeDockerCommand(['logs', '--tail', tail.toString(), containerId]);
+		} catch (error) {
+			throw new Error(`Failed to get logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		}
+	}
 
-    // Apply extension-specific configurations
-    const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
-    if (extensionInfo) {
-      if (extensionInfo.resources?.memory) {
-        baseConfig.resources.memory = extensionInfo.resources.memory;
-      }
-      if (extensionInfo.resources?.cpu) {
-        baseConfig.resources.cpuLimit = extensionInfo.resources.cpu;
-      }
-      if (extensionInfo.security?.requiredCapabilities) {
-        baseConfig.security.capabilities.add.push(...extensionInfo.security.requiredCapabilities);
-      }
-    }
+	getSandboxStatus(containerId: string): ExtensionSandbox | undefined {
+		return this.containers.get(containerId);
+	}
 
-    // Merge with custom configuration
-    return this.mergeConfigs(baseConfig, customConfig || {});
-  }
+	listSandboxes(): ExtensionSandbox[] {
+		return Array.from(this.containers.values());
+	}
 
-  private mergeConfigs(base: ContainerConfig, custom: Partial<ContainerConfig>): ContainerConfig {
-    return {
-      ...base,
-      ...custom,
-      ports: custom.ports || base.ports,
-      volumes: custom.volumes || base.volumes,
-      environment: { ...base.environment, ...(custom.environment || {}) },
-      resources: { ...base.resources, ...(custom.resources || {}) },
-      security: {
-        ...base.security,
-        ...(custom.security || {}),
-        capabilities: {
-          add: [...(base.security.capabilities.add || []), ...(custom.security?.capabilities?.add || [])],
-          drop: [...(base.security.capabilities.drop || []), ...(custom.security?.capabilities?.drop || [])]
-        }
-      }
-    };
-  }
+	getSandboxesByExtension(extensionId: string): ExtensionSandbox[] {
+		return Array.from(this.containers.values()).filter(s => s.extensionId === extensionId);
+	}
 
-  private async ensureImage(imageName: string): Promise<void> {
-    if (this.imageCache.has(imageName)) {
-      return;
-    }
+	getMetrics(): SandboxMetrics {
+		return { ...this.metrics };
+	}
 
-    try {
-      // Check if image exists locally
-      await this.executeDockerCommand(['inspect', imageName]);
-      this.imageCache.set(imageName, true);
-    } catch (error) {
-      // Image doesn't exist, build it
-      await this.buildExtensionImage(imageName);
-      this.imageCache.set(imageName, true);
-    }
-  }
+	private async buildContainerConfig(
+		extensionId: string,
+		customConfig?: Partial<ContainerConfig>
+	): Promise<ContainerConfig> {
+		const baseConfig: ContainerConfig = {
+			name: `vsembed-ext-${extensionId.replace(/[^a-zA-Z0-9]/g, '-')}`,
+			image: 'vsembed/extension-runtime:latest',
+			ports: [
+				{ host: await this.getAvailablePort(), container: 8080 }
+			],
+			volumes: [
+				{ host: '/tmp/vsembed/workspace', container: '/workspace', readonly: false },
+				{ host: '/tmp/vsembed/extensions', container: '/extensions', readonly: true }
+			],
+			environment: {
+				'EXTENSION_ID': extensionId,
+				'NODE_ENV': 'production',
+				'VSCODE_EXTENSION_API_VERSION': '1.74.0'
+			},
+			resources: {
+				memory: '512m',
+				cpuLimit: '0.5',
+				networkMode: 'vsembed-network'
+			},
+			security: {
+				capabilities: {
+					add: [],
+					drop: ['ALL']
+				},
+				user: '1000:1000',
+				readonlyRootfs: true
+			}
+		};
 
-  private async buildExtensionImage(imageName: string): Promise<void> {
-    this.emit('imageBuildStarted', { imageName });
+		// Apply extension-specific configurations
+		const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
+		if (extensionInfo) {
+			if (extensionInfo.resources?.memory) {
+				baseConfig.resources.memory = extensionInfo.resources.memory;
+			}
+			if (extensionInfo.resources?.cpu) {
+				baseConfig.resources.cpuLimit = extensionInfo.resources.cpu;
+			}
+			if (extensionInfo.security?.requiredCapabilities) {
+				baseConfig.security.capabilities.add.push(...extensionInfo.security.requiredCapabilities);
+			}
+		}
 
-    // Create Dockerfile for extension runtime
-    const dockerfile = this.generateDockerfile();
-    const buildContext = '/tmp/vsembed/build';
-    
-    await fs.mkdir(buildContext, { recursive: true });
-    await fs.writeFile(path.join(buildContext, 'Dockerfile'), dockerfile);
+		// Merge with custom configuration
+		return this.mergeConfigs(baseConfig, customConfig || {});
+	}
 
-    try {
-      await this.executeDockerCommand(['build', '-t', imageName, buildContext]);
-      this.emit('imageBuildCompleted', { imageName });
-    } catch (error) {
-      this.emit('imageBuildFailed', { 
-        imageName, 
-        error: error instanceof Error ? error.message : 'Unknown error' 
-      });
-      throw error;
-    }
-  }
+	private mergeConfigs(base: ContainerConfig, custom: Partial<ContainerConfig>): ContainerConfig {
+		return {
+			...base,
+			...custom,
+			ports: custom.ports || base.ports,
+			volumes: custom.volumes || base.volumes,
+			environment: { ...base.environment, ...(custom.environment || {}) },
+			resources: { ...base.resources, ...(custom.resources || {}) },
+			security: {
+				...base.security,
+				...(custom.security || {}),
+				capabilities: {
+					add: [...(base.security.capabilities.add || []), ...(custom.security?.capabilities?.add || [])],
+					drop: [...(base.security.capabilities.drop || []), ...(custom.security?.capabilities?.drop || [])]
+				}
+			}
+		};
+	}
 
-  private generateDockerfile(): string {
-    return `
+	private async ensureImage(imageName: string): Promise<void> {
+		if (this.imageCache.has(imageName)) {
+			return;
+		}
+
+		try {
+			// Check if image exists locally
+			await this.executeDockerCommand(['inspect', imageName]);
+			this.imageCache.set(imageName, true);
+		} catch (error) {
+			// Image doesn't exist, build it
+			await this.buildExtensionImage(imageName);
+			this.imageCache.set(imageName, true);
+		}
+	}
+
+	private async buildExtensionImage(imageName: string): Promise<void> {
+		this.emit('imageBuildStarted', { imageName });
+
+		// Create Dockerfile for extension runtime
+		const dockerfile = this.generateDockerfile();
+		const buildContext = '/tmp/vsembed/build';
+
+		await fs.mkdir(buildContext, { recursive: true });
+		await fs.writeFile(path.join(buildContext, 'Dockerfile'), dockerfile);
+
+		try {
+			await this.executeDockerCommand(['build', '-t', imageName, buildContext]);
+			this.emit('imageBuildCompleted', { imageName });
+		} catch (error) {
+			this.emit('imageBuildFailed', {
+				imageName,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+			throw error;
+		}
+	}
+
+	private generateDockerfile(): string {
+		return `
 FROM node:18-alpine
 
 # Install VS Code dependencies
@@ -449,255 +449,255 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\
 # Start extension runtime
 CMD ["/usr/local/bin/run-extension.sh"]
 `;
-  }
+	}
 
-  private async startContainer(sandbox: ExtensionSandbox): Promise<ChildProcess> {
-    const { config } = sandbox;
-    
-    const dockerArgs = [
-      'run',
-      '-d',
-      '--name', sandbox.containerId,
-      '--memory', config.resources.memory,
-      '--cpus', config.resources.cpuLimit,
-      '--network', config.resources.networkMode,
-      '--user', config.security.user,
-      '--security-opt', 'no-new-privileges:true'
-    ];
+	private async startContainer(sandbox: ExtensionSandbox): Promise<ChildProcess> {
+		const { config } = sandbox;
 
-    // Add readonly root filesystem if specified
-    if (config.security.readonlyRootfs) {
-      dockerArgs.push('--read-only');
-      dockerArgs.push('--tmpfs', '/tmp:exec,size=100m');
-      dockerArgs.push('--tmpfs', '/var/tmp:exec,size=100m');
-    }
+		const dockerArgs = [
+			'run',
+			'-d',
+			'--name', sandbox.containerId,
+			'--memory', config.resources.memory,
+			'--cpus', config.resources.cpuLimit,
+			'--network', config.resources.networkMode,
+			'--user', config.security.user,
+			'--security-opt', 'no-new-privileges:true'
+		];
 
-    // Add capabilities
-    config.security.capabilities.drop.forEach(cap => {
-      dockerArgs.push('--cap-drop', cap);
-    });
-    config.security.capabilities.add.forEach(cap => {
-      dockerArgs.push('--cap-add', cap);
-    });
+		// Add readonly root filesystem if specified
+		if (config.security.readonlyRootfs) {
+			dockerArgs.push('--read-only');
+			dockerArgs.push('--tmpfs', '/tmp:exec,size=100m');
+			dockerArgs.push('--tmpfs', '/var/tmp:exec,size=100m');
+		}
 
-    // Add seccomp profile if specified
-    if (config.security.seccompProfile) {
-      dockerArgs.push('--security-opt', `seccomp=${config.security.seccompProfile}`);
-    }
+		// Add capabilities
+		config.security.capabilities.drop.forEach(cap => {
+			dockerArgs.push('--cap-drop', cap);
+		});
+		config.security.capabilities.add.forEach(cap => {
+			dockerArgs.push('--cap-add', cap);
+		});
 
-    // Add port mappings
-    config.ports.forEach(port => {
-      dockerArgs.push('-p', `${port.host}:${port.container}`);
-    });
+		// Add seccomp profile if specified
+		if (config.security.seccompProfile) {
+			dockerArgs.push('--security-opt', `seccomp=${config.security.seccompProfile}`);
+		}
 
-    // Add volume mounts
-    config.volumes.forEach(volume => {
-      const mount = volume.readonly ? `${volume.host}:${volume.container}:ro` : `${volume.host}:${volume.container}`;
-      dockerArgs.push('-v', mount);
-    });
+		// Add port mappings
+		config.ports.forEach(port => {
+			dockerArgs.push('-p', `${port.host}:${port.container}`);
+		});
 
-    // Add environment variables
-    Object.entries(config.environment).forEach(([key, value]) => {
-      dockerArgs.push('-e', `${key}=${value}`);
-    });
+		// Add volume mounts
+		config.volumes.forEach(volume => {
+			const mount = volume.readonly ? `${volume.host}:${volume.container}:ro` : `${volume.host}:${volume.container}`;
+			dockerArgs.push('-v', mount);
+		});
 
-    // Add image
-    dockerArgs.push(config.image);
+		// Add environment variables
+		Object.entries(config.environment).forEach(([key, value]) => {
+			dockerArgs.push('-e', `${key}=${value}`);
+		});
 
-    const process = spawn('docker', dockerArgs, {
-      stdio: ['pipe', 'pipe', 'pipe'],
-      detached: false
-    });
+		// Add image
+		dockerArgs.push(config.image);
 
-    return new Promise((resolve, reject) => {
-      let output = '';
-      let errorOutput = '';
+		const process = spawn('docker', dockerArgs, {
+			stdio: ['pipe', 'pipe', 'pipe'],
+			detached: false
+		});
 
-      process.stdout?.on('data', (data) => {
-        output += data.toString();
-      });
+		return new Promise((resolve, reject) => {
+			let output = '';
+			let errorOutput = '';
 
-      process.stderr?.on('data', (data) => {
-        errorOutput += data.toString();
-      });
+			process.stdout?.on('data', (data) => {
+				output += data.toString();
+			});
 
-      process.on('close', (code) => {
-        if (code === 0) {
-          resolve(process);
-        } else {
-          reject(new Error(`Docker container failed to start: ${errorOutput}`));
-        }
-      });
+			process.stderr?.on('data', (data) => {
+				errorOutput += data.toString();
+			});
 
-      process.on('error', (error) => {
-        reject(error);
-      });
+			process.on('close', (code) => {
+				if (code === 0) {
+					resolve(process);
+				} else {
+					reject(new Error(`Docker container failed to start: ${errorOutput}`));
+				}
+			});
 
-      // Timeout after 30 seconds
-      setTimeout(() => {
-        if (!process.killed) {
-          process.kill();
-          reject(new Error('Container startup timeout'));
-        }
-      }, 30000);
-    });
-  }
+			process.on('error', (error) => {
+				reject(error);
+			});
 
-  private async executeDockerCommand(args: string[]): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const process = spawn('docker', args, {
-        stdio: ['pipe', 'pipe', 'pipe']
-      });
+			// Timeout after 30 seconds
+			setTimeout(() => {
+				if (!process.killed) {
+					process.kill();
+					reject(new Error('Container startup timeout'));
+				}
+			}, 30000);
+		});
+	}
 
-      let output = '';
-      let errorOutput = '';
+	private async executeDockerCommand(args: string[]): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const process = spawn('docker', args, {
+				stdio: ['pipe', 'pipe', 'pipe']
+			});
 
-      process.stdout?.on('data', (data) => {
-        output += data.toString();
-      });
+			let output = '';
+			let errorOutput = '';
 
-      process.stderr?.on('data', (data) => {
-        errorOutput += data.toString();
-      });
+			process.stdout?.on('data', (data) => {
+				output += data.toString();
+			});
 
-      process.on('close', (code) => {
-        if (code === 0) {
-          resolve(output.trim());
-        } else {
-          reject(new Error(`Docker command failed: ${errorOutput}`));
-        }
-      });
+			process.stderr?.on('data', (data) => {
+				errorOutput += data.toString();
+			});
 
-      process.on('error', (error) => {
-        reject(error);
-      });
-    });
-  }
+			process.on('close', (code) => {
+				if (code === 0) {
+					resolve(output.trim());
+				} else {
+					reject(new Error(`Docker command failed: ${errorOutput}`));
+				}
+			});
 
-  private async getAvailablePort(): Promise<number> {
-    // Simple port allocation - in production, use proper port management
-    return 8080 + Math.floor(Math.random() * 1000);
-  }
+			process.on('error', (error) => {
+				reject(error);
+			});
+		});
+	}
 
-  private generateContainerId(extensionId: string): string {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substr(2, 5);
-    const sanitized = extensionId.replace(/[^a-zA-Z0-9]/g, '-');
-    return `vsembed-${sanitized}-${timestamp}-${random}`;
-  }
+	private async getAvailablePort(): Promise<number> {
+		// Simple port allocation - in production, use proper port management
+		return 8080 + Math.floor(Math.random() * 1000);
+	}
 
-  private async initializeDocker(): Promise<void> {
-    try {
-      // Check if Docker is available
-      await this.executeDockerCommand(['version']);
+	private generateContainerId(extensionId: string): string {
+		const timestamp = Date.now().toString(36);
+		const random = Math.random().toString(36).substr(2, 5);
+		const sanitized = extensionId.replace(/[^a-zA-Z0-9]/g, '-');
+		return `vsembed-${sanitized}-${timestamp}-${random}`;
+	}
 
-      // Create custom network for VSEmbed
-      try {
-        await this.executeDockerCommand([
-          'network', 'create',
-          '--driver', 'bridge',
-          '--subnet', '172.20.0.0/16',
-          '--opt', 'com.docker.network.bridge.enable_icc=false',
-          'vsembed-network'
-        ]);
-        this.networkIds.add('vsembed-network');
-      } catch (error) {
-        // Network might already exist
-        console.log('VSEmbed network already exists or failed to create');
-      }
+	private async initializeDocker(): Promise<void> {
+		try {
+			// Check if Docker is available
+			await this.executeDockerCommand(['version']);
 
-      this.emit('dockerInitialized');
-    } catch (error) {
-      this.emit('dockerError', { error: 'Docker not available' });
-      throw new Error('Docker is not available or not running');
-    }
-  }
+			// Create custom network for VSEmbed
+			try {
+				await this.executeDockerCommand([
+					'network', 'create',
+					'--driver', 'bridge',
+					'--subnet', '172.20.0.0/16',
+					'--opt', 'com.docker.network.bridge.enable_icc=false',
+					'vsembed-network'
+				]);
+				this.networkIds.add('vsembed-network');
+			} catch (error) {
+				// Network might already exist
+				console.log('VSEmbed network already exists or failed to create');
+			}
 
-  private startMonitoring(): void {
-    this.monitoringInterval = setInterval(async () => {
-      await this.updateMetrics();
-    }, 10000); // Every 10 seconds
-  }
+			this.emit('dockerInitialized');
+		} catch (error) {
+			this.emit('dockerError', { error: 'Docker not available' });
+			throw new Error('Docker is not available or not running');
+		}
+	}
 
-  private async updateMetrics(): Promise<void> {
-    try {
-      // Update container health status
-      for (const [containerId, sandbox] of this.containers) {
-        if (sandbox.status === 'running') {
-          try {
-            const healthOutput = await this.executeDockerCommand(['inspect', '--format={{.State.Health.Status}}', containerId]);
-            const isHealthy = healthOutput.trim() === 'healthy';
-            this.metrics.containerHealth.set(containerId, isHealthy);
+	private startMonitoring(): void {
+		this.monitoringInterval = setInterval(async () => {
+			await this.updateMetrics();
+		}, 10000); // Every 10 seconds
+	}
 
-            if (!isHealthy) {
-              this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
-            }
-          } catch (error) {
-            this.metrics.containerHealth.set(containerId, false);
-            this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
-          }
-        }
-      }
+	private async updateMetrics(): Promise<void> {
+		try {
+			// Update container health status
+			for (const [containerId, sandbox] of this.containers) {
+				if (sandbox.status === 'running') {
+					try {
+						const healthOutput = await this.executeDockerCommand(['inspect', '--format={{.State.Health.Status}}', containerId]);
+						const isHealthy = healthOutput.trim() === 'healthy';
+						this.metrics.containerHealth.set(containerId, isHealthy);
 
-      // Update overall metrics
-      this.metrics.runningContainers = Array.from(this.containers.values())
-        .filter(s => s.status === 'running').length;
+						if (!isHealthy) {
+							this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
+						}
+					} catch (error) {
+						this.metrics.containerHealth.set(containerId, false);
+						this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
+					}
+				}
+			}
 
-      this.emit('metricsUpdated', this.metrics);
-    } catch (error) {
-      console.error('Failed to update Docker metrics:', error);
-    }
-  }
+			// Update overall metrics
+			this.metrics.runningContainers = Array.from(this.containers.values())
+				.filter(s => s.status === 'running').length;
 
-  private setupCleanup(): void {
-    this.cleanupInterval = setInterval(async () => {
-      await this.cleanupIdleContainers();
-    }, 60000); // Every minute
-  }
+			this.emit('metricsUpdated', this.metrics);
+		} catch (error) {
+			console.error('Failed to update Docker metrics:', error);
+		}
+	}
 
-  private async cleanupIdleContainers(): Promise<void> {
-    const idleThreshold = 30 * 60 * 1000; // 30 minutes
-    const now = new Date();
+	private setupCleanup(): void {
+		this.cleanupInterval = setInterval(async () => {
+			await this.cleanupIdleContainers();
+		}, 60000); // Every minute
+	}
 
-    for (const [containerId, sandbox] of this.containers) {
-      const idleTime = now.getTime() - sandbox.lastAccessed.getTime();
-      
-      if (idleTime > idleThreshold && sandbox.status === 'running') {
-        try {
-          await this.stopSandbox(containerId);
-          this.emit('containerCleaned', { containerId, extensionId: sandbox.extensionId, idleTime });
-        } catch (error) {
-          console.error(`Failed to cleanup container ${containerId}:`, error);
-        }
-      }
-    }
-  }
+	private async cleanupIdleContainers(): Promise<void> {
+		const idleThreshold = 30 * 60 * 1000; // 30 minutes
+		const now = new Date();
 
-  public async shutdown(): Promise<void> {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-    }
-    
-    if (this.monitoringInterval) {
-      clearInterval(this.monitoringInterval);
-    }
+		for (const [containerId, sandbox] of this.containers) {
+			const idleTime = now.getTime() - sandbox.lastAccessed.getTime();
 
-    // Stop all running containers
-    const stopPromises = Array.from(this.containers.keys()).map(containerId => 
-      this.stopSandbox(containerId).catch(console.error)
-    );
-    
-    await Promise.all(stopPromises);
+			if (idleTime > idleThreshold && sandbox.status === 'running') {
+				try {
+					await this.stopSandbox(containerId);
+					this.emit('containerCleaned', { containerId, extensionId: sandbox.extensionId, idleTime });
+				} catch (error) {
+					console.error(`Failed to cleanup container ${containerId}:`, error);
+				}
+			}
+		}
+	}
 
-    // Clean up networks
-    for (const networkId of this.networkIds) {
-      try {
-        await this.executeDockerCommand(['network', 'rm', networkId]);
-      } catch (error) {
-        console.error(`Failed to remove network ${networkId}:`, error);
-      }
-    }
+	public async shutdown(): Promise<void> {
+		if (this.cleanupInterval) {
+			clearInterval(this.cleanupInterval);
+		}
 
-    this.emit('shutdown');
-  }
+		if (this.monitoringInterval) {
+			clearInterval(this.monitoringInterval);
+		}
+
+		// Stop all running containers
+		const stopPromises = Array.from(this.containers.keys()).map(containerId =>
+			this.stopSandbox(containerId).catch(console.error)
+		);
+
+		await Promise.all(stopPromises);
+
+		// Clean up networks
+		for (const networkId of this.networkIds) {
+			try {
+				await this.executeDockerCommand(['network', 'rm', networkId]);
+			} catch (error) {
+				console.error(`Failed to remove network ${networkId}:`, error);
+			}
+		}
+
+		this.emit('shutdown');
+	}
 }

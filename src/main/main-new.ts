@@ -32,7 +32,7 @@ class VSEmbedApplication {
 		this.secretsManager = new SecretsManager();
 		this.runnerManager = new RunnerManager();
 		this.securityManager = new SecurityManager();
-		
+
 		// Initialize new components
 		this.extensionRecommender = new ExtensionRecommender();
 		this.vscodeBridge = new VSCodeBridge();
@@ -425,9 +425,9 @@ class VSEmbedApplication {
 	private setupShutdownHandlers(): void {
 		app.on('before-quit', async (event) => {
 			event.preventDefault();
-			
+
 			console.log('Shutting down VSEmbed components...');
-			
+
 			try {
 				// Gracefully shutdown all components
 				await Promise.all([
@@ -436,7 +436,7 @@ class VSEmbedApplication {
 					this.performanceOptimizer.shutdown(),
 					this.vscodeBridge.shutdown(),
 				]);
-				
+
 				console.log('All components shut down successfully');
 				app.exit(0);
 			} catch (error) {
@@ -508,7 +508,7 @@ class VSEmbedApplication {
 		const status = `Docker Containers: ${metrics.runningContainers}/${metrics.totalContainers}
 Memory Usage: ${(metrics.memoryUsage / 1024 / 1024).toFixed(2)} MB
 Security Events: ${metrics.securityEvents}`;
-		
+
 		dialog.showMessageBox(this.mainWindow!, {
 			type: 'info',
 			title: 'Docker Status',

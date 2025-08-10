@@ -3,594 +3,594 @@ import * as vscode from 'vscode';
 import { LRUCache } from 'lru-cache';
 
 export interface CacheEntry<T = any> {
-  key: string;
-  value: T;
-  timestamp: number;
-  hits: number;
-  size: number;
-  ttl?: number;
+	key: string;
+	value: T;
+	timestamp: number;
+	hits: number;
+	size: number;
+	ttl?: number;
 }
 
 export interface PerformanceMetrics {
-  cacheHits: number;
-  cacheMisses: number;
-  cacheHitRate: number;
-  memoryUsage: NodeJS.MemoryUsage;
-  cpuUsage: NodeJS.CpuUsage;
-  lazyLoadedModules: string[];
-  performanceTimings: Map<string, number>;
-  resourceUsage: {
-    extensions: number;
-    languageServers: number;
-    workers: number;
-    webviews: number;
-  };
+	cacheHits: number;
+	cacheMisses: number;
+	cacheHitRate: number;
+	memoryUsage: NodeJS.MemoryUsage;
+	cpuUsage: NodeJS.CpuUsage;
+	lazyLoadedModules: string[];
+	performanceTimings: Map<string, number>;
+	resourceUsage: {
+		extensions: number;
+		languageServers: number;
+		workers: number;
+		webviews: number;
+	};
 }
 
 export interface OptimizationConfig {
-  cache: {
-    maxSize: number;
-    ttl: number;
-    enableCompression: boolean;
-    persistToDisk: boolean;
-  };
-  lazyLoading: {
-    enabled: boolean;
-    preloadThreshold: number;
-    modulePattern: RegExp[];
-  };
-  memoryManagement: {
-    gcThreshold: number;
-    maxHeapSize: number;
-    enableMonitoring: boolean;
-  };
-  resourcePooling: {
-    maxWorkers: number;
-    maxLanguageServers: number;
-    workerIdleTimeout: number;
-  };
+	cache: {
+		maxSize: number;
+		ttl: number;
+		enableCompression: boolean;
+		persistToDisk: boolean;
+	};
+	lazyLoading: {
+		enabled: boolean;
+		preloadThreshold: number;
+		modulePattern: RegExp[];
+	};
+	memoryManagement: {
+		gcThreshold: number;
+		maxHeapSize: number;
+		enableMonitoring: boolean;
+	};
+	resourcePooling: {
+		maxWorkers: number;
+		maxLanguageServers: number;
+		workerIdleTimeout: number;
+	};
 }
 
 class IntelligentCache<T = any> extends EventEmitter {
-  private cache: LRUCache<string, CacheEntry<T>>;
-  private accessPatterns: Map<string, number[]> = new Map();
-  private compressionEnabled: boolean;
-  private persistPath?: string;
+	private cache: LRUCache<string, CacheEntry<T>>;
+	private accessPatterns: Map<string, number[]> = new Map();
+	private compressionEnabled: boolean;
+	private persistPath?: string;
 
-  constructor(private config: OptimizationConfig['cache']) {
-    super();
-    
-    this.cache = new LRUCache({
-      max: config.maxSize,
-      ttl: config.ttl,
-      updateAgeOnGet: true,
-      allowStale: false,
-      sizeCalculation: (entry: CacheEntry<T>) => entry.size
-    });
+	constructor(private config: OptimizationConfig['cache']) {
+		super();
 
-    this.compressionEnabled = config.enableCompression;
-    
-    if (config.persistToDisk) {
-      this.setupPersistence();
-    }
+		this.cache = new LRUCache({
+			max: config.maxSize,
+			ttl: config.ttl,
+			updateAgeOnGet: true,
+			allowStale: false,
+			sizeCalculation: (entry: CacheEntry<T>) => entry.size
+		});
 
-    this.setupMonitoring();
-  }
+		this.compressionEnabled = config.enableCompression;
 
-  set(key: string, value: T, ttl?: number): void {
-    const entry: CacheEntry<T> = {
-      key,
-      value,
-      timestamp: Date.now(),
-      hits: 0,
-      size: this.calculateSize(value),
-      ttl
-    };
+		if (config.persistToDisk) {
+			this.setupPersistence();
+		}
 
-    // Track access patterns
-    this.recordAccess(key);
+		this.setupMonitoring();
+	}
 
-    this.cache.set(key, entry);
-    this.emit('set', { key, size: entry.size });
-  }
+	set(key: string, value: T, ttl?: number): void {
+		const entry: CacheEntry<T> = {
+			key,
+			value,
+			timestamp: Date.now(),
+			hits: 0,
+			size: this.calculateSize(value),
+			ttl
+		};
 
-  get(key: string): T | undefined {
-    const entry = this.cache.get(key);
-    
-    if (entry) {
-      entry.hits++;
-      this.recordAccess(key);
-      this.emit('hit', { key, hits: entry.hits });
-      return entry.value;
-    }
+		// Track access patterns
+		this.recordAccess(key);
 
-    this.emit('miss', { key });
-    return undefined;
-  }
+		this.cache.set(key, entry);
+		this.emit('set', { key, size: entry.size });
+	}
 
-  has(key: string): boolean {
-    return this.cache.has(key);
-  }
+	get(key: string): T | undefined {
+		const entry = this.cache.get(key);
 
-  delete(key: string): boolean {
-    const deleted = this.cache.delete(key);
-    if (deleted) {
-      this.emit('delete', { key });
-    }
-    return deleted;
-  }
+		if (entry) {
+			entry.hits++;
+			this.recordAccess(key);
+			this.emit('hit', { key, hits: entry.hits });
+			return entry.value;
+		}
 
-  clear(): void {
-    this.cache.clear();
-    this.accessPatterns.clear();
-    this.emit('clear');
-  }
+		this.emit('miss', { key });
+		return undefined;
+	}
 
-  getStats(): {
-    size: number;
-    maxSize: number;
-    hitRate: number;
-    memoryUsage: number;
-  } {
-    const hits = Array.from(this.cache.values()).reduce((sum, entry) => sum + entry.hits, 0);
-    const totalRequests = hits + this.cache.size;
-    
-    return {
-      size: this.cache.size,
-      maxSize: this.cache.max,
-      hitRate: totalRequests > 0 ? hits / totalRequests : 0,
-      memoryUsage: this.cache.calculatedSize || 0
-    };
-  }
+	has(key: string): boolean {
+		return this.cache.has(key);
+	}
 
-  // Predictive caching based on access patterns
-  getPredictedKeys(): string[] {
-    const predictions: { key: string; score: number }[] = [];
-    
-    this.accessPatterns.forEach((accesses, key) => {
-      if (accesses.length >= 3) {
-        // Calculate frequency and recency score
-        const now = Date.now();
-        const recentAccesses = accesses.filter(time => now - time < 300000); // 5 minutes
-        const frequency = recentAccesses.length / accesses.length;
-        const recency = Math.max(0, 1 - (now - Math.max(...accesses)) / 300000);
-        
-        predictions.push({
-          key,
-          score: frequency * 0.7 + recency * 0.3
-        });
-      }
-    });
+	delete(key: string): boolean {
+		const deleted = this.cache.delete(key);
+		if (deleted) {
+			this.emit('delete', { key });
+		}
+		return deleted;
+	}
 
-    return predictions
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10)
-      .map(p => p.key);
-  }
+	clear(): void {
+		this.cache.clear();
+		this.accessPatterns.clear();
+		this.emit('clear');
+	}
 
-  private recordAccess(key: string): void {
-    const accesses = this.accessPatterns.get(key) || [];
-    accesses.push(Date.now());
-    
-    // Keep only last 50 accesses
-    if (accesses.length > 50) {
-      accesses.splice(0, accesses.length - 50);
-    }
-    
-    this.accessPatterns.set(key, accesses);
-  }
+	getStats(): {
+		size: number;
+		maxSize: number;
+		hitRate: number;
+		memoryUsage: number;
+	} {
+		const hits = Array.from(this.cache.values()).reduce((sum, entry) => sum + entry.hits, 0);
+		const totalRequests = hits + this.cache.size;
 
-  private calculateSize(value: any): number {
-    return JSON.stringify(value).length;
-  }
+		return {
+			size: this.cache.size,
+			maxSize: this.cache.max,
+			hitRate: totalRequests > 0 ? hits / totalRequests : 0,
+			memoryUsage: this.cache.calculatedSize || 0
+		};
+	}
 
-  private setupPersistence(): void {
-    // Simplified persistence - in production, use proper serialization
-    this.persistPath = vscode.workspace.getConfiguration().get('vsembed.cache.path') as string;
-  }
+	// Predictive caching based on access patterns
+	getPredictedKeys(): string[] {
+		const predictions: { key: string; score: number }[] = [];
 
-  private setupMonitoring(): void {
-    setInterval(() => {
-      const stats = this.getStats();
-      this.emit('stats', stats);
-      
-      // Auto-cleanup if memory usage is high
-      if (stats.memoryUsage > this.config.maxSize * 0.9) {
-        this.performCleanup();
-      }
-    }, 30000); // Every 30 seconds
-  }
+		this.accessPatterns.forEach((accesses, key) => {
+			if (accesses.length >= 3) {
+				// Calculate frequency and recency score
+				const now = Date.now();
+				const recentAccesses = accesses.filter(time => now - time < 300000); // 5 minutes
+				const frequency = recentAccesses.length / accesses.length;
+				const recency = Math.max(0, 1 - (now - Math.max(...accesses)) / 300000);
 
-  private performCleanup(): void {
-    // Remove least recently used items with low hit rates
-    const entries = Array.from(this.cache.entries());
-    const candidates = entries
-      .map(([key, entry]) => ({ key, entry }))
-      .filter(({ entry }) => entry.hits < 2)
-      .sort((a, b) => a.entry.timestamp - b.entry.timestamp);
+				predictions.push({
+					key,
+					score: frequency * 0.7 + recency * 0.3
+				});
+			}
+		});
 
-    const toRemove = Math.min(candidates.length, Math.floor(this.cache.size * 0.1));
-    for (let i = 0; i < toRemove; i++) {
-      this.cache.delete(candidates[i].key);
-    }
+		return predictions
+			.sort((a, b) => b.score - a.score)
+			.slice(0, 10)
+			.map(p => p.key);
+	}
 
-    this.emit('cleanup', { removed: toRemove });
-  }
+	private recordAccess(key: string): void {
+		const accesses = this.accessPatterns.get(key) || [];
+		accesses.push(Date.now());
+
+		// Keep only last 50 accesses
+		if (accesses.length > 50) {
+			accesses.splice(0, accesses.length - 50);
+		}
+
+		this.accessPatterns.set(key, accesses);
+	}
+
+	private calculateSize(value: any): number {
+		return JSON.stringify(value).length;
+	}
+
+	private setupPersistence(): void {
+		// Simplified persistence - in production, use proper serialization
+		this.persistPath = vscode.workspace.getConfiguration().get('vsembed.cache.path') as string;
+	}
+
+	private setupMonitoring(): void {
+		setInterval(() => {
+			const stats = this.getStats();
+			this.emit('stats', stats);
+
+			// Auto-cleanup if memory usage is high
+			if (stats.memoryUsage > this.config.maxSize * 0.9) {
+				this.performCleanup();
+			}
+		}, 30000); // Every 30 seconds
+	}
+
+	private performCleanup(): void {
+		// Remove least recently used items with low hit rates
+		const entries = Array.from(this.cache.entries());
+		const candidates = entries
+			.map(([key, entry]) => ({ key, entry }))
+			.filter(({ entry }) => entry.hits < 2)
+			.sort((a, b) => a.entry.timestamp - b.entry.timestamp);
+
+		const toRemove = Math.min(candidates.length, Math.floor(this.cache.size * 0.1));
+		for (let i = 0; i < toRemove; i++) {
+			this.cache.delete(candidates[i].key);
+		}
+
+		this.emit('cleanup', { removed: toRemove });
+	}
 }
 
 class LazyModuleLoader extends EventEmitter {
-  private loadedModules: Set<string> = new Set();
-  private preloadQueue: string[] = [];
-  private isLoading: Map<string, Promise<any>> = new Map();
+	private loadedModules: Set<string> = new Set();
+	private preloadQueue: string[] = [];
+	private isLoading: Map<string, Promise<any>> = new Map();
 
-  constructor(private config: OptimizationConfig['lazyLoading']) {
-    super();
-    this.setupPreloading();
-  }
+	constructor(private config: OptimizationConfig['lazyLoading']) {
+		super();
+		this.setupPreloading();
+	}
 
-  async loadModule(modulePath: string): Promise<any> {
-    if (this.loadedModules.has(modulePath)) {
-      this.emit('hit', { module: modulePath });
-      return require(modulePath);
-    }
+	async loadModule(modulePath: string): Promise<any> {
+		if (this.loadedModules.has(modulePath)) {
+			this.emit('hit', { module: modulePath });
+			return require(modulePath);
+		}
 
-    // Check if already loading
-    const existingLoad = this.isLoading.get(modulePath);
-    if (existingLoad) {
-      return existingLoad;
-    }
+		// Check if already loading
+		const existingLoad = this.isLoading.get(modulePath);
+		if (existingLoad) {
+			return existingLoad;
+		}
 
-    const loadPromise = this.performLoad(modulePath);
-    this.isLoading.set(modulePath, loadPromise);
+		const loadPromise = this.performLoad(modulePath);
+		this.isLoading.set(modulePath, loadPromise);
 
-    try {
-      const module = await loadPromise;
-      this.loadedModules.add(modulePath);
-      this.emit('load', { module: modulePath });
-      return module;
-    } finally {
-      this.isLoading.delete(modulePath);
-    }
-  }
+		try {
+			const module = await loadPromise;
+			this.loadedModules.add(modulePath);
+			this.emit('load', { module: modulePath });
+			return module;
+		} finally {
+			this.isLoading.delete(modulePath);
+		}
+	}
 
-  preloadModule(modulePath: string): void {
-    if (!this.loadedModules.has(modulePath) && !this.preloadQueue.includes(modulePath)) {
-      this.preloadQueue.push(modulePath);
-      this.processPreloadQueue();
-    }
-  }
+	preloadModule(modulePath: string): void {
+		if (!this.loadedModules.has(modulePath) && !this.preloadQueue.includes(modulePath)) {
+			this.preloadQueue.push(modulePath);
+			this.processPreloadQueue();
+		}
+	}
 
-  isModuleLoaded(modulePath: string): boolean {
-    return this.loadedModules.has(modulePath);
-  }
+	isModuleLoaded(modulePath: string): boolean {
+		return this.loadedModules.has(modulePath);
+	}
 
-  getLoadedModules(): string[] {
-    return Array.from(this.loadedModules);
-  }
+	getLoadedModules(): string[] {
+		return Array.from(this.loadedModules);
+	}
 
-  private async performLoad(modulePath: string): Promise<any> {
-    const startTime = performance.now();
-    
-    try {
-      const module = await import(modulePath);
-      const loadTime = performance.now() - startTime;
-      
-      this.emit('loadComplete', {
-        module: modulePath,
-        loadTime,
-        success: true
-      });
-      
-      return module;
-    } catch (error) {
-      const loadTime = performance.now() - startTime;
-      
-      this.emit('loadComplete', {
-        module: modulePath,
-        loadTime,
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-      
-      throw error;
-    }
-  }
+	private async performLoad(modulePath: string): Promise<any> {
+		const startTime = performance.now();
 
-  private setupPreloading(): void {
-    if (!this.config.enabled) return;
+		try {
+			const module = await import(modulePath);
+			const loadTime = performance.now() - startTime;
 
-    // Preload based on usage patterns
-    setInterval(() => {
-      this.processPreloadQueue();
-    }, 5000);
-  }
+			this.emit('loadComplete', {
+				module: modulePath,
+				loadTime,
+				success: true
+			});
 
-  private async processPreloadQueue(): Promise<void> {
-    if (this.preloadQueue.length === 0) return;
-    
-    const module = this.preloadQueue.shift()!;
-    
-    try {
-      await this.loadModule(module);
-    } catch (error) {
-      console.warn(`Failed to preload module ${module}:`, error);
-    }
-  }
+			return module;
+		} catch (error) {
+			const loadTime = performance.now() - startTime;
+
+			this.emit('loadComplete', {
+				module: modulePath,
+				loadTime,
+				success: false,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			});
+
+			throw error;
+		}
+	}
+
+	private setupPreloading(): void {
+		if (!this.config.enabled) return;
+
+		// Preload based on usage patterns
+		setInterval(() => {
+			this.processPreloadQueue();
+		}, 5000);
+	}
+
+	private async processPreloadQueue(): Promise<void> {
+		if (this.preloadQueue.length === 0) return;
+
+		const module = this.preloadQueue.shift()!;
+
+		try {
+			await this.loadModule(module);
+		} catch (error) {
+			console.warn(`Failed to preload module ${module}:`, error);
+		}
+	}
 }
 
 class ResourcePool extends EventEmitter {
-  private workers: Worker[] = [];
-  private availableWorkers: Worker[] = [];
-  private workerTasks: Map<Worker, any> = new Map();
-  private languageServers: Map<string, any> = new Map();
-  private webviews: Set<vscode.WebviewPanel> = new Set();
+	private workers: Worker[] = [];
+	private availableWorkers: Worker[] = [];
+	private workerTasks: Map<Worker, any> = new Map();
+	private languageServers: Map<string, any> = new Map();
+	private webviews: Set<vscode.WebviewPanel> = new Set();
 
-  constructor(private config: OptimizationConfig['resourcePooling']) {
-    super();
-    this.initializeWorkerPool();
-    this.setupCleanup();
-  }
+	constructor(private config: OptimizationConfig['resourcePooling']) {
+		super();
+		this.initializeWorkerPool();
+		this.setupCleanup();
+	}
 
-  async getWorker(): Promise<Worker> {
-    if (this.availableWorkers.length > 0) {
-      const worker = this.availableWorkers.pop()!;
-      this.emit('workerAssigned', { workerId: this.getWorkerId(worker) });
-      return worker;
-    }
+	async getWorker(): Promise<Worker> {
+		if (this.availableWorkers.length > 0) {
+			const worker = this.availableWorkers.pop()!;
+			this.emit('workerAssigned', { workerId: this.getWorkerId(worker) });
+			return worker;
+		}
 
-    if (this.workers.length < this.config.maxWorkers) {
-      const worker = await this.createWorker();
-      this.workers.push(worker);
-      this.emit('workerCreated', { workerId: this.getWorkerId(worker) });
-      return worker;
-    }
+		if (this.workers.length < this.config.maxWorkers) {
+			const worker = await this.createWorker();
+			this.workers.push(worker);
+			this.emit('workerCreated', { workerId: this.getWorkerId(worker) });
+			return worker;
+		}
 
-    // Wait for available worker
-    return new Promise((resolve) => {
-      const checkAvailable = () => {
-        if (this.availableWorkers.length > 0) {
-          const worker = this.availableWorkers.pop()!;
-          this.emit('workerAssigned', { workerId: this.getWorkerId(worker) });
-          resolve(worker);
-        } else {
-          setTimeout(checkAvailable, 100);
-        }
-      };
-      checkAvailable();
-    });
-  }
+		// Wait for available worker
+		return new Promise((resolve) => {
+			const checkAvailable = () => {
+				if (this.availableWorkers.length > 0) {
+					const worker = this.availableWorkers.pop()!;
+					this.emit('workerAssigned', { workerId: this.getWorkerId(worker) });
+					resolve(worker);
+				} else {
+					setTimeout(checkAvailable, 100);
+				}
+			};
+			checkAvailable();
+		});
+	}
 
-  releaseWorker(worker: Worker): void {
-    const task = this.workerTasks.get(worker);
-    if (task) {
-      this.workerTasks.delete(worker);
-    }
-    
-    this.availableWorkers.push(worker);
-    this.emit('workerReleased', { workerId: this.getWorkerId(worker) });
-  }
+	releaseWorker(worker: Worker): void {
+		const task = this.workerTasks.get(worker);
+		if (task) {
+			this.workerTasks.delete(worker);
+		}
 
-  async getLanguageServer(languageId: string): Promise<any> {
-    if (this.languageServers.has(languageId)) {
-      this.emit('languageServerHit', { languageId });
-      return this.languageServers.get(languageId);
-    }
+		this.availableWorkers.push(worker);
+		this.emit('workerReleased', { workerId: this.getWorkerId(worker) });
+	}
 
-    if (this.languageServers.size >= this.config.maxLanguageServers) {
-      // Remove least recently used
-      const lru = Array.from(this.languageServers.keys())[0];
-      this.languageServers.delete(lru);
-      this.emit('languageServerEvicted', { languageId: lru });
-    }
+	async getLanguageServer(languageId: string): Promise<any> {
+		if (this.languageServers.has(languageId)) {
+			this.emit('languageServerHit', { languageId });
+			return this.languageServers.get(languageId);
+		}
 
-    const server = await this.createLanguageServer(languageId);
-    this.languageServers.set(languageId, server);
-    this.emit('languageServerCreated', { languageId });
-    
-    return server;
-  }
+		if (this.languageServers.size >= this.config.maxLanguageServers) {
+			// Remove least recently used
+			const lru = Array.from(this.languageServers.keys())[0];
+			this.languageServers.delete(lru);
+			this.emit('languageServerEvicted', { languageId: lru });
+		}
 
-  registerWebview(webview: vscode.WebviewPanel): void {
-    this.webviews.add(webview);
-    
-    webview.onDidDispose(() => {
-      this.webviews.delete(webview);
-      this.emit('webviewDisposed', { title: webview.title });
-    });
+		const server = await this.createLanguageServer(languageId);
+		this.languageServers.set(languageId, server);
+		this.emit('languageServerCreated', { languageId });
 
-    this.emit('webviewRegistered', { title: webview.title });
-  }
+		return server;
+	}
 
-  getResourceUsage(): PerformanceMetrics['resourceUsage'] {
-    return {
-      extensions: 0, // Would track actual extension instances
-      languageServers: this.languageServers.size,
-      workers: this.workers.length,
-      webviews: this.webviews.size
-    };
-  }
+	registerWebview(webview: vscode.WebviewPanel): void {
+		this.webviews.add(webview);
 
-  private async createWorker(): Promise<Worker> {
-    // In a real implementation, this would create an actual Worker
-    // For now, return a mock worker object
-    return {} as Worker;
-  }
+		webview.onDidDispose(() => {
+			this.webviews.delete(webview);
+			this.emit('webviewDisposed', { title: webview.title });
+		});
 
-  private async createLanguageServer(languageId: string): Promise<any> {
-    // In a real implementation, this would start the language server
-    return { languageId, startTime: Date.now() };
-  }
+		this.emit('webviewRegistered', { title: webview.title });
+	}
 
-  private getWorkerId(worker: Worker): string {
-    return `worker_${this.workers.indexOf(worker)}`;
-  }
+	getResourceUsage(): PerformanceMetrics['resourceUsage'] {
+		return {
+			extensions: 0, // Would track actual extension instances
+			languageServers: this.languageServers.size,
+			workers: this.workers.length,
+			webviews: this.webviews.size
+		};
+	}
 
-  private initializeWorkerPool(): void {
-    // Pre-create some workers
-    const initialWorkers = Math.min(2, this.config.maxWorkers);
-    for (let i = 0; i < initialWorkers; i++) {
-      this.createWorker().then(worker => {
-        this.workers.push(worker);
-        this.availableWorkers.push(worker);
-      });
-    }
-  }
+	private async createWorker(): Promise<Worker> {
+		// In a real implementation, this would create an actual Worker
+		// For now, return a mock worker object
+		return {} as Worker;
+	}
 
-  private setupCleanup(): void {
-    setInterval(() => {
-      this.cleanupIdleResources();
-    }, 60000); // Every minute
-  }
+	private async createLanguageServer(languageId: string): Promise<any> {
+		// In a real implementation, this would start the language server
+		return { languageId, startTime: Date.now() };
+	}
 
-  private cleanupIdleResources(): void {
-    const now = Date.now();
-    
-    // Cleanup idle language servers
-    this.languageServers.forEach((server, languageId) => {
-      if (now - server.startTime > this.config.workerIdleTimeout) {
-        this.languageServers.delete(languageId);
-        this.emit('languageServerCleanup', { languageId });
-      }
-    });
-  }
+	private getWorkerId(worker: Worker): string {
+		return `worker_${this.workers.indexOf(worker)}`;
+	}
+
+	private initializeWorkerPool(): void {
+		// Pre-create some workers
+		const initialWorkers = Math.min(2, this.config.maxWorkers);
+		for (let i = 0; i < initialWorkers; i++) {
+			this.createWorker().then(worker => {
+				this.workers.push(worker);
+				this.availableWorkers.push(worker);
+			});
+		}
+	}
+
+	private setupCleanup(): void {
+		setInterval(() => {
+			this.cleanupIdleResources();
+		}, 60000); // Every minute
+	}
+
+	private cleanupIdleResources(): void {
+		const now = Date.now();
+
+		// Cleanup idle language servers
+		this.languageServers.forEach((server, languageId) => {
+			if (now - server.startTime > this.config.workerIdleTimeout) {
+				this.languageServers.delete(languageId);
+				this.emit('languageServerCleanup', { languageId });
+			}
+		});
+	}
 }
 
 export class PerformanceOptimizer extends EventEmitter {
-  private cache: IntelligentCache;
-  private lazyLoader: LazyModuleLoader;
-  private resourcePool: ResourcePool;
-  private metrics: PerformanceMetrics;
-  private performanceTimings: Map<string, number> = new Map();
-  private memoryMonitor?: NodeJS.Timer;
+	private cache: IntelligentCache;
+	private lazyLoader: LazyModuleLoader;
+	private resourcePool: ResourcePool;
+	private metrics: PerformanceMetrics;
+	private performanceTimings: Map<string, number> = new Map();
+	private memoryMonitor?: NodeJS.Timer;
 
-  constructor(private config: OptimizationConfig) {
-    super();
-    
-    this.cache = new IntelligentCache(config.cache);
-    this.lazyLoader = new LazyModuleLoader(config.lazyLoading);
-    this.resourcePool = new ResourcePool(config.resourcePooling);
-    
-    this.metrics = {
-      cacheHits: 0,
-      cacheMisses: 0,
-      cacheHitRate: 0,
-      memoryUsage: process.memoryUsage(),
-      cpuUsage: process.cpuUsage(),
-      lazyLoadedModules: [],
-      performanceTimings: new Map(),
-      resourceUsage: {
-        extensions: 0,
-        languageServers: 0,
-        workers: 0,
-        webviews: 0
-      }
-    };
+	constructor(private config: OptimizationConfig) {
+		super();
 
-    this.setupEventListeners();
-    this.startMonitoring();
-  }
+		this.cache = new IntelligentCache(config.cache);
+		this.lazyLoader = new LazyModuleLoader(config.lazyLoading);
+		this.resourcePool = new ResourcePool(config.resourcePooling);
 
-  // Cache operations
-  cacheSet(key: string, value: any, ttl?: number): void {
-    this.cache.set(key, value, ttl);
-  }
+		this.metrics = {
+			cacheHits: 0,
+			cacheMisses: 0,
+			cacheHitRate: 0,
+			memoryUsage: process.memoryUsage(),
+			cpuUsage: process.cpuUsage(),
+			lazyLoadedModules: [],
+			performanceTimings: new Map(),
+			resourceUsage: {
+				extensions: 0,
+				languageServers: 0,
+				workers: 0,
+				webviews: 0
+			}
+		};
 
-  cacheGet<T = any>(key: string): T | undefined {
-    return this.cache.get(key);
-  }
+		this.setupEventListeners();
+		this.startMonitoring();
+	}
 
-  cacheHas(key: string): boolean {
-    return this.cache.has(key);
-  }
+	// Cache operations
+	cacheSet(key: string, value: any, ttl?: number): void {
+		this.cache.set(key, value, ttl);
+	}
 
-  cacheDelete(key: string): boolean {
-    return this.cache.delete(key);
-  }
+	cacheGet<T = any>(key: string): T | undefined {
+		return this.cache.get(key);
+	}
 
-  cacheClear(): void {
-    this.cache.clear();
-  }
+	cacheHas(key: string): boolean {
+		return this.cache.has(key);
+	}
 
-  // Lazy loading operations
-  async loadModule(modulePath: string): Promise<any> {
-    return this.lazyLoader.loadModule(modulePath);
-  }
+	cacheDelete(key: string): boolean {
+		return this.cache.delete(key);
+	}
 
-  preloadModule(modulePath: string): void {
-    this.lazyLoader.preloadModule(modulePath);
-  }
+	cacheClear(): void {
+		this.cache.clear();
+	}
 
-  // Resource pool operations
-  async getWorker(): Promise<Worker> {
-    return this.resourcePool.getWorker();
-  }
+	// Lazy loading operations
+	async loadModule(modulePath: string): Promise<any> {
+		return this.lazyLoader.loadModule(modulePath);
+	}
 
-  releaseWorker(worker: Worker): void {
-    this.resourcePool.releaseWorker(worker);
-  }
+	preloadModule(modulePath: string): void {
+		this.lazyLoader.preloadModule(modulePath);
+	}
 
-  async getLanguageServer(languageId: string): Promise<any> {
-    return this.resourcePool.getLanguageServer(languageId);
-  }
+	// Resource pool operations
+	async getWorker(): Promise<Worker> {
+		return this.resourcePool.getWorker();
+	}
 
-  registerWebview(webview: vscode.WebviewPanel): void {
-    this.resourcePool.registerWebview(webview);
-  }
+	releaseWorker(worker: Worker): void {
+		this.resourcePool.releaseWorker(worker);
+	}
 
-  // Performance measurement
-  startTiming(operation: string): void {
-    this.performanceTimings.set(operation, performance.now());
-  }
+	async getLanguageServer(languageId: string): Promise<any> {
+		return this.resourcePool.getLanguageServer(languageId);
+	}
 
-  endTiming(operation: string): number {
-    const startTime = this.performanceTimings.get(operation);
-    if (startTime) {
-      const duration = performance.now() - startTime;
-      this.performanceTimings.delete(operation);
-      this.emit('timing', { operation, duration });
-      return duration;
-    }
-    return 0;
-  }
+	registerWebview(webview: vscode.WebviewPanel): void {
+		this.resourcePool.registerWebview(webview);
+	}
 
-  // Memory management
-  forceGarbageCollection(): void {
-    if (global.gc) {
-      global.gc();
-      this.emit('gc', { timestamp: Date.now() });
-    }
-  }
+	// Performance measurement
+	startTiming(operation: string): void {
+		this.performanceTimings.set(operation, performance.now());
+	}
 
-  checkMemoryUsage(): NodeJS.MemoryUsage {
-    const usage = process.memoryUsage();
-    
-    if (usage.heapUsed > this.config.memoryManagement.gcThreshold) {
-      this.forceGarbageCollection();
-    }
-    
-    return usage;
-  }
+	endTiming(operation: string): number {
+		const startTime = this.performanceTimings.get(operation);
+		if (startTime) {
+			const duration = performance.now() - startTime;
+			this.performanceTimings.delete(operation);
+			this.emit('timing', { operation, duration });
+			return duration;
+		}
+		return 0;
+	}
 
-  // Analytics and reporting
-  getMetrics(): PerformanceMetrics {
-    const cacheStats = this.cache.getStats();
-    
-    this.metrics.cacheHits = cacheStats.hitRate * cacheStats.size;
-    this.metrics.cacheMisses = cacheStats.size - this.metrics.cacheHits;
-    this.metrics.cacheHitRate = cacheStats.hitRate;
-    this.metrics.memoryUsage = this.checkMemoryUsage();
-    this.metrics.cpuUsage = process.cpuUsage();
-    this.metrics.lazyLoadedModules = this.lazyLoader.getLoadedModules();
-    this.metrics.resourceUsage = this.resourcePool.getResourceUsage();
-    this.metrics.performanceTimings = new Map(this.performanceTimings);
-    
-    return { ...this.metrics };
-  }
+	// Memory management
+	forceGarbageCollection(): void {
+		if (global.gc) {
+			global.gc();
+			this.emit('gc', { timestamp: Date.now() });
+		}
+	}
 
-  generateReport(): string {
-    const metrics = this.getMetrics();
-    
-    return `
+	checkMemoryUsage(): NodeJS.MemoryUsage {
+		const usage = process.memoryUsage();
+
+		if (usage.heapUsed > this.config.memoryManagement.gcThreshold) {
+			this.forceGarbageCollection();
+		}
+
+		return usage;
+	}
+
+	// Analytics and reporting
+	getMetrics(): PerformanceMetrics {
+		const cacheStats = this.cache.getStats();
+
+		this.metrics.cacheHits = cacheStats.hitRate * cacheStats.size;
+		this.metrics.cacheMisses = cacheStats.size - this.metrics.cacheHits;
+		this.metrics.cacheHitRate = cacheStats.hitRate;
+		this.metrics.memoryUsage = this.checkMemoryUsage();
+		this.metrics.cpuUsage = process.cpuUsage();
+		this.metrics.lazyLoadedModules = this.lazyLoader.getLoadedModules();
+		this.metrics.resourceUsage = this.resourcePool.getResourceUsage();
+		this.metrics.performanceTimings = new Map(this.performanceTimings);
+
+		return { ...this.metrics };
+	}
+
+	generateReport(): string {
+		const metrics = this.getMetrics();
+
+		return `
 VSEmbed Performance Report
 =========================
 
@@ -614,91 +614,91 @@ Lazy Loaded Modules: ${metrics.lazyLoadedModules.length}
 ${metrics.lazyLoadedModules.map(m => `- ${m}`).join('\n')}
 
 Performance Timings:
-${Array.from(metrics.performanceTimings.entries()).map(([op, time]) => 
-  `- ${op}: ${time.toFixed(2)}ms`
-).join('\n')}
+${Array.from(metrics.performanceTimings.entries()).map(([op, time]) =>
+			`- ${op}: ${time.toFixed(2)}ms`
+		).join('\n')}
 `;
-  }
+	}
 
-  // Optimization recommendations
-  getOptimizationRecommendations(): string[] {
-    const recommendations: string[] = [];
-    const metrics = this.getMetrics();
-    
-    if (metrics.cacheHitRate < 0.7) {
-      recommendations.push('Consider increasing cache size or TTL for better hit rates');
-    }
-    
-    if (metrics.memoryUsage.heapUsed > this.config.memoryManagement.maxHeapSize * 0.8) {
-      recommendations.push('Memory usage is high - consider enabling more aggressive garbage collection');
-    }
-    
-    if (metrics.resourceUsage.languageServers > 5) {
-      recommendations.push('Many language servers active - consider reducing concurrent servers');
-    }
-    
-    if (metrics.lazyLoadedModules.length < 10) {
-      recommendations.push('Enable more aggressive lazy loading to improve startup performance');
-    }
-    
-    return recommendations;
-  }
+	// Optimization recommendations
+	getOptimizationRecommendations(): string[] {
+		const recommendations: string[] = [];
+		const metrics = this.getMetrics();
 
-  private setupEventListeners(): void {
-    this.cache.on('hit', () => this.metrics.cacheHits++);
-    this.cache.on('miss', () => this.metrics.cacheMisses++);
-    
-    this.lazyLoader.on('load', (data) => {
-      if (!this.metrics.lazyLoadedModules.includes(data.module)) {
-        this.metrics.lazyLoadedModules.push(data.module);
-      }
-    });
-  }
+		if (metrics.cacheHitRate < 0.7) {
+			recommendations.push('Consider increasing cache size or TTL for better hit rates');
+		}
 
-  private startMonitoring(): void {
-    if (this.config.memoryManagement.enableMonitoring) {
-      this.memoryMonitor = setInterval(() => {
-        const usage = this.checkMemoryUsage();
-        this.emit('memoryUpdate', usage);
-      }, 10000); // Every 10 seconds
-    }
-  }
+		if (metrics.memoryUsage.heapUsed > this.config.memoryManagement.maxHeapSize * 0.8) {
+			recommendations.push('Memory usage is high - consider enabling more aggressive garbage collection');
+		}
 
-  public shutdown(): void {
-    if (this.memoryMonitor) {
-      clearInterval(this.memoryMonitor);
-    }
-    
-    this.cache.clear();
-    this.emit('shutdown');
-  }
+		if (metrics.resourceUsage.languageServers > 5) {
+			recommendations.push('Many language servers active - consider reducing concurrent servers');
+		}
+
+		if (metrics.lazyLoadedModules.length < 10) {
+			recommendations.push('Enable more aggressive lazy loading to improve startup performance');
+		}
+
+		return recommendations;
+	}
+
+	private setupEventListeners(): void {
+		this.cache.on('hit', () => this.metrics.cacheHits++);
+		this.cache.on('miss', () => this.metrics.cacheMisses++);
+
+		this.lazyLoader.on('load', (data) => {
+			if (!this.metrics.lazyLoadedModules.includes(data.module)) {
+				this.metrics.lazyLoadedModules.push(data.module);
+			}
+		});
+	}
+
+	private startMonitoring(): void {
+		if (this.config.memoryManagement.enableMonitoring) {
+			this.memoryMonitor = setInterval(() => {
+				const usage = this.checkMemoryUsage();
+				this.emit('memoryUpdate', usage);
+			}, 10000); // Every 10 seconds
+		}
+	}
+
+	public shutdown(): void {
+		if (this.memoryMonitor) {
+			clearInterval(this.memoryMonitor);
+		}
+
+		this.cache.clear();
+		this.emit('shutdown');
+	}
 }
 
 // Default configuration
 export const defaultOptimizationConfig: OptimizationConfig = {
-  cache: {
-    maxSize: 100 * 1024 * 1024, // 100MB
-    ttl: 5 * 60 * 1000, // 5 minutes
-    enableCompression: true,
-    persistToDisk: false
-  },
-  lazyLoading: {
-    enabled: true,
-    preloadThreshold: 3,
-    modulePattern: [
-      /^vscode\//,
-      /^@vscode\//,
-      /extensions\//
-    ]
-  },
-  memoryManagement: {
-    gcThreshold: 100 * 1024 * 1024, // 100MB
-    maxHeapSize: 512 * 1024 * 1024, // 512MB
-    enableMonitoring: true
-  },
-  resourcePooling: {
-    maxWorkers: 4,
-    maxLanguageServers: 10,
-    workerIdleTimeout: 5 * 60 * 1000 // 5 minutes
-  }
+	cache: {
+		maxSize: 100 * 1024 * 1024, // 100MB
+		ttl: 5 * 60 * 1000, // 5 minutes
+		enableCompression: true,
+		persistToDisk: false
+	},
+	lazyLoading: {
+		enabled: true,
+		preloadThreshold: 3,
+		modulePattern: [
+			/^vscode\//,
+			/^@vscode\//,
+			/extensions\//
+		]
+	},
+	memoryManagement: {
+		gcThreshold: 100 * 1024 * 1024, // 100MB
+		maxHeapSize: 512 * 1024 * 1024, // 512MB
+		enableMonitoring: true
+	},
+	resourcePooling: {
+		maxWorkers: 4,
+		maxLanguageServers: 10,
+		workerIdleTimeout: 5 * 60 * 1000 // 5 minutes
+	}
 };

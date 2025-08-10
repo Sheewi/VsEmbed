@@ -32,7 +32,7 @@ class VSEmbedApplication {
 		this.secretsManager = new SecretsManager();
 		this.runnerManager = new RunnerManager();
 		this.securityManager = new SecurityManager();
-		
+
 		// Initialize new components - ALL PROPERLY WIRED
 		this.extensionRecommender = new ExtensionRecommender();
 		this.vscodeBridge = new VSCodeBridge();
@@ -410,160 +410,204 @@ class VSEmbedApplication {
 		});
 	}
 
-	}
+}
 
 	private setupNewComponentHandlers(): void {
-		// VS Code Bridge operations
-		ipcMain.handle('vscode:execute-command', async (event, command: string, args?: any[]) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.commands', { command, args });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.vscodeBridge.executeCommand(command, args);
-		});
+	// VS Code Bridge operations
+	ipcMain.handle('vscode:execute-command', async (event, command: string, args?: any[]) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.commands', { command, args });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.vscodeBridge.executeCommand(command, args);
+	});
 
-		ipcMain.handle('vscode:get-file-content', async (event, filePath: string) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.read', { filePath });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.vscodeBridge.getFileContent(filePath);
-		});
+	ipcMain.handle('vscode:get-file-content', async (event, filePath: string) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.read', { filePath });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.vscodeBridge.getFileContent(filePath);
+	});
 
-		ipcMain.handle('vscode:write-file', async (event, filePath: string, content: string) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.write', { filePath, content });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.vscodeBridge.writeFile(filePath, content);
-		});
+	ipcMain.handle('vscode:write-file', async (event, filePath: string, content: string) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.write', { filePath, content });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.vscodeBridge.writeFile(filePath, content);
+	});
 
-		ipcMain.handle('vscode:get-hover-info', async (event, filePath: string, position: any) => {
-			return await this.vscodeBridge.getHoverInfo(filePath, position);
-		});
+	ipcMain.handle('vscode:get-hover-info', async (event, filePath: string, position: any) => {
+		return await this.vscodeBridge.getHoverInfo(filePath, position);
+	});
 
-		ipcMain.handle('vscode:get-completions', async (event, filePath: string, position: any) => {
-			return await this.vscodeBridge.getCompletions(filePath, position);
-		});
+	ipcMain.handle('vscode:get-completions', async (event, filePath: string, position: any) => {
+		return await this.vscodeBridge.getCompletions(filePath, position);
+	});
 
-		ipcMain.handle('vscode:get-definitions', async (event, filePath: string, position: any) => {
-			return await this.vscodeBridge.getDefinitions(filePath, position);
-		});
+	ipcMain.handle('vscode:get-definitions', async (event, filePath: string, position: any) => {
+		return await this.vscodeBridge.getDefinitions(filePath, position);
+	});
 
-		ipcMain.handle('vscode:get-references', async (event, filePath: string, position: any) => {
-			return await this.vscodeBridge.getReferences(filePath, position);
-		});
+	ipcMain.handle('vscode:get-references', async (event, filePath: string, position: any) => {
+		return await this.vscodeBridge.getReferences(filePath, position);
+	});
 
-		// Extension operations
-		ipcMain.handle('extensions:recommend', async (event, context: any) => {
-			return await this.extensionRecommender.recommendExtensions(context);
-		});
+	// Extension operations
+	ipcMain.handle('extensions:recommend', async (event, context: any) => {
+		return await this.extensionRecommender.recommendExtensions(context);
+	});
 
-		ipcMain.handle('extensions:install', async (event, extensionId: string) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'extensions.install', { extensionId });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.extensionRecommender.installExtension(extensionId);
-		});
+	ipcMain.handle('extensions:install', async (event, extensionId: string) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'extensions.install', { extensionId });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.extensionRecommender.installExtension(extensionId);
+	});
 
-		ipcMain.handle('extensions:get-info', async (event, extensionId: string) => {
-			return await this.extensionRecommender.getExtensionInfo(extensionId);
-		});
+	ipcMain.handle('extensions:get-info', async (event, extensionId: string) => {
+		return await this.extensionRecommender.getExtensionInfo(extensionId);
+	});
 
-		// Docker sandbox operations
-		ipcMain.handle('docker:create-sandbox', async (event, extensionId: string, config?: any) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'docker.create', { extensionId, config });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.dockerManager.createExtensionSandbox(extensionId, config);
-		});
+	// Docker sandbox operations
+	ipcMain.handle('docker:create-sandbox', async (event, extensionId: string, config?: any) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'docker.create', { extensionId, config });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.dockerManager.createExtensionSandbox(extensionId, config);
+	});
 
-		ipcMain.handle('docker:stop-sandbox', async (event, containerId: string) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'docker.stop', { containerId });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.dockerManager.stopSandbox(containerId);
-		});
+	ipcMain.handle('docker:stop-sandbox', async (event, containerId: string) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'docker.stop', { containerId });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.dockerManager.stopSandbox(containerId);
+	});
 
-		ipcMain.handle('docker:execute-command', async (event, containerId: string, command: string[]) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'docker.execute', { containerId, command });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return await this.dockerManager.executeSandboxCommand(containerId, command);
-		});
+	ipcMain.handle('docker:execute-command', async (event, containerId: string, command: string[]) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'docker.execute', { containerId, command });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return await this.dockerManager.executeSandboxCommand(containerId, command);
+	});
 
-		ipcMain.handle('docker:get-logs', async (event, containerId: string, tail?: number) => {
-			return await this.dockerManager.getSandboxLogs(containerId, tail);
-		});
+	ipcMain.handle('docker:get-logs', async (event, containerId: string, tail?: number) => {
+		return await this.dockerManager.getSandboxLogs(containerId, tail);
+	});
 
-		ipcMain.handle('docker:list-sandboxes', async () => {
-			return this.dockerManager.listSandboxes();
-		});
+	ipcMain.handle('docker:list-sandboxes', async () => {
+		return this.dockerManager.listSandboxes();
+	});
 
-		ipcMain.handle('docker:get-metrics', async () => {
-			return this.dockerManager.getMetrics();
-		});
+	ipcMain.handle('docker:get-metrics', async () => {
+		return this.dockerManager.getMetrics();
+	});
 
-		// Performance operations
-		ipcMain.handle('performance:get-metrics', async () => {
-			return this.performanceOptimizer.getMetrics();
-		});
+	// Performance operations
+	ipcMain.handle('performance:get-metrics', async () => {
+		return this.performanceOptimizer.getMetrics();
+	});
 
-		ipcMain.handle('performance:generate-report', async () => {
-			return this.performanceOptimizer.generateReport();
-		});
+	ipcMain.handle('performance:generate-report', async () => {
+		return this.performanceOptimizer.generateReport();
+	});
 
-		ipcMain.handle('performance:get-recommendations', async () => {
-			return this.performanceOptimizer.getOptimizationRecommendations();
-		});
+	ipcMain.handle('performance:get-recommendations', async () => {
+		return this.performanceOptimizer.getOptimizationRecommendations();
+	});
 
-		ipcMain.handle('performance:force-gc', async () => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'performance.gc');
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return this.performanceOptimizer.forceGarbageCollection();
-		});
+	ipcMain.handle('performance:force-gc', async () => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'performance.gc');
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return this.performanceOptimizer.forceGarbageCollection();
+	});
 
-		// Permission middleware operations
-		ipcMain.handle('permissions:check', async (event, actor: string, resource: string, context?: any) => {
-			return await this.permissionMiddleware.checkPermission(actor, resource, context);
-		});
+	// Permission middleware operations
+	ipcMain.handle('permissions:check', async (event, actor: string, resource: string, context?: any) => {
+		return await this.permissionMiddleware.checkPermission(actor, resource, context);
+	});
 
-		ipcMain.handle('permissions:get-policies', async () => {
-			return this.permissionMiddleware.getPolicies();
-		});
+	ipcMain.handle('permissions:get-policies', async () => {
+		return this.permissionMiddleware.getPolicies();
+	});
 
-		ipcMain.handle('permissions:update-policy', async (event, policyId: string, updates: any) => {
-			const permission = await this.permissionMiddleware.checkPermission('user', 'permissions.policy.update', { policyId, updates });
-			if (!permission.allowed) {
-				throw new Error(`Permission denied: ${permission.reason}`);
-			}
-			return this.permissionMiddleware.updatePolicy(policyId, updates);
-		});
+	ipcMain.handle('permissions:update-policy', async (event, policyId: string, updates: any) => {
+		const permission = await this.permissionMiddleware.checkPermission('user', 'permissions.policy.update', { policyId, updates });
+		if (!permission.allowed) {
+			throw new Error(`Permission denied: ${permission.reason}`);
+		}
+		return this.permissionMiddleware.updatePolicy(policyId, updates);
+	});
 
-		ipcMain.handle('permissions:get-audit-log', async (event, filters?: any) => {
-			return this.permissionMiddleware.getAuditLog(filters);
-		});
+	ipcMain.handle('permissions:get-audit-log', async (event, filters?: any) => {
+		return this.permissionMiddleware.getAuditLog(filters);
+	});
 
-		// AI Streaming operations
-		ipcMain.handle('ai-stream:get-connection-info', async () => {
-			return {
-				port: 8081,
-				url: 'ws://localhost:8081',
-				connections: this.aiStream.getActiveConnections(),
-				streams: this.aiStream.getActiveStreams()
-			};
-		});
+	// AI Streaming operations
+	ipcMain.handle('ai-stream:get-connection-info', async () => {
+		return {
+			port: 8081,
+			url: 'ws://localhost:8081',
+			connections: this.aiStream.getActiveConnections(),
+			streams: this.aiStream.getActiveStreams()
+		};
+	});
 
-		// Event forwarding from components
-		this.setupEventForwarding();
-	}
+	// Event forwarding from components
+	this.setupEventForwarding();
+}
 
+	private setupEventForwarding(): void {
+	// Forward Docker events to renderer
+	this.dockerManager.on('sandboxCreated', (data) => {
+		this.mainWindow?.webContents.send('docker:sandbox-created', data);
+	});
+
+	this.dockerManager.on('sandboxStopped', (data) => {
+		this.mainWindow?.webContents.send('docker:sandbox-stopped', data);
+	});
+
+	this.dockerManager.on('sandboxError', (data) => {
+		this.mainWindow?.webContents.send('docker:sandbox-error', data);
+	});
+
+	// Forward performance events to renderer
+	this.performanceOptimizer.on('memoryUpdate', (data) => {
+		this.mainWindow?.webContents.send('performance:memory-update', data);
+	});
+
+	this.performanceOptimizer.on('timing', (data) => {
+		this.mainWindow?.webContents.send('performance:timing', data);
+	});
+
+	// Forward permission events to renderer
+	this.permissionMiddleware.on('permissionDenied', (data) => {
+		this.mainWindow?.webContents.send('permissions:denied', data);
+	});
+
+	this.permissionMiddleware.on('auditEvent', (data) => {
+		this.mainWindow?.webContents.send('permissions:audit-event', data);
+	});
+
+	// Forward VS Code bridge events to renderer
+	this.vscodeBridge.on('extensionInstalled', (data) => {
+		this.mainWindow?.webContents.send('vscode:extension-installed', data);
+	});
+
+	this.vscodeBridge.on('languageServerReady', (data) => {
+		this.mainWindow?.webContents.send('vscode:language-server-ready', data);
+	});
+}
+
+	// Menu handlers
+	private async handleNewWorkspace(): Promise < void> {
 	private setupEventForwarding(): void {
 		// Forward Docker events to renderer
 		this.dockerManager.on('sandboxCreated', (data) => {
@@ -605,135 +649,92 @@ class VSEmbedApplication {
 			this.mainWindow?.webContents.send('vscode:language-server-ready', data);
 		});
 	}
-
-	// Menu handlers
-	private async handleNewWorkspace(): Promise<void> {	private setupEventForwarding(): void {
-		// Forward Docker events to renderer
-		this.dockerManager.on('sandboxCreated', (data) => {
-			this.mainWindow?.webContents.send('docker:sandbox-created', data);
-		});
-
-		this.dockerManager.on('sandboxStopped', (data) => {
-			this.mainWindow?.webContents.send('docker:sandbox-stopped', data);
-		});
-
-		this.dockerManager.on('sandboxError', (data) => {
-			this.mainWindow?.webContents.send('docker:sandbox-error', data);
-		});
-
-		// Forward performance events to renderer
-		this.performanceOptimizer.on('memoryUpdate', (data) => {
-			this.mainWindow?.webContents.send('performance:memory-update', data);
-		});
-
-		this.performanceOptimizer.on('timing', (data) => {
-			this.mainWindow?.webContents.send('performance:timing', data);
-		});
-
-		// Forward permission events to renderer
-		this.permissionMiddleware.on('permissionDenied', (data) => {
-			this.mainWindow?.webContents.send('permissions:denied', data);
-		});
-
-		this.permissionMiddleware.on('auditEvent', (data) => {
-			this.mainWindow?.webContents.send('permissions:audit-event', data);
-		});
-
-		// Forward VS Code bridge events to renderer
-		this.vscodeBridge.on('extensionInstalled', (data) => {
-			this.mainWindow?.webContents.send('vscode:extension-installed', data);
-		});
-
-		this.vscodeBridge.on('languageServerReady', (data) => {
-			this.mainWindow?.webContents.send('vscode:language-server-ready', data);
-		});
-	}
 		this.mainWindow?.webContents.send('menu:new-workspace');
+}
+
+	private async handleOpenWorkspace(): Promise < void> {
+	const result = await dialog.showOpenDialog(this.mainWindow!, {
+		properties: ['openDirectory'],
+		title: 'Select Workspace Directory',
+	});
+
+	if(!result.canceled && result.filePaths.length > 0) {
+	const workspacePath = result.filePaths[0];
+	this.mainWindow?.webContents.send('workspace:open', workspacePath);
+}
 	}
 
-	private async handleOpenWorkspace(): Promise<void> {
-		const result = await dialog.showOpenDialog(this.mainWindow!, {
-			properties: ['openDirectory'],
-			title: 'Select Workspace Directory',
-		});
+	private async handleExportWorkspace(): Promise < void> {
+	const result = await dialog.showSaveDialog(this.mainWindow!, {
+		title: 'Export Workspace',
+		defaultPath: 'workspace.tar.gz',
+		filters: [
+			{ name: 'Workspace Archive', extensions: ['tar.gz', 'zip'] },
+		],
+	});
 
-		if (!result.canceled && result.filePaths.length > 0) {
-			const workspacePath = result.filePaths[0];
-			this.mainWindow?.webContents.send('workspace:open', workspacePath);
-		}
+	if(!result.canceled && result.filePath) {
+	this.mainWindow?.webContents.send('workspace:export', result.filePath);
+}
 	}
 
-	private async handleExportWorkspace(): Promise<void> {
-		const result = await dialog.showSaveDialog(this.mainWindow!, {
-			title: 'Export Workspace',
-			defaultPath: 'workspace.tar.gz',
-			filters: [
-				{ name: 'Workspace Archive', extensions: ['tar.gz', 'zip'] },
-			],
-		});
+	private async handleSettings(): Promise < void> {
+	this.mainWindow?.webContents.send('menu:settings');
+}
 
-		if (!result.canceled && result.filePath) {
-			this.mainWindow?.webContents.send('workspace:export', result.filePath);
-		}
-	}
+	private async handleClearConversation(): Promise < void> {
+	this.mainWindow?.webContents.send('ai:clear-conversation');
+}
 
-	private async handleSettings(): Promise<void> {
-		this.mainWindow?.webContents.send('menu:settings');
-	}
+	private async handleChangeModel(): Promise < void> {
+	this.mainWindow?.webContents.send('ai:change-model');
+}
 
-	private async handleClearConversation(): Promise<void> {
-		this.mainWindow?.webContents.send('ai:clear-conversation');
-	}
+	private async handleAISettings(): Promise < void> {
+	this.mainWindow?.webContents.send('ai:settings');
+}
 
-	private async handleChangeModel(): Promise<void> {
-		this.mainWindow?.webContents.send('ai:change-model');
-	}
+	private async handleStartRunner(): Promise < void> {
+	this.mainWindow?.webContents.send('runner:start');
+}
 
-	private async handleAISettings(): Promise<void> {
-		this.mainWindow?.webContents.send('ai:settings');
-	}
+	private async handleStopRunner(): Promise < void> {
+	this.mainWindow?.webContents.send('runner:stop');
+}
 
-	private async handleStartRunner(): Promise<void> {
-		this.mainWindow?.webContents.send('runner:start');
-	}
+	private async handleRestartRunner(): Promise < void> {
+	this.mainWindow?.webContents.send('runner:restart');
+}
 
-	private async handleStopRunner(): Promise<void> {
-		this.mainWindow?.webContents.send('runner:stop');
-	}
+	private async handleViewLogs(): Promise < void> {
+	this.mainWindow?.webContents.send('runner:view-logs');
+}
 
-	private async handleRestartRunner(): Promise<void> {
-		this.mainWindow?.webContents.send('runner:restart');
-	}
+	private async handleManageSecrets(): Promise < void> {
+	this.mainWindow?.webContents.send('security:manage-secrets');
+}
 
-	private async handleViewLogs(): Promise<void> {
-		this.mainWindow?.webContents.send('runner:view-logs');
-	}
+	private async handleViewAuditLog(): Promise < void> {
+	this.mainWindow?.webContents.send('security:view-audit-log');
+}
 
-	private async handleManageSecrets(): Promise<void> {
-		this.mainWindow?.webContents.send('security:manage-secrets');
-	}
+	private async handleSecuritySettings(): Promise < void> {
+	this.mainWindow?.webContents.send('security:settings');
+}
 
-	private async handleViewAuditLog(): Promise<void> {
-		this.mainWindow?.webContents.send('security:view-audit-log');
-	}
+	private async handleAbout(): Promise < void> {
+	dialog.showMessageBox(this.mainWindow!, {
+		type: 'info',
+		title: 'About VSEmbed AI DevTool',
+		message: 'VSEmbed AI DevTool',
+		detail: 'Portable, embeddable AI-powered development environment\nVersion 0.1.0\nCopyright (c) 2025 Sheewi',
+	});
+}
 
-	private async handleSecuritySettings(): Promise<void> {
-		this.mainWindow?.webContents.send('security:settings');
-	}
-
-	private async handleAbout(): Promise<void> {
-		dialog.showMessageBox(this.mainWindow!, {
-			type: 'info',
-			title: 'About VSEmbed AI DevTool',
-			message: 'VSEmbed AI DevTool',
-			detail: 'Portable, embeddable AI-powered development environment\nVersion 0.1.0\nCopyright (c) 2025 Sheewi',
-		});
-	}
-
-	private async handleDocumentation(): Promise<void> {
-		// Open documentation URL
-		require('electron').shell.openExternal('https://github.com/Sheewi/VsEmbed#readme');
-	}
+	private async handleDocumentation(): Promise < void> {
+	// Open documentation URL
+	require('electron').shell.openExternal('https://github.com/Sheewi/VsEmbed#readme');
+}
 }
 
 // Initialize the application
