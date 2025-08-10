@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn, ChildProcess } from 'child_process';
 import { EventEmitter } from 'events';
+import { AIService, AIRequest } from '../ai/ai-service';
 
 export interface DebugSessionData {
 	sessionId: string;
@@ -72,31 +73,57 @@ export interface DebugError {
 }
 
 export class AIDebugModel {
-	private apiEndpoint = 'https://api.vsembed.ai/v1/debug';
-	private localModel?: any; // Local GGUF model for offline use
+	private aiService: AIService;
+
+	constructor(aiService: AIService) {
+		this.aiService = aiService;
+	}
 
 	async predict(request: any): Promise<any> {
 		try {
-			// Try local model first
-			if (this.localModel) {
-				return await this.localModel.generate(request);
+			// Auto-select model based on task complexity
+			const complexity = this.assessTaskComplexity(request);
+			const modelType = complexity > 3 ? 'advanced' : 'lightweight';
+
+			const aiRequest: AIRequest = {
+				task: request.task,
+				context: request,
+				model: modelType,
+				priority: request.priority || 'normal',
+				timeout: request.timeout
+			};
+
+			const response = await this.aiService.predict(aiRequest);
+
+			if (response.success) {
+				return response.data;
+			} else {
+				// Use fallback response
+				return this.getFallbackResponse(request);
 			}
 
-			// Fallback to cloud API
-			const response = await fetch(this.apiEndpoint, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${process.env.VSEMBED_API_KEY}`
-				},
-				body: JSON.stringify(request)
-			});
-
-			return await response.json();
 		} catch (error) {
 			console.error('AI Debug prediction failed:', error);
 			return this.getFallbackResponse(request);
 		}
+	}
+
+	private assessTaskComplexity(request: any): number {
+		let complexity = 1;
+
+		// Task-based complexity
+		const complexTasks = ['analyze-stack', 'suggest-fix', 'code-refactor'];
+		const simpleTasks = ['suggest-breakpoints', 'basic-analysis'];
+
+		if (complexTasks.includes(request.task)) complexity += 2;
+		if (simpleTasks.includes(request.task)) complexity -= 1;
+
+		// Context-based complexity
+		if (request.stackFrames?.length > 10) complexity += 1;
+		if (request.variables?.length > 20) complexity += 1;
+		if (request.codeContext?.length > 1000) complexity += 1;
+
+		return Math.max(1, Math.min(5, complexity));
 	}
 
 	private getFallbackResponse(request: any): any {
@@ -108,6 +135,8 @@ export class AIDebugModel {
 				return { tags: ['unknown'], suggestions: [], anomalies: [], fixes: [] };
 			case 'suggest-fix':
 				return { description: 'Manual debugging required', newCode: request.code };
+			case 'breakpoint-condition':
+				return { condition: this.generateBasicCondition(request.code, request.line) };
 			default:
 				return {};
 		}
@@ -131,6 +160,7 @@ export class AIDebugModel {
 			if (line.trim().match(/^(if|else if|switch|case)/)) {
 				suggestions.push({
 					line: index + 1,
+					condition: this.generateBasicCondition(code, index + 1),
 					reason: 'Conditional logic',
 					confidence: 0.7
 				});
@@ -157,60 +187,214 @@ export class AIDebugModel {
 
 		return suggestions.slice(0, 10); // Limit to top 10 suggestions
 	}
+
+	private generateBasicCondition(code: string, line: number): string {
+		const lines = code.split('\n');
+		const currentLine = lines[line - 1];
+
+		// Extract variables from the line
+		const variableMatches = currentLine.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g);
+		if (variableMatches && variableMatches.length > 0) {
+			const variable = variableMatches[0];
+
+			// Generate appropriate condition based on context
+			if (currentLine.includes('if') || currentLine.includes('while')) {
+				return `${variable} !== undefined`;
+			} else if (currentLine.includes('for')) {
+				return `${variable} >= 0`;
+			} else {
+				return `${variable} != null`;
+			}
+		}
+
+		return 'true';
+	}
 }
 
 export class AIDebugger {
-	private model = new AIDebugModel();
+	private model: AIDebugModel;
 	private performance = new PerformanceMonitor();
+
+	constructor(aiService: AIService) {
+		this.model = new AIDebugModel(aiService);
+	}
 
 	async suggestBreakpoints(code: string): Promise<BreakpointSuggestion[]> {
 		const startTime = Date.now();
 
-		const response = await this.model.predict({
-			task: 'suggest-breakpoints',
-			code,
-			context: {
-				language: this.detectLanguage(code),
-				complexity: this.calculateComplexity(code)
+		try {
+			const response = await this.model.predict({
+				task: 'suggest-breakpoints',
+				code,
+				context: {
+					language: this.detectLanguage(code),
+					complexity: this.calculateComplexity(code)
+				},
+				priority: 'high'
+			});
+
+			this.performance.recordOperation('breakpoint-suggestion', Date.now() - startTime);
+			return response.suggestions || [];
+
+		} catch (error) {
+			console.error('Failed to suggest breakpoints:', error);
+			this.performance.recordOperation('breakpoint-suggestion', Date.now() - startTime);
+			return this.model.predict({ task: 'suggest-breakpoints', code }).then(r => r.suggestions || []);
+		}
+	}
+
+	async suggestBreakpointConditions(code: string, line: number): Promise<string> {
+		try {
+			const response = await this.model.predict({
+				task: 'breakpoint-condition',
+				code,
+				line,
+				context: this.getContextAroundLine(code, line),
+				priority: 'normal'
+			});
+
+			return response.condition || 'true';
+
+		} catch (error) {
+			console.error('Failed to suggest breakpoint condition:', error);
+			// Fallback to basic condition generation
+			return this.generateFallbackCondition(code, line);
+		}
+	}
+
+	private getContextAroundLine(code: string, line: number): any {
+		const lines = code.split('\n');
+		const start = Math.max(0, line - 5);
+		const end = Math.min(lines.length, line + 5);
+
+		return {
+			beforeLines: lines.slice(start, line - 1),
+			currentLine: lines[line - 1],
+			afterLines: lines.slice(line, end),
+			variables: this.extractVariables(lines.slice(start, end))
+		};
+	}
+
+	private extractVariables(lines: string[]): string[] {
+		const variables = new Set<string>();
+		const varPattern = /\b(?:let|const|var)\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+
+		lines.forEach(line => {
+			let match;
+			while ((match = varPattern.exec(line)) !== null) {
+				variables.add(match[1]);
 			}
 		});
 
-		this.performance.recordOperation('breakpoint-suggestion', Date.now() - startTime);
-		return response.suggestions || [];
+		return Array.from(variables);
+	}
+
+	private generateFallbackCondition(code: string, line: number): string {
+		const lines = code.split('\n');
+		const currentLine = lines[line - 1];
+
+		if (currentLine.includes('for')) {
+			const indexVar = currentLine.match(/for\s*\(\s*(?:let|const|var)?\s*([a-zA-Z_][a-zA-Z0-9_]*)/)?.[1];
+			return indexVar ? `${indexVar} % 10 === 0` : 'true';
+		}
+
+		if (currentLine.includes('if')) {
+			const condition = currentLine.match(/if\s*\(([^)]+)\)/)?.[1];
+			return condition ? `!(${condition})` : 'true';
+		}
+
+		return 'true';
 	}
 
 	async analyzeStack(context: DebugContext): Promise<DebugAnalysis> {
 		const startTime = Date.now();
 
-		const response = await this.model.predict({
-			task: 'analyze-stack',
-			stackFrames: context.frames,
-			variables: context.variables,
-			performance: context.performance,
-			codeContext: context.codeContext
-		});
+		try {
+			const response = await this.model.predict({
+				task: 'analyze-stack',
+				stackFrames: context.frames,
+				variables: context.variables,
+				performance: context.performance,
+				codeContext: context.codeContext,
+				priority: 'high'
+			});
 
-		this.performance.recordOperation('stack-analysis', Date.now() - startTime);
-		return response;
+			this.performance.recordOperation('stack-analysis', Date.now() - startTime);
+			return response;
+
+		} catch (error) {
+			console.error('Failed to analyze stack:', error);
+			this.performance.recordOperation('stack-analysis', Date.now() - startTime);
+
+			// Return basic analysis
+			return {
+				tags: ['error'],
+				suggestions: [],
+				anomalies: [],
+				fixes: []
+			};
+		}
 	}
 
 	async suggestFix(error: DebugError): Promise<DebugFix> {
 		const startTime = Date.now();
 
-		const response = await this.model.predict({
-			task: 'suggest-fix',
-			error: error.message,
-			stack: error.stack,
-			file: error.file,
-			line: error.line,
-			column: error.column
-		});
+		try {
+			const response = await this.model.predict({
+				task: 'suggest-fix',
+				error: error.message,
+				stack: error.stack,
+				file: error.file,
+				line: error.line,
+				column: error.column,
+				priority: 'high'
+			});
 
-		this.performance.recordOperation('fix-suggestion', Date.now() - startTime);
-		return response;
+			this.performance.recordOperation('fix-suggestion', Date.now() - startTime);
+			return response;
+
+		} catch (error) {
+			console.error('Failed to suggest fix:', error);
+			this.performance.recordOperation('fix-suggestion', Date.now() - startTime);
+
+			// Return basic fix suggestion
+			return {
+				uri: vscode.Uri.file(error.file),
+				startLine: error.line,
+				endLine: error.line,
+				newCode: '// TODO: Fix the error manually',
+				description: 'Manual fix required'
+			};
+		}
 	}
 
 	async detectVariableAnomalies(variables: vscode.DebugVariable[]): Promise<VariableAnomaly[]> {
+		const anomalies: VariableAnomaly[] = [];
+
+		try {
+			// Enhanced anomaly detection with AI assistance
+			const response = await this.model.predict({
+				task: 'detect-anomalies',
+				variables,
+				priority: 'normal'
+			});
+
+			if (response.anomalies) {
+				anomalies.push(...response.anomalies);
+			}
+
+		} catch (error) {
+			console.error('AI anomaly detection failed, using fallback:', error);
+		}
+
+		// Always run basic rule-based detection as well
+		const basicAnomalies = await this.detectBasicAnomalies(variables);
+		anomalies.push(...basicAnomalies);
+
+		return anomalies;
+	}
+
+	private async detectBasicAnomalies(variables: vscode.DebugVariable[]): Promise<VariableAnomaly[]> {
 		const anomalies: VariableAnomaly[] = [];
 
 		for (const variable of variables) {
@@ -410,13 +594,14 @@ export class PerformanceMonitor {
 }
 
 export class AIDebugAdapter implements vscode.DebugAdapter {
-	private readonly ai = new AIDebugger();
+	private readonly ai: AIDebugger;
 	private sessionData: DebugSessionData = { sessionId: '' };
 	private anomalyDetector = new VariableAnomalyDetector();
 	private performance = new PerformanceMonitor();
 	private eventEmitter = new EventEmitter();
 
-	constructor() {
+	constructor(aiService: AIService) {
+		this.ai = new AIDebugger(aiService);
 		this.sessionData.sessionId = `debug_${Date.now()}`;
 	}
 
@@ -442,6 +627,9 @@ export class AIDebugAdapter implements vscode.DebugAdapter {
 				case 'suggestBreakpoints':
 					result = await this.suggestSmartBreakpoints(args);
 					break;
+				case 'suggestBreakpointCondition':
+					result = await this.suggestBreakpointCondition(args);
+					break;
 				default:
 					result = { error: `Unknown command: ${command}` };
 			}
@@ -459,6 +647,31 @@ export class AIDebugAdapter implements vscode.DebugAdapter {
 		}
 	}
 
+	private async suggestBreakpointCondition(args: any): Promise<any> {
+		try {
+			const { filePath, line } = args;
+			const doc = await vscode.workspace.openTextDocument(filePath);
+			const code = doc.getText();
+
+			const condition = await this.ai.suggestBreakpointConditions(code, line);
+
+			return {
+				line,
+				condition,
+				preview: this.getLinePreview(doc, line),
+				context: this.ai['getContextAroundLine'](code, line) // Access private method
+			};
+
+		} catch (error) {
+			console.error('Failed to suggest breakpoint condition:', error);
+			return {
+				line: args.line,
+				condition: 'true',
+				error: error instanceof Error ? error.message : 'Unknown error'
+			};
+		}
+	}
+
 	private async handleSetBreakpoints(args: any): Promise<any> {
 		try {
 			const doc = await vscode.workspace.openTextDocument(args.source.path);
@@ -470,13 +683,32 @@ export class AIDebugAdapter implements vscode.DebugAdapter {
 				.filter(bp => !userBreakpoints.some((ubp: any) => ubp.line === bp.line))
 				.slice(0, 5); // Limit suggestions
 
+			// Generate conditions for user breakpoints if not provided
+			const enhancedUserBreakpoints = await Promise.all(
+				userBreakpoints.map(async (bp: any) => {
+					if (!bp.condition) {
+						const suggestedCondition = await this.ai.suggestBreakpointConditions(
+							doc.getText(),
+							bp.line
+						);
+						return {
+							...bp,
+							id: bp.line,
+							verified: true,
+							condition: suggestedCondition,
+							logMessage: `AI suggested condition: ${suggestedCondition}`
+						};
+					}
+					return {
+						...bp,
+						id: bp.line,
+						verified: true
+					};
+				})
+			);
+
 			const allBreakpoints = [
-				...userBreakpoints.map((bp: any) => ({
-					id: bp.line,
-					line: bp.line,
-					verified: true,
-					condition: bp.condition
-				})),
+				...enhancedUserBreakpoints,
 				...suggestedBreakpoints.map(bp => ({
 					id: `ai_${bp.line}`,
 					line: bp.line,

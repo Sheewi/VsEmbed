@@ -82,7 +82,153 @@ export interface TestExecutionContext {
 	coverage: boolean;
 	timeout: number;
 	env: Record<string, string>;
+	parallel?: boolean;
+	maxConcurrency?: number;
 }
+
+export interface DependencyGraphNode {
+	file: string;
+	dependencies: string[];
+	dependents: string[];
+	tests: string[];
+}
+
+export class DependencyGraph {
+	private static graph = new Map<string, DependencyGraphNode>();
+
+	static addFile(file: string, dependencies: string[] = []): void {
+		if (!this.graph.has(file)) {
+			this.graph.set(file, {
+				file,
+				dependencies,
+				dependents: [],
+				tests: []
+			});
+		}
+
+		// Update dependents
+		dependencies.forEach(dep => {
+			const depNode = this.graph.get(dep);
+			if (depNode && !depNode.dependents.includes(file)) {
+				depNode.dependents.push(file);
+			}
+		});
+	}
+
+	static getAffectedTests(changedFile: string): string[] {
+		const visited = new Set<string>();
+		const affectedTests = new Set<string>();
+
+		const traverse = (file: string) => {
+			if (visited.has(file)) return;
+			visited.add(file);
+
+			const node = this.graph.get(file);
+			if (!node) return;
+
+			// Add tests for this file
+			node.tests.forEach(test => affectedTests.add(test));
+
+			// Traverse dependents
+			node.dependents.forEach(dependent => traverse(dependent));
+		};
+
+		traverse(changedFile);
+		return Array.from(affectedTests);
+	}
+
+	static addTestForFile(file: string, testFile: string): void {
+		const node = this.graph.get(file);
+		if (node && !node.tests.includes(testFile)) {
+			node.tests.push(testFile);
+		}
+	}
+}
+
+export class TestFrameworkAdapter {
+	private framework: string;
+	private workspaceRoot: string;
+
+	constructor(framework: string, workspaceRoot: string) {
+		this.framework = framework;
+		this.workspaceRoot = workspaceRoot;
+	}
+
+	async executeTests(tests: TestCase[], context: TestExecutionContext): Promise<TestResult[]> {
+		if (context.parallel && tests.length > 1) {
+			return await this.executeTestsParallel(tests, context);
+		} else {
+			return await this.executeTestsSequential(tests, context);
+		}
+	}
+
+	private async executeTestsParallel(tests: TestCase[], context: TestExecutionContext): Promise<TestResult[]> {
+		const maxConcurrency = context.maxConcurrency || Math.min(4, tests.length);
+		const results: TestResult[] = [];
+
+		// Process tests in batches
+		for (let i = 0; i < tests.length; i += maxConcurrency) {
+			const batch = tests.slice(i, i + maxConcurrency);
+			const batchPromises = batch.map(test => this.runTest(test, context));
+
+			try {
+				const batchResults = await Promise.all(batchPromises);
+				results.push(...batchResults);
+			} catch (error) {
+				console.error('Parallel test execution failed:', error);
+				// Fallback to sequential execution for this batch
+				for (const test of batch) {
+					try {
+						const result = await this.runTest(test, context);
+						results.push(result);
+					} catch (testError) {
+						results.push(this.createErrorResult(test, testError));
+					}
+				}
+			}
+		}
+
+		return results;
+	}
+
+	private async executeTestsSequential(tests: TestCase[], context: TestExecutionContext): Promise<TestResult[]> {
+		const results: TestResult[] = [];
+
+		for (const test of tests) {
+			try {
+				const result = await this.runTest(test, context);
+				results.push(result);
+			} catch (error) {
+				results.push(this.createErrorResult(test, error));
+			}
+		}
+
+		return results;
+	}
+
+	private createErrorResult(test: TestCase, error: any): TestResult {
+		return {
+			suite: {
+				id: 'error',
+				name: 'Error Suite',
+				framework: this.framework,
+				tests: [test],
+				totalTests: 1,
+				passedTests: 0,
+				failedTests: 1,
+				duration: 0
+			},
+			test: {
+				...test,
+				status: 'error',
+				error: error instanceof Error ? error.message : 'Unknown error'
+			},
+			status: 'error',
+			duration: 0,
+			output: '',
+			error: error instanceof Error ? error.message : 'Unknown error'
+		};
+	}
 
 export interface LiveTestEvent {
 	type: 'test-start' | 'test-end' | 'test-fail' | 'suite-start' | 'suite-end' | 'coverage-update';
@@ -507,6 +653,9 @@ export class TestWatcher {
 	private config: TestWatchConfig;
 	private eventEmitter = new EventEmitter();
 	private isWatching = false;
+	private debounceTimer?: NodeJS.Timeout;
+	private pendingChanges = new Set<string>();
+	private cancellationToken?: vscode.CancellationTokenSource;
 
 	constructor(config: TestWatchConfig) {
 		this.config = config;
@@ -532,6 +681,15 @@ export class TestWatcher {
 			this.watcher.dispose();
 			this.watcher = undefined;
 		}
+
+		if (this.debounceTimer) {
+			clearTimeout(this.debounceTimer);
+		}
+
+		if (this.cancellationToken) {
+			this.cancellationToken.cancel();
+		}
+
 		this.isWatching = false;
 		this.eventEmitter.emit('watch-stopped');
 	}
@@ -550,17 +708,50 @@ export class TestWatcher {
 		);
 
 		if (shouldWatch && !isIgnored) {
-			this.eventEmitter.emit('file-changed', {
-				uri,
-				relativePath,
-				timestamp: Date.now()
+			this.pendingChanges.add(relativePath);
+
+			// Debounce file changes to avoid running tests too frequently
+			if (this.debounceTimer) {
+				clearTimeout(this.debounceTimer);
+			}
+
+			this.debounceTimer = setTimeout(() => {
+				this.processPendingChanges();
+			}, 500); // 500ms debounce
+		}
+	}
+
+	private processPendingChanges(): void {
+		const changes = Array.from(this.pendingChanges);
+		this.pendingChanges.clear();
+
+		if (changes.length === 0) return;
+
+		// Cancel any ongoing test runs
+		if (this.cancellationToken) {
+			this.cancellationToken.cancel();
+		}
+		this.cancellationToken = new vscode.CancellationTokenSource();
+
+		this.eventEmitter.emit('file-changes-batch', {
+			changes,
+			timestamp: Date.now(),
+			cancellationToken: this.cancellationToken.token
+		});
+
+		if (this.config.runOnChange) {
+			// Get affected tests for all changed files
+			const affectedTests = new Set<string>();
+			changes.forEach(change => {
+				const tests = DependencyGraph.getAffectedTests(change);
+				tests.forEach(test => affectedTests.add(test));
 			});
 
-			if (this.config.runOnChange) {
-				this.eventEmitter.emit('run-tests-requested', {
-					triggeredBy: relativePath
-				});
-			}
+			this.eventEmitter.emit('run-tests-requested', {
+				triggeredBy: changes,
+				affectedTests: Array.from(affectedTests),
+				cancellationToken: this.cancellationToken.token
+			});
 		}
 	}
 
