@@ -96,7 +96,7 @@ jobs:
             exit 1
           fi
 
-          # Check for suspicious files
+                    # Check for suspicious files
           find dist/ -name "*.exe" -o -name "*.bat" -o -name "*.sh" | while read file; do
             echo "⚠ Suspicious executable found: $file"
           done

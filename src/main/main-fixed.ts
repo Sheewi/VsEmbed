@@ -75,105 +75,8 @@ class VSEmbedApplication {
 		});
 	}
 
-	private createMainWindow(): void {
-		this.mainWindow = new BrowserWindow({
-			width: 1400,
-			height: 900,
-			minWidth: 800,
-			minHeight: 600,
-			webPreferences: {
-				nodeIntegration: false,
-				contextIsolation: true,
-				enableRemoteModule: false,
-				preload: path.join(__dirname, 'preload.js'),
-				webSecurity: true,
-				allowRunningInsecureContent: false,
-			},
-			titleBarStyle: 'default',
-			show: false,
-		});
-
-		if (process.env.NODE_ENV === 'development') {
-			this.mainWindow.loadURL('http://localhost:3000');
-			this.mainWindow.webContents.openDevTools();
-		} else {
-			this.mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-		}
-
-		this.mainWindow.once('ready-to-show', () => {
-			this.mainWindow?.show();
-		});
-
-		this.mainWindow.on('closed', () => {
-			this.mainWindow = null;
-		});
-	}
-
-	private createMenu(): void {
-		const template: any[] = [
-			{
-				label: 'File',
-				submenu: [
-					{ label: 'New Workspace', accelerator: 'CmdOrCtrl+N', click: () => this.handleNewWorkspace() },
-					{ label: 'Open Workspace', accelerator: 'CmdOrCtrl+O', click: () => this.handleOpenWorkspace() },
-					{ label: 'Export Workspace', accelerator: 'CmdOrCtrl+E', click: () => this.handleExportWorkspace() },
-					{ type: 'separator' },
-					{ label: 'Settings', accelerator: 'CmdOrCtrl+,', click: () => this.handleSettings() },
-					{ type: 'separator' },
-					{ label: 'Quit', accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q', click: () => app.quit() }
-				]
-			},
-			{
-				label: 'AI',
-				submenu: [
-					{ label: 'Clear Conversation', click: () => this.handleClearConversation() },
-					{ label: 'Change Model', click: () => this.handleChangeModel() },
-					{ type: 'separator' },
-					{ label: 'AI Settings', click: () => this.handleAISettings() }
-				]
-			},
-			{
-				label: 'Developer',
-				submenu: [
-					{ label: 'Performance Report', click: () => this.handlePerformanceReport() },
-					{ label: 'Docker Status', click: () => this.handleDockerStatus() },
-					{ label: 'Permission Audit', click: () => this.handlePermissionAudit() }
-				]
-			}
-		];
-
-		const menu = Menu.buildFromTemplate(template);
-		Menu.setApplicationMenu(menu);
-	}
-
-	private setupAppHandlers(): void {
-		app.whenReady().then(() => {
-			this.createMainWindow();
-			this.createMenu();
-		});
-
-		app.on('window-all-closed', () => {
-			if (process.platform !== 'darwin') {
-				app.quit();
-			}
-		});
-
-		app.on('activate', () => {
-			if (BrowserWindow.getAllWindows().length === 0) {
-				this.createMainWindow();
-			}
-		});
-
-		// Security: Prevent new window creation
-		app.on('web-contents-created', (event, contents) => {
-			contents.on('new-window', (event, navigationUrl) => {
-				event.preventDefault();
-				// Only allow navigation to localhost for preview
-				if (!navigationUrl.startsWith('http://localhost:')) {
-					console.warn('Blocked navigation to:', navigationUrl);
-				}
-			});
-		});
+	private setupShutdownHandlers(): void {
+		// Add cleanup logic here
 	}
 
 	private createMainWindow(): void {
@@ -194,7 +97,6 @@ class VSEmbedApplication {
 			show: false,
 		});
 
-		// Load the React application
 		if (process.env.NODE_ENV === 'development') {
 			this.mainWindow.loadURL('http://localhost:3000');
 			this.mainWindow.webContents.openDevTools();
@@ -313,6 +215,23 @@ class VSEmbedApplication {
 					{
 						label: 'Security Settings',
 						click: () => this.handleSecuritySettings(),
+					},
+				],
+			},
+			{
+				label: 'Developer',
+				submenu: [
+					{
+						label: 'Performance Report',
+						click: () => this.handlePerformanceReport(),
+					},
+					{
+						label: 'Docker Status',
+						click: () => this.handleDockerStatus(),
+					},
+					{
+						label: 'Permission Audit',
+						click: () => this.handlePermissionAudit(),
 					},
 				],
 			},

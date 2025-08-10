@@ -23,7 +23,6 @@
 		"conversational"
 	],
 	"activationEvents": [
-		"onCommand:aiDevCompanion.start",
 		"onDebug",
 		"onLanguage:typescript",
 		"onLanguage:javascript",
@@ -298,4 +297,5 @@
 		"ws": "^8.14.0",
 		"@types/ws": "^8.5.0"
 	}
+}
 }
