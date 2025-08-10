@@ -38,26 +38,15 @@ check_requirements() {
     echo "🔍 Checking system requirements..."
 
     # Check Node.js
-    if ! command -v node &> /dev/null; then# Fix missing dependencies and rebuild
-cd ~/vsembed && \
-npm install lucide-react @types/lucide-react --save-exact && \
-npm run clean && \
 npm run build
-
-# Fix Docker permissions
-sudo usermod -aG docker $USER && \
-newgrp docker && \
 sudo systemctl restart docker
-
-# Update test configurations (automated patch)
-cat <<EOF > jest.patch
 diff --git a/jest.config.js b/jest.config.js
 index abc1234..def5678 100644
---- a/jest.config.js
-+++ b/jest.config.js
-@@ -1,5 +1,9 @@
- module.exports = {
-   // ... existing config ...
+++ b/jest.config.js
+    if ! command -v node &> /dev/null; then
+        print_error "Node.js is not installed. Please install Node.js 18+ and try again."
+        exit 1
+    fi
 +  testPathIgnorePatterns: [
 +    "/node_modules/",
 +    "/tests/performance/"
@@ -97,25 +86,14 @@ npm start
     fi
     print_status "Node.js $(node --version) found"
 
-    # Check npm
-    if ! command -v npm &> /dev/null; then
-        print_error "npm is not installed"
-        exit 1
-    fi
     print_status "npm $(npm --version) found"
-
-    # Check Docker (optional)
-    if command -v docker &> /dev/null; then
-        print_status "Docker $(docker --version | cut -d' ' -f3 | cut -d',' -f1) found"
         DOCKER_AVAILABLE=true
-    else
-        print_warning "Docker not found. Some security features will be disabled."
-        DOCKER_AVAILABLE=false
     fi
 
-    # Check Git
-    if ! command -v git &> /dev/null; then
-        print_error "Git is not installed"
+++ b/jest.config.js
+    # Check Node.js
+    if ! command -v node &> /dev/null; then
+        print_error "Node.js is not installed. Please install Node.js 18+ and try again."
         exit 1
     fi
     print_status "Git $(git --version | cut -d' ' -f3) found"
