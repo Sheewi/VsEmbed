@@ -31,7 +31,7 @@ export class RunnerManager implements RunnerAPI {
 			},
 		};
 
-		// Skip Docker initialization to avoid constructor errors
+		// Skip Docker initialization completely to avoid issues
 		console.log('Docker initialization disabled - using local runner only');
 		this.docker = null;
 	}
@@ -42,15 +42,9 @@ export class RunnerManager implements RunnerAPI {
 	}
 
 	private async initializeDocker(): Promise<void> {
-		try {
-			// Skip Docker initialization for now to avoid constructor errors
-			// TODO: Fix Docker integration later
-			console.log('Docker initialization skipped - using local runner only');
-			this.docker = null;
-		} catch (error) {
-			console.warn('Docker not available, falling back to local runner:', error);
-			this.docker = null;
-		}
+		// Docker initialization completely disabled
+		console.log('Docker initialization skipped - using local runner only');
+		this.docker = null;
 	}
 
 	async build(config?: RunnerConfig): Promise<BuildResult> {
