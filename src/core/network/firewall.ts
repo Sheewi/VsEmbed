@@ -36,10 +36,15 @@ export class AIFirewall {
 			'api.cohere.ai',
 			'generativelanguage.googleapis.com',
 			'huggingface.co',
+			'api.github.com',
 			'github.com',
+			'pkg.actions.githubusercontent.com', // Required for immutable actions
+			'ghcr.io', // For future immutable action publishing
 			'raw.githubusercontent.com',
 			'marketplace.visualstudio.com',
-			'vscode-update.azurewebsites.net'
+			'vscode-update.azurewebsites.net',
+			'registry.npmjs.org',
+			'nodejs.org'
 		],
 		blockedDomains: [
 			'malware-domain.com',
@@ -416,6 +421,24 @@ export const globalFirewall = new AIFirewall();
 // Convenience function for checking URLs
 export function checkUrl(url: string): Promise<{ allowed: boolean; reason?: string }> {
 	return globalFirewall.checkRequest(url);
+}
+
+// Enhanced validation function for GitHub Actions support
+export function validateRequest(url: string): boolean {
+	const ALLOWED_DOMAINS = [
+		'api.github.com',
+		'pkg.actions.githubusercontent.com', // Required for immutable actions
+		'ghcr.io' // For future immutable action publishing
+	];
+
+	try {
+		const parsedUrl = new URL(url);
+		return ALLOWED_DOMAINS.some(domain =>
+			parsedUrl.hostname === domain || parsedUrl.hostname.endsWith('.' + domain)
+		);
+	} catch {
+		return false;
+	}
 }
 
 // Secure fetch function

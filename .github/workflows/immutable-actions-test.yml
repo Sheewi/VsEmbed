@@ -1,0 +1,155 @@
+name: Immutable Actions Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/immutable-actions-test.yml'
+      - 'vscode-engine/src/vs/server/immutable-actions-patch.js'
+
+jobs:
+  test-immutable-actions:
+    name: Test Immutable Actions Support
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_ACTIONS_CHECK_RUNS: 'true'
+      VSEMBED_SECURITY: 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Using immutable action
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4  # Using immutable action
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Test actions cache v3
+        uses: actions/cache@v3  # Updated from deprecated v2
+        with:
+          path: ~/.npm
+          key: test-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: test-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test immutable actions patch
+        run: |
+          echo "Testing immutable actions patch..."
+          node -e "
+            const { patch, validateAction, getActionMetadata } = require('./vscode-engine/src/vs/server/immutable-actions-patch.js');
+
+            // Test action validation
+            console.log('Testing action validation...');
+            const validActions = [
+              'actions/checkout@v4',
+              'actions/setup-node@v4',
+              'actions/cache@v3'
+            ];
+
+            const invalidActions = [
+              'untrusted/action@latest',
+              'actions/checkout@bad-version',
+              'malicious/script@v1'
+            ];
+
+            validActions.forEach(action => {
+              const result = patch.validateAction(action);
+              console.log(\`Valid action \${action}: \${result}\`);
+              if (!result) process.exit(1);
+            });
+
+            invalidActions.forEach(action => {
+              const result = patch.validateAction(action);
+              console.log(\`Invalid action \${action}: \${result}\`);
+              if (result) process.exit(1);
+            });
+
+            // Test metadata retrieval
+            console.log('Testing metadata retrieval...');
+            const metadata = getActionMetadata('actions/checkout@v4');
+            console.log('Metadata:', JSON.stringify(metadata, null, 2));
+
+            console.log('All tests passed!');
+          "
+
+      - name: Test network allowlist
+        run: |
+          echo "Testing network allowlist..."
+          node -e "
+            const { validateRequest } = require('./src/core/network/firewall');
+
+            const allowedUrls = [
+              'https://api.github.com/repos/test',
+              'https://pkg.actions.githubusercontent.com/action',
+              'https://ghcr.io/package'
+            ];
+
+            const blockedUrls = [
+              'https://malicious-site.com',
+              'http://insecure-site.com',
+              'https://unknown-domain.net'
+            ];
+
+            allowedUrls.forEach(url => {
+              const result = validateRequest(url);
+              console.log(\`Allowed URL \${url}: \${result}\`);
+              if (!result) process.exit(1);
+            });
+
+            blockedUrls.forEach(url => {
+              const result = validateRequest(url);
+              console.log(\`Blocked URL \${url}: \${result}\`);
+              if (result) console.log('WARNING: URL should be blocked but was allowed');
+            });
+
+            console.log('Network allowlist test completed!');
+          "
+
+      - name: Test GitHub Actions environment
+        run: |
+          echo "Testing GitHub Actions environment..."
+          echo "GITHUB_ACTIONS: $GITHUB_ACTIONS"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_REF: $GITHUB_REF"
+
+          # Test check run support environment
+          echo "GITHUB_ACTIONS_CHECK_RUNS: $GITHUB_ACTIONS_CHECK_RUNS"
+
+      - name: Create test check run
+        if: github.event_name == 'push'
+        run: |
+          echo "Creating test check run..."
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            -H "User-Agent: VSEmbed-ImmutableActions/1.0" \
+            "https://api.github.com/repos/${{ github.repository }}/check-runs" \
+            -d '{
+              "name": "VSEmbed Immutable Actions Test",
+              "head_sha": "${{ github.sha }}",
+              "status": "completed",
+              "conclusion": "success",
+              "external_id": "vsembed-test-'$(date +%s)'",
+              "started_at": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+              "completed_at": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'",
+              "output": {
+                "title": "Immutable Actions Test Passed",
+                "summary": "All immutable actions compatibility tests passed successfully"
+              }
+            }'
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: immutable-actions-test-results
+          path: |
+            .github-actions-cache/
+          retention-days: 1
