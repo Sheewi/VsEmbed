@@ -1,0 +1,298 @@
+# VSEmbed Security Policy Configuration
+
+# Extension Security Settings
+extensions:
+  # Microsoft Extensions (High Trust)
+  - id: ms-python.python
+    trust_level: high
+    allowed_commands:
+      - python.execInTerminal
+      - python.runCurrentFile
+      - python.debugCurrentFile
+    file_access: read-write
+    network_access: external
+    sandbox: false
+
+  - id: ms-vscode.vscode-typescript-next
+    trust_level: high
+    allowed_commands:
+      - typescript.reloadProjects
+      - typescript.selectTypeScriptVersion
+    file_access: read-write
+    network_access: local
+    sandbox: false
+
+  - id: ms-vscode.vscode-json
+    trust_level: high
+    allowed_commands: ["*"]
+    file_access: read-write
+    network_access: none
+    sandbox: false
+
+  # Third-party Extensions (Medium Trust)
+  - id: esbenp.prettier-vscode
+    trust_level: medium
+    allowed_commands:
+      - prettier.formatDocument
+      - prettier.formatSelection
+    file_access: read-write
+    network_access: none
+    sandbox: true
+
+  - id: bradlc.vscode-tailwindcss
+    trust_level: medium
+    allowed_commands:
+      - tailwindCSS.showOutput
+    file_access: read-only
+    network_access: none
+    sandbox: true
+
+  # AI Extensions (Controlled Trust)
+  - id: github.copilot
+    trust_level: controlled
+    allowed_commands:
+      - github.copilot.generate
+      - github.copilot.acceptSuggestion
+    file_access: read-only
+    network_access: external
+    sandbox: true
+    network_domains:
+      - copilot-proxy.githubusercontent.com
+      - api.github.com
+
+  - id: continue.continue
+    trust_level: controlled
+    allowed_commands:
+      - continue.continueGUIView
+      - continue.acceptDiff
+    file_access: read-write
+    network_access: external
+    sandbox: true
+    network_domains:
+      - api.openai.com
+      - api.anthropic.com
+
+# AI System Security
+ai:
+  # Command Safety Configuration
+  dangerous_commands:
+    # File System Operations
+    - pattern: "rm -rf"
+      risk_level: critical
+      auto_confirm: false
+      description: "Recursive file deletion"
+
+    - pattern: "chmod 777"
+      risk_level: high
+      auto_confirm: false
+      description: "Insecure permission changes"
+
+    - pattern: "sudo.*"
+      risk_level: high
+      auto_confirm: false
+      description: "Elevated privilege execution"
+
+    # System Operations
+    - pattern: "dd if=.*"
+      risk_level: critical
+      auto_confirm: false
+      description: "Low-level disk operations"
+
+    - pattern: "mkfs.*"
+      risk_level: critical
+      auto_confirm: false
+      description: "File system formatting"
+
+    - pattern: "fdisk.*"
+      risk_level: critical
+      auto_confirm: false
+      description: "Disk partitioning"
+
+    # Network Operations
+    - pattern: "curl.*\\|.*sh"
+      risk_level: high
+      auto_confirm: false
+      description: "Remote script execution"
+
+    - pattern: "wget.*\\|.*sh"
+      risk_level: high
+      auto_confirm: false
+      description: "Remote script execution"
+
+    - pattern: "nc -l.*"
+      risk_level: medium
+      auto_confirm: true
+      description: "Network listener"
+
+    # Code Execution
+    - pattern: "eval.*"
+      risk_level: high
+      auto_confirm: false
+      description: "Dynamic code evaluation"
+
+    - pattern: "exec.*"
+      risk_level: medium
+      auto_confirm: true
+      description: "Process execution"
+
+    - pattern: "python -c.*import.*os"
+      risk_level: medium
+      auto_confirm: true
+      description: "Python system access"
+
+  # Auto-confirmation Thresholds
+  auto_confirm_threshold:
+    low: always        # Always auto-confirm low-risk commands
+    medium: prompt     # Prompt user for medium-risk commands
+    high: never        # Never auto-confirm high-risk commands
+    critical: never    # Never auto-confirm critical commands
+
+  # Model Access Controls
+  model_permissions:
+    local_models:
+      file_access: read-only
+      network_access: none
+      system_commands: restricted
+      memory_limit: 8GB
+
+    cloud_models:
+      file_access: none
+      network_access: api-only
+      system_commands: none
+      rate_limit: 60/minute
+
+# Network Security Configuration
+network:
+  # Allowed domains for AI services
+  allowed_domains:
+    - api.openai.com
+    - api.anthropic.com
+    - api.cohere.ai
+    - generativelanguage.googleapis.com
+    - huggingface.co
+    - github.com
+    - raw.githubusercontent.com
+    - marketplace.visualstudio.com
+    - vscode-update.azurewebsites.net
+    - "*.huggingface.co"
+    - "*.github.io"
+
+  # Blocked domains (security threats)
+  blocked_domains:
+    - malware-check.example.com
+    - phishing-test.net
+    - crypto-miner.evil
+    - "*.suspicious-domain.com"
+
+  # Request limits
+  rate_limits:
+    default: 60/minute
+    openai: 100/minute
+    anthropic: 80/minute
+    huggingface: 200/minute
+
+  # Security requirements
+  require_https: true
+  max_request_size: 10MB
+  timeout: 30s
+
+  # Content filtering
+  content_filters:
+    - type: malware
+      enabled: true
+      quarantine: true
+
+    - type: phishing
+      enabled: true
+      block: true
+
+    - type: suspicious_scripts
+      enabled: true
+      scan: true
+
+# File System Security
+filesystem:
+  # Restricted directories
+  restricted_paths:
+    - /etc/passwd
+    - /etc/shadow
+    - /etc/hosts
+    - /root
+    - /var/log
+    - ~/.ssh
+    - ~/.aws
+    - ~/.config/gcloud
+
+  # Allowed file operations by context
+  permissions:
+    workspace:
+      read: true
+      write: true
+      execute: false
+
+    home_directory:
+      read: true
+      write: false
+      execute: false
+
+    system_directories:
+      read: false
+      write: false
+      execute: false
+
+# Audit and Logging
+audit:
+  # Log all security events
+  log_security_events: true
+
+  # Log destinations
+  log_files:
+    security: ~/.vscode/security.log
+    commands: ~/.vscode/commands.log
+    network: ~/.vscode/network.log
+
+  # Retention policy
+  retention_days: 30
+  max_log_size: 100MB
+
+  # Real-time monitoring
+  alerts:
+    failed_commands: true
+    blocked_requests: true
+    permission_violations: true
+
+  # Export options
+  export_formats:
+    - json
+    - csv
+    - syslog
+
+# Compliance Settings
+compliance:
+  # Data protection
+  data_classification: internal
+  encryption_required: true
+  data_retention: 90_days
+
+  # Access controls
+  require_mfa: false
+  session_timeout: 8_hours
+
+  # Reporting
+  generate_reports: true
+  report_frequency: weekly
+
+# Emergency Controls
+emergency:
+  # Kill switches
+  disable_ai: false
+  disable_network: false
+  disable_extensions: false
+
+  # Contact information
+  security_contact: security@example.com
+  incident_response: incident@example.com
+
+  # Escalation procedures
+  auto_escalate_critical: true
+  escalation_timeout: 15_minutes

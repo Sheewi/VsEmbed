@@ -1,0 +1,48 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"lib": [
+			"ES2020",
+			"DOM",
+			"DOM.Iterable"
+		],
+		"outDir": "./.webpack/renderer",
+		"allowJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"jsx": "react-jsx",
+		"baseUrl": ".",
+		"paths": {
+			"@renderer/*": [
+				"src/renderer/*"
+			],
+			"@shared/*": [
+				"src/shared/*"
+			],
+			"@ai/*": [
+				"src/ai/*"
+			],
+			"@core/*": [
+				"src/core/*"
+			]
+		}
+	},
+	"include": [
+		"src/renderer/**/*",
+		"src/shared/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"src/main",
+		"**/*.test.ts",
+		"**/*.test.tsx",
+		"**/*.spec.ts",
+		"**/*.spec.tsx"
+	]
+}
