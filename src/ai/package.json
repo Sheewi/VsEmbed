@@ -87,18 +87,21 @@
 				{
 					"command": "aiDevCompanion.debugWithAI",
 					"when": "editorHasSelection",
-					"group": "aiCompanion@1"
+					"group": "aiCompanion@1",
+					"icon": "$(debug-alt)"
 				},
 				{
 					"command": "aiDevCompanion.quickBrainstorm",
-					"group": "aiCompanion@2"
+					"group": "aiCompanion@2",
+					"icon": "$(lightbulb)"
 				}
 			],
 			"explorer/context": [
 				{
 					"command": "aiDevCompanion.buildFeature",
 					"when": "explorerResourceIsFolder",
-					"group": "aiCompanion@1"
+					"group": "aiCompanion@1",
+					"icon": "$(tools)"
 				}
 			],
 			"view/title": [
