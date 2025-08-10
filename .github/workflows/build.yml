@@ -64,6 +64,15 @@ jobs:
       - name: Run type checking
         run: npm run type-check
 
+      - name: Build verification - Show modified files
+        run: |
+          echo "=== Modified files in this commit ==="
+          git show --name-only
+          echo "=== Changes from last commit ==="
+          git diff HEAD~1 --name-only
+          echo "=== Security validation ==="
+          npm run security:check
+
       - name: Run tests
         run: npm run test:coverage
 
@@ -71,6 +80,26 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+
+      - name: Verify build artifacts
+        run: |
+          echo "=== Build artifact verification ==="
+          ls -la dist/ || echo "No dist directory"
+          ls -la out/ || echo "No out directory"
+
+          # Verify critical files exist
+          if [ -f "dist/main.js" ]; then
+            echo "✓ Main application built successfully"
+            echo "Main.js size: $(stat -c%s dist/main.js) bytes"
+          else
+            echo "✗ Main application build failed"
+            exit 1
+          fi
+
+          # Check for suspicious files
+          find dist/ -name "*.exe" -o -name "*.bat" -o -name "*.sh" | while read file; do
+            echo "⚠ Suspicious executable found: $file"
+          done
 
       - name: Package application
         run: npm run package

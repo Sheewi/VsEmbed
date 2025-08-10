@@ -1,0 +1,357 @@
+{
+	"localModels": {
+		"llama3-8b": {
+			"path": "./models/llama3-8b-q4.gguf",
+			"displayName": "Llama 3 8B (Quantized)",
+			"description": "Meta's Llama 3 8B model optimized for local inference",
+			"hardwareRequirements": {
+				"minRAM": 8,
+				"recommendedRAM": 16,
+				"acceleration": [
+					"cuda",
+					"metal",
+					"cpu"
+				],
+				"minVRAM": 6,
+				"diskSpace": 4.5
+			},
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true
+			},
+			"performance": {
+				"contextWindow": 8192,
+				"tokensPerSecond": 25,
+				"accuracy": 0.85
+			},
+			"license": "custom",
+			"version": "3.0",
+			"downloadUrl": "https://huggingface.co/meta-llama/Llama-3-8B-Instruct-GGUF",
+			"checksum": "sha256:abc123..."
+		},
+		"llama3-70b": {
+			"path": "./models/llama3-70b-q4.gguf",
+			"displayName": "Llama 3 70B (Quantized)",
+			"description": "Meta's Llama 3 70B model for high-quality inference",
+			"hardwareRequirements": {
+				"minRAM": 48,
+				"recommendedRAM": 64,
+				"acceleration": [
+					"cuda",
+					"metal"
+				],
+				"minVRAM": 40,
+				"diskSpace": 39
+			},
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true,
+				"complexTasks": true
+			},
+			"performance": {
+				"contextWindow": 8192,
+				"tokensPerSecond": 8,
+				"accuracy": 0.92
+			},
+			"license": "custom",
+			"version": "3.0",
+			"downloadUrl": "https://huggingface.co/meta-llama/Llama-3-70B-Instruct-GGUF",
+			"checksum": "sha256:def456..."
+		},
+		"codellama-7b": {
+			"path": "./models/codellama-7b-instruct.gguf",
+			"displayName": "Code Llama 7B Instruct",
+			"description": "Specialized model for code generation and understanding",
+			"hardwareRequirements": {
+				"minRAM": 6,
+				"recommendedRAM": 12,
+				"acceleration": [
+					"cuda",
+					"metal",
+					"cpu"
+				],
+				"minVRAM": 4,
+				"diskSpace": 3.8
+			},
+			"capabilities": {
+				"codeGeneration": true,
+				"codeCompletion": true,
+				"debugging": true,
+				"refactoring": true
+			},
+			"performance": {
+				"contextWindow": 16384,
+				"tokensPerSecond": 30,
+				"accuracy": 0.88
+			},
+			"license": "custom",
+			"version": "1.0",
+			"downloadUrl": "https://huggingface.co/codellama/CodeLlama-7b-Instruct-GGUF",
+			"checksum": "sha256:ghi789..."
+		},
+		"phi3-mini": {
+			"path": "./models/phi3-mini-4k-instruct.gguf",
+			"displayName": "Phi-3 Mini 4K Instruct",
+			"description": "Microsoft's compact high-performance model",
+			"hardwareRequirements": {
+				"minRAM": 4,
+				"recommendedRAM": 8,
+				"acceleration": [
+					"cuda",
+					"metal",
+					"cpu"
+				],
+				"minVRAM": 2,
+				"diskSpace": 2.2
+			},
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"summarization": true
+			},
+			"performance": {
+				"contextWindow": 4096,
+				"tokensPerSecond": 45,
+				"accuracy": 0.82
+			},
+			"license": "MIT",
+			"version": "3.0",
+			"downloadUrl": "https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-GGUF",
+			"checksum": "sha256:jkl012..."
+		}
+	},
+	"cloudModels": {
+		"gpt4-turbo": {
+			"endpoint": "https://api.openai.com/v1",
+			"modelId": "gpt-4-turbo-preview",
+			"displayName": "GPT-4 Turbo",
+			"description": "OpenAI's latest GPT-4 model with improved speed and capabilities",
+			"provider": "OpenAI",
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true,
+				"vision": true,
+				"functionCalling": true
+			},
+			"performance": {
+				"contextWindow": 128000,
+				"tokensPerSecond": 100,
+				"accuracy": 0.95
+			},
+			"pricing": {
+				"inputTokens": 0.01,
+				"outputTokens": 0.03,
+				"currency": "USD",
+				"per": 1000
+			},
+			"requiresApiKey": true,
+			"license": "proprietary"
+		},
+		"claude3-sonnet": {
+			"endpoint": "https://api.anthropic.com/v1",
+			"modelId": "claude-3-sonnet-20240229",
+			"displayName": "Claude 3 Sonnet",
+			"description": "Anthropic's balanced model for complex tasks",
+			"provider": "Anthropic",
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true,
+				"vision": true,
+				"longContext": true
+			},
+			"performance": {
+				"contextWindow": 200000,
+				"tokensPerSecond": 80,
+				"accuracy": 0.93
+			},
+			"pricing": {
+				"inputTokens": 0.003,
+				"outputTokens": 0.015,
+				"currency": "USD",
+				"per": 1000
+			},
+			"requiresApiKey": true,
+			"license": "proprietary"
+		},
+		"gemini-pro": {
+			"endpoint": "https://generativelanguage.googleapis.com/v1",
+			"modelId": "gemini-1.5-pro",
+			"displayName": "Gemini 1.5 Pro",
+			"description": "Google's advanced multimodal model",
+			"provider": "Google",
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true,
+				"vision": true,
+				"multimodal": true
+			},
+			"performance": {
+				"contextWindow": 1000000,
+				"tokensPerSecond": 60,
+				"accuracy": 0.91
+			},
+			"pricing": {
+				"inputTokens": 0.0035,
+				"outputTokens": 0.0105,
+				"currency": "USD",
+				"per": 1000
+			},
+			"requiresApiKey": true,
+			"license": "proprietary"
+		},
+		"cohere-command": {
+			"endpoint": "https://api.cohere.ai/v1",
+			"modelId": "command-r-plus",
+			"displayName": "Command R+",
+			"description": "Cohere's enterprise-grade model for business applications",
+			"provider": "Cohere",
+			"capabilities": {
+				"chat": true,
+				"completion": true,
+				"codeGeneration": true,
+				"reasoning": true,
+				"rag": true
+			},
+			"performance": {
+				"contextWindow": 128000,
+				"tokensPerSecond": 70,
+				"accuracy": 0.89
+			},
+			"pricing": {
+				"inputTokens": 0.003,
+				"outputTokens": 0.015,
+				"currency": "USD",
+				"per": 1000
+			},
+			"requiresApiKey": true,
+			"license": "proprietary"
+		}
+	},
+	"modelGroups": {
+		"coding": {
+			"name": "Code Generation",
+			"description": "Models optimized for programming tasks",
+			"models": [
+				"codellama-7b",
+				"gpt4-turbo",
+				"claude3-sonnet"
+			],
+			"recommended": "codellama-7b"
+		},
+		"chat": {
+			"name": "General Chat",
+			"description": "Models for conversational AI",
+			"models": [
+				"llama3-8b",
+				"phi3-mini",
+				"gpt4-turbo",
+				"claude3-sonnet"
+			],
+			"recommended": "llama3-8b"
+		},
+		"enterprise": {
+			"name": "Enterprise",
+			"description": "High-quality models for business use",
+			"models": [
+				"llama3-70b",
+				"gpt4-turbo",
+				"claude3-sonnet",
+				"cohere-command"
+			],
+			"recommended": "gpt4-turbo"
+		},
+		"lightweight": {
+			"name": "Lightweight",
+			"description": "Fast models for basic tasks",
+			"models": [
+				"phi3-mini"
+			],
+			"recommended": "phi3-mini"
+		}
+	},
+	"compatibility": {
+		"platforms": {
+			"windows": {
+				"supported": true,
+				"acceleration": [
+					"cuda",
+					"cpu"
+				],
+				"notes": "CUDA support requires NVIDIA GPU with compute capability 6.0+"
+			},
+			"macos": {
+				"supported": true,
+				"acceleration": [
+					"metal",
+					"cpu"
+				],
+				"notes": "Metal acceleration available on M1/M2 Macs"
+			},
+			"linux": {
+				"supported": true,
+				"acceleration": [
+					"cuda",
+					"cpu"
+				],
+				"notes": "CUDA support requires NVIDIA drivers 470+"
+			}
+		},
+		"hardwareProfiles": {
+			"minimal": {
+				"ram": 4,
+				"vram": 0,
+				"models": [
+					"phi3-mini"
+				]
+			},
+			"standard": {
+				"ram": 8,
+				"vram": 4,
+				"models": [
+					"llama3-8b",
+					"codellama-7b",
+					"phi3-mini"
+				]
+			},
+			"professional": {
+				"ram": 16,
+				"vram": 8,
+				"models": [
+					"llama3-8b",
+					"codellama-7b",
+					"phi3-mini"
+				]
+			},
+			"enterprise": {
+				"ram": 64,
+				"vram": 40,
+				"models": [
+					"llama3-70b",
+					"llama3-8b",
+					"codellama-7b",
+					"phi3-mini"
+				]
+			}
+		}
+	},
+	"settings": {
+		"autoDownload": false,
+		"preferLocalModels": true,
+		"fallbackToCloud": true,
+		"maxConcurrentModels": 2,
+		"modelCacheDir": "./models",
+		"telemetryEnabled": false,
+		"updateCheckInterval": 86400000
+	}
+}
