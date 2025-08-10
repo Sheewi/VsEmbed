@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Play, 
-  Pause, 
-  Stop, 
-  Bug, 
-  TestTube, 
-  Target, 
-  Zap, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Play,
+  Pause,
+  Stop,
+  Bug,
+  TestTube,
+  Target,
+  Zap,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Clock,
   TrendingUp,
   Code,
   FileText,
@@ -88,7 +88,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
     const connectWebSocket = () => {
       try {
         wsRef.current = new WebSocket('ws://localhost:8080/debug-test');
-        
+
         wsRef.current.onopen = () => {
           console.log('Debug-Test WebSocket connected');
         };
@@ -139,7 +139,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
         updateTestCase(data.test.id, { status: 'running' });
         break;
       case 'test-completed':
-        updateTestCase(data.test.id, { 
+        updateTestCase(data.test.id, {
           status: data.result.status,
           duration: data.result.duration,
           error: data.result.error
@@ -165,7 +165,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
   }, []);
 
   const updateTestCase = (id: string, updates: Partial<TestCase>) => {
-    setTestCases(prev => prev.map(test => 
+    setTestCases(prev => prev.map(test =>
       test.id === id ? { ...test, ...updates } : test
     ));
   };
@@ -194,7 +194,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
 
     try {
       setIsDebugging(true);
-      
+
       // Send debug start command via WebSocket
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({
@@ -311,8 +311,8 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
         <button
           onClick={isDebugging ? stopDebugSession : startDebugSession}
           className={`flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium ${
-            isDebugging 
-              ? 'bg-red-600 text-white hover:bg-red-700' 
+            isDebugging
+              ? 'bg-red-600 text-white hover:bg-red-700'
               : 'bg-green-600 text-white hover:bg-green-700'
           }`}
         >
@@ -339,7 +339,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
             {isAutoTestEnabled ? <Eye size={14} /> : <EyeOff size={14} />}
             Auto Test
           </button>
-          
+
           <button
             onClick={toggleFileWatching}
             className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
@@ -367,8 +367,8 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
             </span>
           </div>
           <div className="text-sm text-blue-700">
-            Stack Frames: {debugSession.stackFrames?.length || 0} | 
-            Variables: {debugSession.variables?.length || 0} | 
+            Stack Frames: {debugSession.stackFrames?.length || 0} |
+            Variables: {debugSession.variables?.length || 0} |
             Breakpoints: {debugSession.breakpoints?.length || 0}
           </div>
         </div>
@@ -435,7 +435,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
             Debug Output
           </h4>
         </div>
-        <div 
+        <div
           ref={debugOutputRef}
           className="h-48 p-3 overflow-y-auto bg-black text-green-400 font-mono text-sm"
         >
@@ -472,8 +472,8 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
         </button>
 
         <div className="ml-auto text-sm text-gray-600">
-          Total: {metrics.totalTests} | 
-          Passed: {metrics.passedTests} | 
+          Total: {metrics.totalTests} |
+          Passed: {metrics.passedTests} |
           Failed: {metrics.failedTests}
         </div>
       </div>
@@ -563,7 +563,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
             Test Output
           </h4>
         </div>
-        <div 
+        <div
           ref={testOutputRef}
           className="h-36 p-3 overflow-y-auto bg-black text-green-400 font-mono text-sm"
         >
@@ -608,7 +608,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
         </div>
         <div className="mt-3">
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${metrics.coverage}%` }}
             />

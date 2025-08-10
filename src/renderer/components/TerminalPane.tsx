@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRunner } from '../contexts/RunnerContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import { DebugTestPanel } from '../../debug/components/DebugTestPanel';
 import '../styles/TerminalPane.css';
 
 interface TerminalTab {
@@ -46,6 +47,7 @@ export const TerminalPane: React.FC = () => {
   const [activeTabId, setActiveTabId] = useState('main');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [showDebugTestPanel, setShowDebugTestPanel] = useState(false);
 
   const terminalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -403,6 +405,14 @@ export const TerminalPane: React.FC = () => {
         </div>
 
         <div className="status-right">
+          <button
+            onClick={() => setShowDebugTestPanel(!showDebugTestPanel)}
+            className={`debug-test-toggle ${showDebugTestPanel ? 'active' : ''}`}
+            title="Toggle AI Debug & Test Panel"
+          >
+            {showDebugTestPanel ? '🐛' : '🧪'} Debug & Test
+          </button>
+
           {currentWorkspace && (
             <span className="workspace-info">
               📁 {currentWorkspace.name}
@@ -410,6 +420,32 @@ export const TerminalPane: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* AI Debug & Test Panel */}
+      {showDebugTestPanel && (
+        <div className="debug-test-panel-container">
+          <DebugTestPanel
+            workspaceRoot={currentWorkspace?.path || ''}
+            activeFile={currentWorkspace?.activeFile}
+            onTestRun={(results) => {
+              addNotification({
+                id: Date.now().toString(),
+                type: 'success',
+                message: `Test run completed: ${results.length} tests`,
+                timestamp: new Date()
+              });
+            }}
+            onDebugStart={(session) => {
+              addNotification({
+                id: Date.now().toString(),
+                type: 'info',
+                message: `Debug session started for ${session.file}`,
+                timestamp: new Date()
+              });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

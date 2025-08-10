@@ -1,0 +1,301 @@
+{
+	"name": "ai-dev-companion",
+	"displayName": "AI Development Companion",
+	"description": "Conversational AI that brainstorms, builds, and debugs applications in real-time",
+	"version": "1.0.0",
+	"publisher": "vsembed",
+	"engines": {
+		"vscode": "^1.74.0"
+	},
+	"categories": [
+		"Other",
+		"Debuggers",
+		"Snippets",
+		"Machine Learning"
+	],
+	"keywords": [
+		"ai",
+		"assistant",
+		"development",
+		"debugging",
+		"brainstorming",
+		"code-generation",
+		"conversational"
+	],
+	"activationEvents": [
+		"onCommand:aiDevCompanion.start",
+		"onDebug",
+		"onLanguage:typescript",
+		"onLanguage:javascript",
+		"onLanguage:python"
+	],
+	"main": "./out/ai/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "aiDevCompanion.start",
+				"title": "Start AI Development Companion",
+				"category": "AI Companion",
+				"icon": "$(robot)"
+			},
+			{
+				"command": "aiDevCompanion.stop",
+				"title": "Stop AI Development Companion",
+				"category": "AI Companion",
+				"icon": "$(debug-stop)"
+			},
+			{
+				"command": "aiDevCompanion.quickBrainstorm",
+				"title": "Quick Brainstorm with AI",
+				"category": "AI Companion",
+				"icon": "$(lightbulb)"
+			},
+			{
+				"command": "aiDevCompanion.debugWithAI",
+				"title": "Debug with AI",
+				"category": "AI Companion",
+				"icon": "$(debug-alt)"
+			},
+			{
+				"command": "aiDevCompanion.buildFeature",
+				"title": "Build Feature with AI",
+				"category": "AI Companion",
+				"icon": "$(tools)"
+			},
+			{
+				"command": "aiDevCompanion.exportConversation",
+				"title": "Export AI Conversation",
+				"category": "AI Companion",
+				"icon": "$(save)"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "aiDevCompanion.start",
+					"when": "!aiCompanion.active"
+				},
+				{
+					"command": "aiDevCompanion.stop",
+					"when": "aiCompanion.active"
+				},
+				{
+					"command": "aiDevCompanion.exportConversation",
+					"when": "aiCompanion.active"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "aiDevCompanion.debugWithAI",
+					"when": "editorHasSelection",
+					"group": "aiCompanion@1"
+				},
+				{
+					"command": "aiDevCompanion.quickBrainstorm",
+					"group": "aiCompanion@2"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "aiDevCompanion.buildFeature",
+					"when": "explorerResourceIsFolder",
+					"group": "aiCompanion@1"
+				}
+			],
+			"view/title": [
+				{
+					"command": "aiDevCompanion.start",
+					"when": "view == aiDevCompanion.brainstormView && !aiCompanion.active",
+					"group": "navigation"
+				},
+				{
+					"command": "aiDevCompanion.stop",
+					"when": "view == aiDevCompanion.brainstormView && aiCompanion.active",
+					"group": "navigation"
+				}
+			]
+		},
+		"keybindings": [
+			{
+				"command": "aiDevCompanion.start",
+				"key": "ctrl+shift+a",
+				"mac": "cmd+shift+a",
+				"when": "!aiCompanion.active"
+			},
+			{
+				"command": "aiDevCompanion.quickBrainstorm",
+				"key": "ctrl+shift+b",
+				"mac": "cmd+shift+b"
+			},
+			{
+				"command": "aiDevCompanion.debugWithAI",
+				"key": "ctrl+shift+d",
+				"mac": "cmd+shift+d",
+				"when": "editorTextFocus"
+			}
+		],
+		"views": {
+			"explorer": [
+				{
+					"id": "aiDevCompanion.brainstormView",
+					"name": "AI Brainstorming",
+					"when": "aiCompanion.active"
+				}
+			],
+			"debug": [
+				{
+					"id": "aiDevCompanion.debugConsole",
+					"name": "AI Debug Assistant",
+					"when": "debuggersAvailable"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "aiDevCompanion.brainstormView",
+				"contents": "Start brainstorming with AI to generate ideas and explore possibilities.\n[Start AI Companion](command:aiDevCompanion.start)\n[Quick Brainstorm](command:aiDevCompanion.quickBrainstorm)",
+				"when": "!aiCompanion.active"
+			},
+			{
+				"view": "aiDevCompanion.debugConsole",
+				"contents": "AI Debug Assistant helps you understand and fix issues in your code.\n[Debug with AI](command:aiDevCompanion.debugWithAI)\nStart a debug session to activate the AI assistant."
+			}
+		],
+		"configuration": {
+			"title": "AI Development Companion",
+			"properties": {
+				"aiDevCompanion.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable the AI Development Companion"
+				},
+				"aiDevCompanion.autoStart": {
+					"type": "boolean",
+					"default": false,
+					"description": "Automatically start the AI companion when VS Code opens"
+				},
+				"aiDevCompanion.model": {
+					"type": "string",
+					"enum": [
+						"gpt-4-turbo",
+						"gpt-4",
+						"gpt-3.5-turbo",
+						"claude-3-opus",
+						"claude-3-sonnet"
+					],
+					"default": "gpt-4-turbo",
+					"description": "AI model to use for conversations"
+				},
+				"aiDevCompanion.maxTokens": {
+					"type": "number",
+					"default": 4000,
+					"minimum": 1000,
+					"maximum": 8000,
+					"description": "Maximum tokens per AI response"
+				},
+				"aiDevCompanion.contextWindow": {
+					"type": "number",
+					"default": 10,
+					"minimum": 5,
+					"maximum": 50,
+					"description": "Number of previous messages to include in context"
+				},
+				"aiDevCompanion.autoSave": {
+					"type": "boolean",
+					"default": true,
+					"description": "Automatically save conversations"
+				},
+				"aiDevCompanion.livePreview": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable live preview for web projects"
+				},
+				"aiDevCompanion.debugAssistant": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable AI debug assistant"
+				},
+				"aiDevCompanion.brainstormingMode": {
+					"type": "string",
+					"enum": [
+						"creative",
+						"practical",
+						"balanced"
+					],
+					"default": "balanced",
+					"description": "Brainstorming mode for idea generation"
+				},
+				"aiDevCompanion.notifications": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show notifications for AI actions"
+				}
+			}
+		},
+		"debuggers": [
+			{
+				"type": "ai-debug",
+				"label": "AI Enhanced Debugging",
+				"program": "./out/debug/ai-debug-adapter.js",
+				"runtime": "node",
+				"configurationAttributes": {
+					"launch": {
+						"required": [
+							"program"
+						],
+						"properties": {
+							"program": {
+								"type": "string",
+								"description": "Absolute path to the program.",
+								"default": "${workspaceFolder}/${command:AskForProgramName}"
+							},
+							"aiAssist": {
+								"type": "boolean",
+								"description": "Enable AI debugging assistance",
+								"default": true
+							},
+							"smartBreakpoints": {
+								"type": "boolean",
+								"description": "Enable smart breakpoint suggestions",
+								"default": true
+							},
+							"liveTestIntegration": {
+								"type": "boolean",
+								"description": "Enable live test integration",
+								"default": true
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"type": "ai-debug",
+						"request": "launch",
+						"name": "AI Enhanced Debug",
+						"program": "${workspaceFolder}/app.js",
+						"aiAssist": true,
+						"smartBreakpoints": true,
+						"liveTestIntegration": true
+					}
+				]
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@types/node": "^18.x",
+		"@types/vscode": "^1.74.0",
+		"@typescript-eslint/eslint-plugin": "^5.45.0",
+		"@typescript-eslint/parser": "^5.45.0",
+		"eslint": "^8.28.0",
+		"typescript": "^4.9.4"
+	},
+	"dependencies": {
+		"ws": "^8.14.0",
+		"@types/ws": "^8.5.0"
+	}
+}

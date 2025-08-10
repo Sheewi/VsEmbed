@@ -321,6 +321,62 @@
   opacity: 0.8;
 }
 
+.debug-test-toggle {
+  background: none;
+  border: none;
+  color: var(--vscode-statusBar-foreground);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.debug-test-toggle:hover {
+  background-color: var(--vscode-statusBarItem-hoverBackground);
+}
+
+.debug-test-toggle.active {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.debug-test-panel-container {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  bottom: 60px;
+  width: 450px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--vscode-panel-border);
+}
+
+@media (max-width: 1200px) {
+  .debug-test-panel-container {
+    width: 380px;
+    right: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .debug-test-panel-container {
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    right: 10px;
+    bottom: 50px;
+    width: auto;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .terminal-tab {
