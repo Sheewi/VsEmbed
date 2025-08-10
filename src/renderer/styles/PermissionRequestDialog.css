@@ -1,0 +1,409 @@
+/* Permission Request Dialog Styles */
+.permission-request-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.permission-request-dialog {
+  background-color: var(--vscode-editor-background);
+  border: 2px solid var(--vscode-widget-border);
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.permission-header {
+  padding: 16px 20px;
+  background-color: var(--vscode-titleBar-activeBackground);
+  border-bottom: 1px solid var(--vscode-widget-border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.permission-icon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.permission-title {
+  flex: 1;
+}
+
+.permission-title h3 {
+  margin: 0;
+  color: var(--vscode-titleBar-activeForeground);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.timeout-indicator {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  margin-top: 4px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--vscode-titleBar-activeForeground);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.permission-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.extension-info {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.extension-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  margin-bottom: 4px;
+}
+
+.extension-id {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  font-family: var(--vscode-editor-font-family);
+  margin-bottom: 8px;
+}
+
+.extension-description {
+  font-size: 13px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.request-details {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  font-weight: 500;
+  color: var(--vscode-foreground);
+  min-width: 80px;
+}
+
+.command {
+  background-color: var(--vscode-textCodeBlock-background);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: var(--vscode-editor-font-family);
+  font-size: 12px;
+  color: var(--vscode-textPreformat-foreground);
+}
+
+.purpose {
+  color: var(--vscode-foreground);
+  flex: 1;
+}
+
+.risk-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+.warning-box {
+  background-color: rgba(244, 67, 54, 0.1);
+  border: 1px solid #f44336;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.warning-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.warning-text strong {
+  color: #f44336;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.warning-text p {
+  margin: 0;
+  color: var(--vscode-foreground);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.caution-box {
+  background-color: rgba(255, 152, 0, 0.1);
+  border: 1px solid #ff9800;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.caution-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.caution-text strong {
+  color: #ff9800;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.caution-text p {
+  margin: 0;
+  color: var(--vscode-foreground);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.permission-options {
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-widget-border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.remember-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--vscode-foreground);
+}
+
+.remember-option input[type="checkbox"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--vscode-checkbox-border);
+  border-radius: 3px;
+  background-color: var(--vscode-checkbox-background);
+  cursor: pointer;
+  position: relative;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.remember-option input[type="checkbox"]:checked {
+  background-color: var(--vscode-checkbox-selectBackground);
+  border-color: var(--vscode-checkbox-selectBorder);
+}
+
+.remember-option input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--vscode-checkbox-selectForeground);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.remember-option .checkmark {
+  display: none;
+}
+
+.permission-actions {
+  padding: 16px 20px;
+  background-color: var(--vscode-editor-background);
+  border-top: 1px solid var(--vscode-widget-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.deny-btn {
+  background-color: var(--vscode-button-secondaryBackground);
+  color: var(--vscode-button-secondaryForeground);
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+.deny-btn:hover {
+  background-color: var(--vscode-button-secondaryHoverBackground);
+  border-color: var(--vscode-button-hoverBorder);
+}
+
+.allow-btn {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  min-width: 80px;
+}
+
+.allow-btn:hover {
+  background-color: var(--vscode-button-hoverBackground);
+  border-color: var(--vscode-button-hoverBorder);
+}
+
+.progress-bar {
+  height: 3px;
+  background-color: var(--vscode-progressBar-background);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 1s linear;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .permission-request-dialog {
+    width: 95vw;
+    margin: 10px;
+  }
+
+  .permission-content {
+    padding: 16px;
+  }
+
+  .permission-header {
+    padding: 12px 16px;
+  }
+
+  .permission-actions {
+    padding: 12px 16px;
+    flex-direction: column;
+  }
+
+  .deny-btn,
+  .allow-btn {
+    width: 100%;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .label {
+    min-width: auto;
+    font-size: 12px;
+  }
+
+  .warning-box,
+  .caution-box {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .permission-request-dialog {
+    border-width: 3px;
+  }
+
+  .warning-box,
+  .caution-box {
+    border-width: 2px;
+  }
+
+  .risk-badge {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .permission-request-overlay,
+  .permission-request-dialog {
+    animation: none;
+  }
+
+  .progress-fill {
+    transition: none;
+  }
+}

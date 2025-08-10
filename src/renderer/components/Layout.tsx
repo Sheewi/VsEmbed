@@ -6,6 +6,8 @@ import { TerminalPane } from './TerminalPane';
 import { PreviewPane } from './PreviewPane';
 import { FileExplorer } from './FileExplorer';
 import { StatusBar } from './StatusBar';
+import { ModelSettings } from './ModelSettings';
+import { PermissionRequestManager } from './PermissionRequestDialog';
 import '../styles/Layout.css';
 
 interface LayoutProps {
@@ -17,6 +19,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [terminalVisible, setTerminalVisible] = useState(true);
   const [previewVisible, setPreviewVisible] = useState(true);
   const [chatVisible, setChatVisible] = useState(true);
+  const [showModelSettings, setShowModelSettings] = useState(false);
 
   const handleViewToggle = (view: string) => {
     switch (view) {
@@ -31,6 +34,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         break;
       case 'chat':
         setChatVisible(!chatVisible);
+        break;
+      case 'settings':
+        setShowModelSettings(true);
         break;
     }
   };
@@ -53,53 +59,60 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="layout">
-      {/* Menu Bar */}
-      <MenuHandler onViewToggle={handleViewToggle} />
+    <PermissionRequestManager>
+      <div className="layout">
+        {/* Menu Bar */}
+        <MenuHandler onViewToggle={handleViewToggle} />
 
-      {/* Main Content */}
-      <div className="main-content">
-        {/* Sidebar */}
-        {sidebarVisible && (
-          <div className="sidebar">
-            <FileExplorer />
+        {/* Main Content */}
+        <div className="main-content">
+          {/* Sidebar */}
+          {sidebarVisible && (
+            <div className="sidebar">
+              <FileExplorer />
+            </div>
+          )}
+
+          {/* Editor Area */}
+          <div className="editor-area">
+            <div className="editor-container">
+              {/* Chat Panel */}
+              {chatVisible && (
+                <div className="chat-panel">
+                  <ChatPane />
+                </div>
+              )}
+
+              {/* Code Editor */}
+              <div className="code-editor">
+                <EditorPane />
+              </div>
+            </div>
+
+            {/* Preview Panel */}
+            {previewVisible && (
+              <div className="preview-panel">
+                <PreviewPane />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Terminal */}
+        {terminalVisible && (
+          <div className="terminal-panel">
+            <TerminalPane />
           </div>
         )}
 
-        {/* Editor Area */}
-        <div className="editor-area">
-          <div className="editor-container">
-            {/* Chat Panel */}
-            {chatVisible && (
-              <div className="chat-panel">
-                <ChatPane />
-              </div>
-            )}
+        {/* Status Bar */}
+        <StatusBar onTogglePanel={handlePanelToggle} />
 
-            {/* Code Editor */}
-            <div className="code-editor">
-              <EditorPane />
-            </div>
-          </div>
-
-          {/* Preview Panel */}
-          {previewVisible && (
-            <div className="preview-panel">
-              <PreviewPane />
-            </div>
-          )}
-        </div>
+        {/* Model Settings Dialog */}
+        {showModelSettings && (
+          <ModelSettings onClose={() => setShowModelSettings(false)} />
+        )}
       </div>
-
-      {/* Terminal */}
-      {terminalVisible && (
-        <div className="terminal-panel">
-          <TerminalPane />
-        </div>
-      )}
-
-      {/* Status Bar */}
-      <StatusBar onTogglePanel={handlePanelToggle} />
-    </div>
+    </PermissionRequestManager>
   );
 };
