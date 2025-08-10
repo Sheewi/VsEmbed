@@ -101,7 +101,10 @@ export class ModelManager {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${process.env.VSEMBED_API_KEY}`
+						'Authorization': `Bearer ${process.env.VSEMBED_API_KEY}`,
+						'Content-Security-Policy': 'default-src self',
+						'X-Content-Type-Options': 'nosniff',
+						'X-Frame-Options': 'DENY'
 					},
 					body: JSON.stringify(request)
 				});
