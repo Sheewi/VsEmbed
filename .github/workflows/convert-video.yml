@@ -1,0 +1,49 @@
+name: Convert Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: 'Path to input video file'
+        required: true
+      output_format:
+        description: 'Output format (mp4, webm, etc.)'
+        required: true
+        default: 'mp4'
+  push:
+    paths:
+      - '**.mov'
+      - '**.avi'
+      - '**.mkv'
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        
+      - name: Convert video
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            INPUT_FILE="${{ github.event.inputs.input_file }}"
+            OUTPUT_FORMAT="${{ github.event.inputs.output_format }}"
+            OUTPUT_FILE="${INPUT_FILE%.*}.${OUTPUT_FORMAT}"
+            ffmpeg -i "$INPUT_FILE" "$OUTPUT_FILE"
+          else
+            for file in $(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -E '\.(mov|avi|mkv)$'); do
+              OUTPUT_FILE="${file%.*}.mp4"
+              ffmpeg -i "$file" "$OUTPUT_FILE"
+            done
+          fi
+          
+      - name: Commit converted files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.mp4 *.webm
+          git commit -m "Convert videos" || echo "No changes to commit"
+          git push
