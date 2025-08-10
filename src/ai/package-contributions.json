@@ -1,0 +1,190 @@
+{
+  "contributes": {
+    "commands": [
+      {
+        "command": "ai.oneClickModelSetup",
+        "title": "🚀 One-Click AI Model Setup",
+        "category": "AI Models",
+        "icon": "$(robot)"
+      },
+      {
+        "command": "ai.openModelManager",
+        "title": "📊 Open Model Manager",
+        "category": "AI Models",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "ai.quickModelSwitch",
+        "title": "🔄 Quick Model Switch",
+        "category": "AI Models",
+        "icon": "$(arrow-swap)"
+      },
+      {
+        "command": "ai.modelManager.showStats",
+        "title": "📈 Show Model Statistics",
+        "category": "AI Models"
+      },
+      {
+        "command": "ai.modelManager.refresh",
+        "title": "🔄 Refresh Model Status",
+        "category": "AI Models"
+      },
+      {
+        "command": "ai.modelManager.testActive",
+        "title": "🧪 Test Active Model",
+        "category": "AI Models"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "ai.oneClickModelSetup",
+          "when": "true"
+        },
+        {
+          "command": "ai.openModelManager",
+          "when": "true"
+        },
+        {
+          "command": "ai.quickModelSwitch",
+          "when": "true"
+        },
+        {
+          "command": "ai.modelManager.showStats",
+          "when": "true"
+        },
+        {
+          "command": "ai.modelManager.refresh",
+          "when": "true"
+        },
+        {
+          "command": "ai.modelManager.testActive",
+          "when": "true"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "ai.openModelManager",
+          "when": "view == aiModelsView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "aiModelsView",
+          "name": "AI Models",
+          "when": "true"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiModels",
+          "title": "AI Models",
+          "icon": "$(robot)"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "AI Models",
+      "properties": {
+        "ai.activeModel": {
+          "type": "string",
+          "default": "",
+          "description": "Currently active AI model ID"
+        },
+        "ai.models.autoDetect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically detect optimal models for system"
+        },
+        "ai.models.downloadPath": {
+          "type": "string",
+          "default": "~/ai_models",
+          "description": "Directory to download AI models to"
+        },
+        "ai.models.maxConcurrentDownloads": {
+          "type": "number",
+          "default": 1,
+          "description": "Maximum number of concurrent model downloads"
+        },
+        "ai.models.verifyDownloads": {
+          "type": "boolean",
+          "default": true,
+          "description": "Verify model downloads after completion"
+        },
+        "ai.models.enableGpuAcceleration": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable GPU acceleration when available"
+        },
+        "ai.models.defaultQuantization": {
+          "type": "string",
+          "enum": ["q4_0", "q4_1", "q5_0", "q5_1", "q8_0", "f16", "f32"],
+          "default": "q4_0",
+          "description": "Default quantization level for local models"
+        },
+        "ai.models.contextLength": {
+          "type": "number",
+          "default": 2048,
+          "description": "Default context length for AI models"
+        },
+        "ai.models.showWelcomeMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show welcome message when no models are installed"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "ai.quickModelSwitch",
+        "key": "ctrl+shift+m",
+        "mac": "cmd+shift+m",
+        "when": "true"
+      },
+      {
+        "command": "ai.openModelManager",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "true"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "aiModelSetup",
+        "title": "AI Model Setup",
+        "description": "Get started with AI models in VS Code",
+        "steps": [
+          {
+            "id": "runOneClickSetup",
+            "title": "Run One-Click Setup",
+            "description": "Automatically detect and install the best AI model for your system.\n[Run One-Click Setup](command:ai.oneClickModelSetup)",
+            "media": {
+              "markdown": "media/setup-step1.md"
+            }
+          },
+          {
+            "id": "browseModels",
+            "title": "Browse Available Models",
+            "description": "Explore the catalog of available AI models and install specific ones.\n[Open Model Manager](command:ai.openModelManager)",
+            "media": {
+              "markdown": "media/setup-step2.md"
+            }
+          },
+          {
+            "id": "switchModels",
+            "title": "Switch Between Models",
+            "description": "Quickly switch between installed AI models.\n[Quick Model Switch](command:ai.quickModelSwitch)",
+            "media": {
+              "markdown": "media/setup-step3.md"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
