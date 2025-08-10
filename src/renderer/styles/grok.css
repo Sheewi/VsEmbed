@@ -1,0 +1,261 @@
+/* --- GROK UX STYLES --- */
+/* Merged from example/inlinestylesheet1-5 and example/*.css */
+
+/* Inline stylesheets */
+.r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}
+.r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}
+
+:where(html[dir="ltr"]),:where([data-sonner-toaster][dir="ltr"]) {
+  --toast-icon-margin-start: -3px;
+  --toast-icon-margin-end: 4px;
+  --toast-svg-margin-start: -1px;
+  --toast-svg-margin-end: 0px;
+  --toast-button-margin-start: auto;
+  --toast-button-margin-end: 0;
+  --toast-close-button-start: 0;
+  --toast-close-button-end: unset;
+  --toast-close-button-transform: translate(-35%, -35%)
+}
+:where(html[dir="rtl"]),:where([data-sonner-toaster][dir="rtl"]) {
+  --toast-icon-margin-start: 4px;
+  --toast-icon-margin-end: -3px;
+  --toast-svg-margin-start: 0px;
+  --toast-svg-margin-end: -1px;
+  --toast-button-margin-start: 0;
+  --toast-button-margin-end: auto;
+  --toast-close-button-start: unset;
+  --toast-close-button-end: 0;
+  --toast-close-button-transform: translate(35%, -35%)
+}
+:where([data-sonner-toaster]) {
+  position:fixed;
+  width:var(--width);
+  font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+  --gray1: hsl(0, 0%, 99%);
+  --gray2: hsl(0, 0%, 97.3%);
+  --gray3: hsl(0, 0%, 95.1%);
+  --gray4: hsl(0, 0%, 93%);
+  --gray5: hsl(0, 0%, 90.9%);
+  --gray6: hsl(0, 0%, 88.7%);
+  --gray7: hsl(0, 0%, 85.8%);
+  --gray8: hsl(0, 0%, 78%);
+  --gray9: hsl(0, 0%, 56.1%);
+  --gray10: hsl(0, 0%, 52.3%);
+  --gray11: hsl(0, 0%, 43.5%);
+  --gray12: hsl(0, 0%, 9%);
+  --border-radius: 8px;
+  box-sizing:border-box;
+  padding:0;
+  margin:0;
+  list-style:none;
+  outline:none;
+  z-index:999999999;
+  transition:transform .4s ease
+}
+:where([data-sonner-toaster][data-lifted="true"]) {
+  transform:translateY(-10px)
+}
+@media (hover: none) and (pointer: coarse) {
+  :where([data-sonner-toaster][data-lifted="true"]) {
+    transform:none
+  }
+}
+:where([data-sonner-toaster][data-x-position="right"]) {
+  right:max(var(--offset),env(safe-area-inset-right))
+}
+:where([data-sonner-toaster][data-x-position="left"]) {
+  left:max(var(--offset),env(safe-area-inset-left))
+}
+
+[vaul-drawer] {
+  touch-action:none;
+  will-change:transform;
+  transition:transform .5s cubic-bezier(.32, .72, 0, 1)
+}
+[vaul-drawer][vaul-drawer-direction=bottom] {
+  transform:translate3d(0,100%,0)
+}
+[vaul-drawer][vaul-drawer-direction=top] {
+  transform:translate3d(0,-100%,0)
+}
+[vaul-drawer][vaul-drawer-direction=left] {
+  transform:translate3d(-100%,0,0)
+}
+[vaul-drawer][vaul-drawer-direction=right] {
+  transform:translate3d(100%,0,0)
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=top] {
+  overflow-y:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=bottom] {
+  overflow-y:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=left] {
+  overflow-x:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=right] {
+  overflow-x:hidden!important
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=top] {
+  transform:translate3d(0,var(--snap-point-height,0),0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=bottom] {
+  transform:translate3d(0,var(--snap-point-height,0),0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=left] {
+  transform:translate3d(var(--snap-point-height,0),0,0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=right] {
+  transform:translate3d(var(--snap-point-height,0),0,0)
+}
+[vaul-overlay] {
+  opacity:0;
+  transition:opacity .5s cubic-bezier(.32, .72, 0, 1)
+}
+[vaul-overlay][vaul-drawer-visible=true] {
+  opacity:1
+}
+[vaul-drawer]::after {
+  content:'';
+  position:absolute;
+  background:inherit;
+  background-color:inherit
+}
+[vaul-drawer][vaul-drawer-direction=top]::after {
+  top:initial;
+  bottom:100%;
+  left:0;
+  right:0;
+  height:200%
+}
+
+.transform-component-module_wrapper__SPB86 {
+  position: relative;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+.transform-component-module_content__FBWxo {
+  display: flex;
+  flex-wrap: wrap;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  margin: 0;
+  padding: 0;
+  transform-origin: 0% 0%;
+}
+.transform-component-module_content__FBWxo img {
+  pointer-events: none;
+}
+
+.picker-dialog-frame {
+  width:100%;
+  height:100%;
+  border:0;
+  overflow:hidden
+}
+.picker-dialog-bg {
+  position:absolute;
+  top:0;
+  left:0;
+  background-color:#fff;
+  z-index:1000
+}
+.picker-dialog {
+  position:absolute;
+  top:0;
+  left:0;
+  background-color:#fff;
+  border:1px solid #acacac;
+  width:auto;
+  padding:0;
+  z-index:1001;
+  overflow:auto;
+  box-shadow:0 4px 16px rgba(0,0,0,.2)
+}
+.picker-dialog-content {
+  height:100%;
+  font-size:0;
+  padding:0
+}
+.picker-dialog-buttons,
+.picker-dialog-title {
+  display:none
+}
+
+/* Example CSS (partial, for brevity) */
+.gdg-r17m35ur {
+  flex-grow:1;
+  border:none;
+  outline:none;
+  background-color:var(--gdg-bg-header-has-focus);
+  border-radius:9px;
+  padding:0 8px;
+  box-shadow:0 0 0 1px var(--gdg-border-color);
+  color:var(--gdg-text-group-header);
+  min-height:var(--r17m35ur-0);
+  font:var(--gdg-header-font-style) var(--gdg-font-family)
+}
+.gdg-c1tqibwd {
+  padding:0 8px;
+  display:flex;
+  align-items:center;
+  background-color:var(--gdg-bg-header)
+}
+.gdg-seveqep {
+  position:absolute;
+  top:4px;
+  right:20px;
+  background-color:var(--gdg-bg-cell);
+  color:var(--gdg-text-dark);
+  padding:8px;
+  border:1px solid var(--gdg-border-color);
+  border-radius:6px;
+  font-size:var(--gdg-editor-font-size);
+  animation:gdg-search-fadein-gdg-seveqep .15s forwards
+}
+.gdg-seveqep.out {
+  animation:gdg-search-fadeout-gdg-seveqep .15s forwards
+}
+.gdg-seveqep .gdg-search-bar-inner {
+  display:flex
+}
+.gdg-seveqep .gdg-search-status {
+  padding-top:4px;
+  font-size:11px
+}
+.gdg-seveqep .gdg-search-progress {
+  position:absolute;
+  height:4px;
+  left:0;
+  bottom:0;
+  background-color:var(--gdg-text-light)
+}
+.gdg-seveqep input {
+  width:220px;
+  color:var(--gdg-textDark);
+  background-color:var(--gdg-bg-cell);
+  border:0;
+  outline:none
+}
+.gdg-seveqep button {
+  width:24px;
+  height:24px;
+  padding:0;
+  border:none;
+  outline:none;
+  background:none;
+}
+/* ...additional Grok CSS omitted for brevity... */
