@@ -1,127 +1,25 @@
 import { app, BrowserWindow, ipcMain, Menu, dialog } from 'electron';
 import * as path from 'path';
-import { AIOrchestratorService } from './services/AIOrchestratorService';
-import { WorkspaceManager } from './services/WorkspaceManager';
-import { SecretsManager } from './services/SecretsManager';
-import { RunnerManager } from './services/RunnerManager';
-import { SecurityManager } from './services/SecurityManager';
-import { VSCodeBridge } from '../electron/vscode';
-import { PermissionMiddleware } from '../permissions/middleware';
-import { AIStream } from '../ai/streaming';
-import { PerformanceOptimizer, defaultOptimizationConfig } from '../performance/optimizer';
-import { DockerManager } from '../docker/sandbox';
-import { ExtensionRecommender } from '../extensions/recommender';
-
-class VSEmbedApplication {
-	private mainWindow: BrowserWindow | null = null;
-	private orchestrator: AIOrchestratorService;
-	private workspaceManager: WorkspaceManager;
-	private secretsManager: SecretsManager;
-	private runnerManager: RunnerManager;
-	private securityManager: SecurityManager;
-	private vscodeBridge: VSCodeBridge;
-	private permissionMiddleware: PermissionMiddleware;
-	private aiStream: AIStream;
-	private performanceOptimizer: PerformanceOptimizer;
-	private dockerManager: DockerManager;
-	private extensionRecommender: ExtensionRecommender;
-
-	constructor() {
-		this.orchestrator = new AIOrchestratorService();
-		this.workspaceManager = new WorkspaceManager();
-		this.secretsManager = new SecretsManager();
-		this.runnerManager = new RunnerManager();
-		this.securityManager = new SecurityManager();
-
-		// Initialize new components - ALL PROPERLY WIRED
-		this.extensionRecommender = new ExtensionRecommender();
-		this.vscodeBridge = new VSCodeBridge();
-		this.permissionMiddleware = new PermissionMiddleware();
-		this.aiStream = new AIStream(8081);
-		this.performanceOptimizer = new PerformanceOptimizer(defaultOptimizationConfig);
-		this.dockerManager = new DockerManager(this.extensionRecommender);
-
-		this.setupAppHandlers();
-		this.setupIpcHandlers();
-		this.setupNewComponentHandlers();
-		this.setupShutdownHandlers();
-	}
-
-	private setupAppHandlers(): void {
-		app.whenReady().then(() => {
-			this.createMainWindow();
-			this.createMenu();
-		});
-
-		app.on('window-all-closed', () => {
-			if (process.platform !== 'darwin') {
-				app.quit();
-			}
-		});
-
-		app.on('activate', () => {
-			if (BrowserWindow.getAllWindows().length === 0) {
-				this.createMainWindow();
-			}
-		});
-
-		app.on('web-contents-created', (event, contents) => {
-			contents.on('new-window', (event, navigationUrl) => {
-				event.preventDefault();
-				if (!navigationUrl.startsWith('http://localhost:')) {
-					console.warn('Blocked navigation to:', navigationUrl);
-				}
-			});
-		});
-	}
-
-	private createMainWindow(): void {
-		this.mainWindow = new BrowserWindow({
-			width: 1400,
-			height: 900,
-			minWidth: 800,
-			minHeight: 600,
-			webPreferences: {
-				nodeIntegration: false,
-				contextIsolation: true,
-				enableRemoteModule: false,
-				preload: path.join(__dirname, 'preload.js'),
-				webSecurity: true,
-				allowRunningInsecureContent: false,
-			},
-			titleBarStyle: 'default',
-			show: false,
-		});
-
-		if (process.env.NODE_ENV === 'development') {
-			this.mainWindow.loadURL('http://localhost:3000');
-			this.mainWindow.webContents.openDevTools();
-		} else {
-			this.mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
-		}
-
-		this.mainWindow.once('ready-to-show', () => {
-			this.mainWindow?.show();
-		});
-
-		this.mainWindow.on('closed', () => {
-			this.mainWindow = null;
-		});
-	}
-
-	private createMenu(): void {
-		const template: any[] = [
-			{
-				label: 'File',
+import { AIOrchestratorService } from '../services/AIOrchestratorService';
+import { WorkspaceManager } from '../services/WorkspaceManager';
+import { SecretsManager } from '../services/SecretsManager';
+import { RunnerManager } from '../services/RunnerManager';
+import { SecurityManager } from '../services/SecurityManager';
+// ...existing code...
+	this.setupAppHandlers();
+	this.setupIpcHandlers();
+	this.setupNewComponentHandlers();
+}
 				submenu: [
-					{ label: 'New Workspace', accelerator: 'CmdOrCtrl+N', click: () => this.handleNewWorkspace() },
-					{ label: 'Open Workspace', accelerator: 'CmdOrCtrl+O', click: () => this.handleOpenWorkspace() },
-					{ label: 'Export Workspace', accelerator: 'CmdOrCtrl+E', click: () => this.handleExportWorkspace() },
-					{ type: 'separator' },
-					{ label: 'Settings', accelerator: 'CmdOrCtrl+,', click: () => this.handleSettings() },
-					{ type: 'separator' },
-					{ label: 'Quit', accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q', click: () => app.quit() }
-				]
+					{ label: 'About', click: () => this.handleAbout() },
+					{ label: 'Documentation', click: () => this.handleDocumentation() },
+				],
+			},
+		];
+
+		const menu = Menu.buildFromTemplate(template);
+		Menu.setApplicationMenu(menu);
+	}
 			},
 			{
 				label: 'AI',
