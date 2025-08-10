@@ -50,11 +50,17 @@
     "webpack-dev-server": "^4.13.0"
   },
   "dependencies": {
+    "@vscode/vscode-languagedetection": "^1.0.0",
+    "@vscode/extension-telemetry": "^0.6.2",
+    "vscode-languageclient": "^8.0.2",
+    "vscode-languageserver": "^8.0.2",
+    "vscode-languageserver-textdocument": "^1.0.8",
     "axios": "^1.3.0",
     "crypto-js": "^4.1.0",
     "dockerode": "^3.3.0",
     "electron-store": "^8.1.0",
     "monaco-editor": "^0.45.0",
+    "monaco-languageclient": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rclone": "^2.0.0",
