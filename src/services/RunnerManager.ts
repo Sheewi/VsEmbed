@@ -1,13 +1,13 @@
 import { RunnerAPI } from '../api/interfaces';
 import { RunnerConfig, RunnerStatus, BuildResult } from '../types';
 import { TerminalService } from './TerminalService';
-import Docker from 'dockerode';
+// import Docker from 'dockerode'; // Disabled due to constructor issues
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
 export class RunnerManager implements RunnerAPI {
-	private docker: Docker | null = null;
-	private currentContainer: Docker.Container | null = null;
+	private docker: any | null = null; // Disabled Docker functionality
+	private currentContainer: any | null = null; // Disabled Docker functionality
 	private currentStatus: RunnerStatus;
 	private terminalService: TerminalService;
 	private workspacePath: string | null = null;
