@@ -6,6 +6,37 @@ import { SecretsManager } from '../services/SecretsManager';
 import { RunnerManager } from '../services/RunnerManager';
 import { SecurityManager } from '../services/SecurityManager';
 class VSEmbedApplication {
+	constructor() {
+		app.on('ready', this.createMainWindow.bind(this));
+		app.on('window-all-closed', () => {
+			if (process.platform !== 'darwin') {
+				app.quit();
+			}
+		});
+		app.on('activate', () => {
+			if (this.mainWindow === null) {
+				this.createMainWindow();
+			}
+		});
+		// ...existing constructor logic (if any)...
+	}
+
+	private createMainWindow() {
+		this.mainWindow = new BrowserWindow({
+			width: 1200,
+			height: 800,
+			webPreferences: {
+				nodeIntegration: true,
+				contextIsolation: false,
+			},
+		});
+		// Load renderer output (index.html from .webpack/renderer)
+		const rendererPath = path.join(__dirname, '../renderer/index.html');
+		this.mainWindow.loadFile(rendererPath);
+		this.mainWindow.on('closed', () => {
+			this.mainWindow = null;
+		});
+	}
 	private mainWindow: BrowserWindow | null = null;
 	private orchestrator = new AIOrchestratorService();
 	private workspaceManager = new WorkspaceManager();
