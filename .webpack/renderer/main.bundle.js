@@ -3609,10 +3609,10 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* TerminalPane.css */
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/index.css":
-/*!*****************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/index.css ***!
-  \*****************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/grok.css":
+/*!****************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/grok.css ***!
+  \****************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -3627,6 +3627,296 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* --- GROK UX STYLES --- */
+/* Merged from example/inlinestylesheet1-5 and example/*.css */
+
+/* Inline stylesheets */
+.r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}
+.r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}
+
+:where(html[dir="ltr"]),:where([data-sonner-toaster][dir="ltr"]) {
+  --toast-icon-margin-start: -3px;
+  --toast-icon-margin-end: 4px;
+  --toast-svg-margin-start: -1px;
+  --toast-svg-margin-end: 0px;
+  --toast-button-margin-start: auto;
+  --toast-button-margin-end: 0;
+  --toast-close-button-start: 0;
+  --toast-close-button-end: unset;
+  --toast-close-button-transform: translate(-35%, -35%)
+}
+:where(html[dir="rtl"]),:where([data-sonner-toaster][dir="rtl"]) {
+  --toast-icon-margin-start: 4px;
+  --toast-icon-margin-end: -3px;
+  --toast-svg-margin-start: 0px;
+  --toast-svg-margin-end: -1px;
+  --toast-button-margin-start: 0;
+  --toast-button-margin-end: auto;
+  --toast-close-button-start: unset;
+  --toast-close-button-end: 0;
+  --toast-close-button-transform: translate(35%, -35%)
+}
+:where([data-sonner-toaster]) {
+  position:fixed;
+  width:var(--width);
+  font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
+  --gray1: hsl(0, 0%, 99%);
+  --gray2: hsl(0, 0%, 97.3%);
+  --gray3: hsl(0, 0%, 95.1%);
+  --gray4: hsl(0, 0%, 93%);
+  --gray5: hsl(0, 0%, 90.9%);
+  --gray6: hsl(0, 0%, 88.7%);
+  --gray7: hsl(0, 0%, 85.8%);
+  --gray8: hsl(0, 0%, 78%);
+  --gray9: hsl(0, 0%, 56.1%);
+  --gray10: hsl(0, 0%, 52.3%);
+  --gray11: hsl(0, 0%, 43.5%);
+  --gray12: hsl(0, 0%, 9%);
+  --border-radius: 8px;
+  box-sizing:border-box;
+  padding:0;
+  margin:0;
+  list-style:none;
+  outline:none;
+  z-index:999999999;
+  transition:transform .4s ease
+}
+:where([data-sonner-toaster][data-lifted="true"]) {
+  transform:translateY(-10px)
+}
+@media (hover: none) and (pointer: coarse) {
+  :where([data-sonner-toaster][data-lifted="true"]) {
+    transform:none
+  }
+}
+:where([data-sonner-toaster][data-x-position="right"]) {
+  right:max(var(--offset),env(safe-area-inset-right))
+}
+:where([data-sonner-toaster][data-x-position="left"]) {
+  left:max(var(--offset),env(safe-area-inset-left))
+}
+
+[vaul-drawer] {
+  touch-action:none;
+  will-change:transform;
+  transition:transform .5s cubic-bezier(.32, .72, 0, 1)
+}
+[vaul-drawer][vaul-drawer-direction=bottom] {
+  transform:translate3d(0,100%,0)
+}
+[vaul-drawer][vaul-drawer-direction=top] {
+  transform:translate3d(0,-100%,0)
+}
+[vaul-drawer][vaul-drawer-direction=left] {
+  transform:translate3d(-100%,0,0)
+}
+[vaul-drawer][vaul-drawer-direction=right] {
+  transform:translate3d(100%,0,0)
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=top] {
+  overflow-y:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=bottom] {
+  overflow-y:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=left] {
+  overflow-x:hidden!important
+}
+.vaul-dragging .vaul-scrollable [vault-drawer-direction=right] {
+  overflow-x:hidden!important
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=top] {
+  transform:translate3d(0,var(--snap-point-height,0),0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=bottom] {
+  transform:translate3d(0,var(--snap-point-height,0),0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=left] {
+  transform:translate3d(var(--snap-point-height,0),0,0)
+}
+[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=right] {
+  transform:translate3d(var(--snap-point-height,0),0,0)
+}
+[vaul-overlay] {
+  opacity:0;
+  transition:opacity .5s cubic-bezier(.32, .72, 0, 1)
+}
+[vaul-overlay][vaul-drawer-visible=true] {
+  opacity:1
+}
+[vaul-drawer]::after {
+  content:'';
+  position:absolute;
+  background:inherit;
+  background-color:inherit
+}
+[vaul-drawer][vaul-drawer-direction=top]::after {
+  top:initial;
+  bottom:100%;
+  left:0;
+  right:0;
+  height:200%
+}
+
+.transform-component-module_wrapper__SPB86 {
+  position: relative;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+.transform-component-module_content__FBWxo {
+  display: flex;
+  flex-wrap: wrap;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  margin: 0;
+  padding: 0;
+  transform-origin: 0% 0%;
+}
+.transform-component-module_content__FBWxo img {
+  pointer-events: none;
+}
+
+.picker-dialog-frame {
+  width:100%;
+  height:100%;
+  border:0;
+  overflow:hidden
+}
+.picker-dialog-bg {
+  position:absolute;
+  top:0;
+  left:0;
+  background-color:#fff;
+  z-index:1000
+}
+.picker-dialog {
+  position:absolute;
+  top:0;
+  left:0;
+  background-color:#fff;
+  border:1px solid #acacac;
+  width:auto;
+  padding:0;
+  z-index:1001;
+  overflow:auto;
+  box-shadow:0 4px 16px rgba(0,0,0,.2)
+}
+.picker-dialog-content {
+  height:100%;
+  font-size:0;
+  padding:0
+}
+.picker-dialog-buttons,
+.picker-dialog-title {
+  display:none
+}
+
+/* Example CSS (partial, for brevity) */
+.gdg-r17m35ur {
+  flex-grow:1;
+  border:none;
+  outline:none;
+  background-color:var(--gdg-bg-header-has-focus);
+  border-radius:9px;
+  padding:0 8px;
+  box-shadow:0 0 0 1px var(--gdg-border-color);
+  color:var(--gdg-text-group-header);
+  min-height:var(--r17m35ur-0);
+  font:var(--gdg-header-font-style) var(--gdg-font-family)
+}
+.gdg-c1tqibwd {
+  padding:0 8px;
+  display:flex;
+  align-items:center;
+  background-color:var(--gdg-bg-header)
+}
+.gdg-seveqep {
+  position:absolute;
+  top:4px;
+  right:20px;
+  background-color:var(--gdg-bg-cell);
+  color:var(--gdg-text-dark);
+  padding:8px;
+  border:1px solid var(--gdg-border-color);
+  border-radius:6px;
+  font-size:var(--gdg-editor-font-size);
+  animation:gdg-search-fadein-gdg-seveqep .15s forwards
+}
+.gdg-seveqep.out {
+  animation:gdg-search-fadeout-gdg-seveqep .15s forwards
+}
+.gdg-seveqep .gdg-search-bar-inner {
+  display:flex
+}
+.gdg-seveqep .gdg-search-status {
+  padding-top:4px;
+  font-size:11px
+}
+.gdg-seveqep .gdg-search-progress {
+  position:absolute;
+  height:4px;
+  left:0;
+  bottom:0;
+  background-color:var(--gdg-text-light)
+}
+.gdg-seveqep input {
+  width:220px;
+  color:var(--gdg-textDark);
+  background-color:var(--gdg-bg-cell);
+  border:0;
+  outline:none
+}
+.gdg-seveqep button {
+  width:24px;
+  height:24px;
+  padding:0;
+  border:none;
+  outline:none;
+  background:none;
+}
+/* ...additional Grok CSS omitted for brevity... */
+`, "",{"version":3,"sources":["webpack://./src/renderer/styles/grok.css"],"names":[],"mappings":"AAAA,2BAA2B;AAC3B,8DAA8D;;AAE9D,uBAAuB;AACvB,WAAW,iBAAiB,CAAC,iBAAiB,CAAC,KAAK,CAAC,UAAU,CAAC,mBAAmB;AACnF,kBAAkB,kBAAkB,CAAC,QAAQ,CAAC,UAAU;;AAExD;EACE,+BAA+B;EAC/B,4BAA4B;EAC5B,8BAA8B;EAC9B,2BAA2B;EAC3B,iCAAiC;EACjC,4BAA4B;EAC5B,6BAA6B;EAC7B,+BAA+B;EAC/B;AACF;AACA;EACE,8BAA8B;EAC9B,6BAA6B;EAC7B,6BAA6B;EAC7B,4BAA4B;EAC5B,8BAA8B;EAC9B,+BAA+B;EAC/B,iCAAiC;EACjC,2BAA2B;EAC3B;AACF;AACA;EACE,cAAc;EACd,kBAAkB;EAClB,gMAAgM;EAChM,wBAAwB;EACxB,0BAA0B;EAC1B,0BAA0B;EAC1B,wBAAwB;EACxB,0BAA0B;EAC1B,0BAA0B;EAC1B,0BAA0B;EAC1B,wBAAwB;EACxB,0BAA0B;EAC1B,2BAA2B;EAC3B,2BAA2B;EAC3B,wBAAwB;EACxB,oBAAoB;EACpB,qBAAqB;EACrB,SAAS;EACT,QAAQ;EACR,eAAe;EACf,YAAY;EACZ,iBAAiB;EACjB;AACF;AACA;EACE;AACF;AACA;EACE;IACE;EACF;AACF;AACA;EACE;AACF;AACA;EACE;AACF;;AAEA;EACE,iBAAiB;EACjB,qBAAqB;EACrB;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE,SAAS;EACT;AACF;AACA;EACE;AACF;AACA;EACE,UAAU;EACV,iBAAiB;EACjB,kBAAkB;EAClB;AACF;AACA;EACE,WAAW;EACX,WAAW;EACX,MAAM;EACN,OAAO;EACP;AACF;;AAEA;EACE,kBAAkB;EAClB,uBAAuB;EACvB,kBAAkB;EAClB,wBAAwB;EACxB,mBAAmB;EACnB,gBAAgB;EAChB,2BAA2B;EAC3B,yBAAyB;EACzB,wBAAwB;EACxB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;AACA;EACE,aAAa;EACb,eAAe;EACf,uBAAuB;EACvB,kBAAkB;EAClB,wBAAwB;EACxB,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,uBAAuB;AACzB;AACA;EACE,oBAAoB;AACtB;;AAEA;EACE,UAAU;EACV,WAAW;EACX,QAAQ;EACR;AACF;AACA;EACE,iBAAiB;EACjB,KAAK;EACL,MAAM;EACN,qBAAqB;EACrB;AACF;AACA;EACE,iBAAiB;EACjB,KAAK;EACL,MAAM;EACN,qBAAqB;EACrB,wBAAwB;EACxB,UAAU;EACV,SAAS;EACT,YAAY;EACZ,aAAa;EACb;AACF;AACA;EACE,WAAW;EACX,WAAW;EACX;AACF;AACA;;EAEE;AACF;;AAEA,uCAAuC;AACvC;EACE,WAAW;EACX,WAAW;EACX,YAAY;EACZ,+CAA+C;EAC/C,iBAAiB;EACjB,aAAa;EACb,4CAA4C;EAC5C,kCAAkC;EAClC,4BAA4B;EAC5B;AACF;AACA;EACE,aAAa;EACb,YAAY;EACZ,kBAAkB;EAClB;AACF;AACA;EACE,iBAAiB;EACjB,OAAO;EACP,UAAU;EACV,mCAAmC;EACnC,0BAA0B;EAC1B,WAAW;EACX,wCAAwC;EACxC,iBAAiB;EACjB,qCAAqC;EACrC;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE,eAAe;EACf;AACF;AACA;EACE,iBAAiB;EACjB,UAAU;EACV,MAAM;EACN,QAAQ;EACR;AACF;AACA;EACE,WAAW;EACX,yBAAyB;EACzB,mCAAmC;EACnC,QAAQ;EACR;AACF;AACA;EACE,UAAU;EACV,WAAW;EACX,SAAS;EACT,WAAW;EACX,YAAY;EACZ,eAAe;AACjB;AACA,kDAAkD","sourcesContent":["/* --- GROK UX STYLES --- */\n/* Merged from example/inlinestylesheet1-5 and example/*.css */\n\n/* Inline stylesheets */\n.r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}\n.r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}\n\n:where(html[dir=\"ltr\"]),:where([data-sonner-toaster][dir=\"ltr\"]) {\n  --toast-icon-margin-start: -3px;\n  --toast-icon-margin-end: 4px;\n  --toast-svg-margin-start: -1px;\n  --toast-svg-margin-end: 0px;\n  --toast-button-margin-start: auto;\n  --toast-button-margin-end: 0;\n  --toast-close-button-start: 0;\n  --toast-close-button-end: unset;\n  --toast-close-button-transform: translate(-35%, -35%)\n}\n:where(html[dir=\"rtl\"]),:where([data-sonner-toaster][dir=\"rtl\"]) {\n  --toast-icon-margin-start: 4px;\n  --toast-icon-margin-end: -3px;\n  --toast-svg-margin-start: 0px;\n  --toast-svg-margin-end: -1px;\n  --toast-button-margin-start: 0;\n  --toast-button-margin-end: auto;\n  --toast-close-button-start: unset;\n  --toast-close-button-end: 0;\n  --toast-close-button-transform: translate(35%, -35%)\n}\n:where([data-sonner-toaster]) {\n  position:fixed;\n  width:var(--width);\n  font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;\n  --gray1: hsl(0, 0%, 99%);\n  --gray2: hsl(0, 0%, 97.3%);\n  --gray3: hsl(0, 0%, 95.1%);\n  --gray4: hsl(0, 0%, 93%);\n  --gray5: hsl(0, 0%, 90.9%);\n  --gray6: hsl(0, 0%, 88.7%);\n  --gray7: hsl(0, 0%, 85.8%);\n  --gray8: hsl(0, 0%, 78%);\n  --gray9: hsl(0, 0%, 56.1%);\n  --gray10: hsl(0, 0%, 52.3%);\n  --gray11: hsl(0, 0%, 43.5%);\n  --gray12: hsl(0, 0%, 9%);\n  --border-radius: 8px;\n  box-sizing:border-box;\n  padding:0;\n  margin:0;\n  list-style:none;\n  outline:none;\n  z-index:999999999;\n  transition:transform .4s ease\n}\n:where([data-sonner-toaster][data-lifted=\"true\"]) {\n  transform:translateY(-10px)\n}\n@media (hover: none) and (pointer: coarse) {\n  :where([data-sonner-toaster][data-lifted=\"true\"]) {\n    transform:none\n  }\n}\n:where([data-sonner-toaster][data-x-position=\"right\"]) {\n  right:max(var(--offset),env(safe-area-inset-right))\n}\n:where([data-sonner-toaster][data-x-position=\"left\"]) {\n  left:max(var(--offset),env(safe-area-inset-left))\n}\n\n[vaul-drawer] {\n  touch-action:none;\n  will-change:transform;\n  transition:transform .5s cubic-bezier(.32, .72, 0, 1)\n}\n[vaul-drawer][vaul-drawer-direction=bottom] {\n  transform:translate3d(0,100%,0)\n}\n[vaul-drawer][vaul-drawer-direction=top] {\n  transform:translate3d(0,-100%,0)\n}\n[vaul-drawer][vaul-drawer-direction=left] {\n  transform:translate3d(-100%,0,0)\n}\n[vaul-drawer][vaul-drawer-direction=right] {\n  transform:translate3d(100%,0,0)\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=top] {\n  overflow-y:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=bottom] {\n  overflow-y:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=left] {\n  overflow-x:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=right] {\n  overflow-x:hidden!important\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=top] {\n  transform:translate3d(0,var(--snap-point-height,0),0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=bottom] {\n  transform:translate3d(0,var(--snap-point-height,0),0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=left] {\n  transform:translate3d(var(--snap-point-height,0),0,0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=right] {\n  transform:translate3d(var(--snap-point-height,0),0,0)\n}\n[vaul-overlay] {\n  opacity:0;\n  transition:opacity .5s cubic-bezier(.32, .72, 0, 1)\n}\n[vaul-overlay][vaul-drawer-visible=true] {\n  opacity:1\n}\n[vaul-drawer]::after {\n  content:'';\n  position:absolute;\n  background:inherit;\n  background-color:inherit\n}\n[vaul-drawer][vaul-drawer-direction=top]::after {\n  top:initial;\n  bottom:100%;\n  left:0;\n  right:0;\n  height:200%\n}\n\n.transform-component-module_wrapper__SPB86 {\n  position: relative;\n  width: -moz-fit-content;\n  width: fit-content;\n  height: -moz-fit-content;\n  height: fit-content;\n  overflow: hidden;\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  margin: 0;\n  padding: 0;\n}\n.transform-component-module_content__FBWxo {\n  display: flex;\n  flex-wrap: wrap;\n  width: -moz-fit-content;\n  width: fit-content;\n  height: -moz-fit-content;\n  height: fit-content;\n  margin: 0;\n  padding: 0;\n  transform-origin: 0% 0%;\n}\n.transform-component-module_content__FBWxo img {\n  pointer-events: none;\n}\n\n.picker-dialog-frame {\n  width:100%;\n  height:100%;\n  border:0;\n  overflow:hidden\n}\n.picker-dialog-bg {\n  position:absolute;\n  top:0;\n  left:0;\n  background-color:#fff;\n  z-index:1000\n}\n.picker-dialog {\n  position:absolute;\n  top:0;\n  left:0;\n  background-color:#fff;\n  border:1px solid #acacac;\n  width:auto;\n  padding:0;\n  z-index:1001;\n  overflow:auto;\n  box-shadow:0 4px 16px rgba(0,0,0,.2)\n}\n.picker-dialog-content {\n  height:100%;\n  font-size:0;\n  padding:0\n}\n.picker-dialog-buttons,\n.picker-dialog-title {\n  display:none\n}\n\n/* Example CSS (partial, for brevity) */\n.gdg-r17m35ur {\n  flex-grow:1;\n  border:none;\n  outline:none;\n  background-color:var(--gdg-bg-header-has-focus);\n  border-radius:9px;\n  padding:0 8px;\n  box-shadow:0 0 0 1px var(--gdg-border-color);\n  color:var(--gdg-text-group-header);\n  min-height:var(--r17m35ur-0);\n  font:var(--gdg-header-font-style) var(--gdg-font-family)\n}\n.gdg-c1tqibwd {\n  padding:0 8px;\n  display:flex;\n  align-items:center;\n  background-color:var(--gdg-bg-header)\n}\n.gdg-seveqep {\n  position:absolute;\n  top:4px;\n  right:20px;\n  background-color:var(--gdg-bg-cell);\n  color:var(--gdg-text-dark);\n  padding:8px;\n  border:1px solid var(--gdg-border-color);\n  border-radius:6px;\n  font-size:var(--gdg-editor-font-size);\n  animation:gdg-search-fadein-gdg-seveqep .15s forwards\n}\n.gdg-seveqep.out {\n  animation:gdg-search-fadeout-gdg-seveqep .15s forwards\n}\n.gdg-seveqep .gdg-search-bar-inner {\n  display:flex\n}\n.gdg-seveqep .gdg-search-status {\n  padding-top:4px;\n  font-size:11px\n}\n.gdg-seveqep .gdg-search-progress {\n  position:absolute;\n  height:4px;\n  left:0;\n  bottom:0;\n  background-color:var(--gdg-text-light)\n}\n.gdg-seveqep input {\n  width:220px;\n  color:var(--gdg-textDark);\n  background-color:var(--gdg-bg-cell);\n  border:0;\n  outline:none\n}\n.gdg-seveqep button {\n  width:24px;\n  height:24px;\n  padding:0;\n  border:none;\n  outline:none;\n  background:none;\n}\n/* ...additional Grok CSS omitted for brevity... */\n"],"sourceRoot":""}]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/index.css":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/index.css ***!
+  \*****************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_grok_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! -!../../../node_modules/css-loader/dist/cjs.js!./grok.css */ "./node_modules/css-loader/dist/cjs.js!./src/renderer/styles/grok.css");
+// Imports
+
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_grok_css__WEBPACK_IMPORTED_MODULE_2__["default"]);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `* {
   box-sizing: border-box;
@@ -3911,7 +4201,7 @@ body {
 .shadow {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-`, "",{"version":3,"sources":["webpack://./src/renderer/styles/index.css"],"names":[],"mappings":"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","sourcesContent":["* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',\n    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',\n    sans-serif;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n  background-color: #1e1e1e;\n  color: #cccccc;\n  overflow: hidden;\n}\n\n#root {\n  height: 100vh;\n  width: 100vw;\n  display: flex;\n  flex-direction: column;\n}\n\n/* VS Code color scheme */\n:root {\n  --vscode-background: #1e1e1e;\n  --vscode-foreground: #cccccc;\n  --vscode-editor-background: #1e1e1e;\n  --vscode-editor-foreground: #d4d4d4;\n  --vscode-sidebar-background: #252526;\n  --vscode-sidebar-foreground: #cccccc;\n  --vscode-input-background: #3c3c3c;\n  --vscode-input-foreground: #cccccc;\n  --vscode-input-border: #3c3c3c;\n  --vscode-button-background: #0e639c;\n  --vscode-button-foreground: #ffffff;\n  --vscode-button-hover-background: #1177bb;\n  --vscode-list-hover-background: #2a2d2e;\n  --vscode-border: #3c3c3c;\n  --vscode-panel-background: #1e1e1e;\n  --vscode-panel-border: #3c3c3c;\n  --vscode-statusbar-background: #007acc;\n  --vscode-statusbar-foreground: #ffffff;\n  --vscode-terminal-background: #1e1e1e;\n  --vscode-terminal-foreground: #cccccc;\n  --vscode-success: #89d185;\n  --vscode-warning: #ffcc02;\n  --vscode-error: #f85149;\n  --vscode-info: #3794ff;\n}\n\n/* Custom scrollbar */\n::-webkit-scrollbar {\n  width: 14px;\n  height: 14px;\n}\n\n::-webkit-scrollbar-thumb {\n  background-color: rgba(121, 121, 121, 0.4);\n  border-radius: 10px;\n  border: 3px solid transparent;\n  background-clip: content-box;\n}\n\n::-webkit-scrollbar-thumb:hover {\n  background-color: rgba(121, 121, 121, 0.7);\n}\n\n::-webkit-scrollbar-track {\n  background-color: transparent;\n}\n\n/* Common styles */\n.button {\n  background-color: var(--vscode-button-background);\n  color: var(--vscode-button-foreground);\n  border: none;\n  padding: 8px 16px;\n  border-radius: 4px;\n  cursor: pointer;\n  font-size: 14px;\n  font-family: inherit;\n  transition: background-color 0.2s;\n}\n\n.button:hover {\n  background-color: var(--vscode-button-hover-background);\n}\n\n.button:disabled {\n  opacity: 0.6;\n  cursor: not-allowed;\n}\n\n.button.secondary {\n  background-color: transparent;\n  border: 1px solid var(--vscode-border);\n  color: var(--vscode-foreground);\n}\n\n.button.secondary:hover {\n  background-color: var(--vscode-list-hover-background);\n}\n\n.input {\n  background-color: var(--vscode-input-background);\n  color: var(--vscode-input-foreground);\n  border: 1px solid var(--vscode-input-border);\n  padding: 8px 12px;\n  border-radius: 4px;\n  font-size: 14px;\n  font-family: inherit;\n  outline: none;\n}\n\n.input:focus {\n  border-color: var(--vscode-button-background);\n  box-shadow: 0 0 0 1px var(--vscode-button-background);\n}\n\n.textarea {\n  background-color: var(--vscode-input-background);\n  color: var(--vscode-input-foreground);\n  border: 1px solid var(--vscode-input-border);\n  padding: 12px;\n  border-radius: 4px;\n  font-size: 14px;\n  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;\n  outline: none;\n  resize: vertical;\n  min-height: 100px;\n}\n\n.textarea:focus {\n  border-color: var(--vscode-button-background);\n  box-shadow: 0 0 0 1px var(--vscode-button-background);\n}\n\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: currentColor;\n  display: inline-block;\n  vertical-align: middle;\n}\n\n.icon.large {\n  width: 24px;\n  height: 24px;\n}\n\n/* Status indicators */\n.status-success {\n  color: var(--vscode-success);\n}\n\n.status-warning {\n  color: var(--vscode-warning);\n}\n\n.status-error {\n  color: var(--vscode-error);\n}\n\n.status-info {\n  color: var(--vscode-info);\n}\n\n/* Loading spinner */\n.spinner {\n  border: 2px solid transparent;\n  border-top: 2px solid var(--vscode-button-background);\n  border-radius: 50%;\n  width: 16px;\n  height: 16px;\n  animation: spin 1s linear infinite;\n  display: inline-block;\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n/* Utility classes */\n.flex {\n  display: flex;\n}\n\n.flex-column {\n  flex-direction: column;\n}\n\n.flex-1 {\n  flex: 1;\n}\n\n.gap-2 {\n  gap: 8px;\n}\n\n.gap-3 {\n  gap: 12px;\n}\n\n.gap-4 {\n  gap: 16px;\n}\n\n.p-2 {\n  padding: 8px;\n}\n\n.p-3 {\n  padding: 12px;\n}\n\n.p-4 {\n  padding: 16px;\n}\n\n.m-2 {\n  margin: 8px;\n}\n\n.m-3 {\n  margin: 12px;\n}\n\n.m-4 {\n  margin: 16px;\n}\n\n.text-center {\n  text-align: center;\n}\n\n.text-sm {\n  font-size: 12px;\n}\n\n.text-lg {\n  font-size: 16px;\n}\n\n.font-semibold {\n  font-weight: 600;\n}\n\n.opacity-50 {\n  opacity: 0.5;\n}\n\n.cursor-pointer {\n  cursor: pointer;\n}\n\n.select-none {\n  user-select: none;\n}\n\n.truncate {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.border-b {\n  border-bottom: 1px solid var(--vscode-border);\n}\n\n.border-r {\n  border-right: 1px solid var(--vscode-border);\n}\n\n.rounded {\n  border-radius: 4px;\n}\n\n.shadow {\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n}\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/renderer/styles/index.css"],"names":[],"mappings":"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","sourcesContent":["* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',\n    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',\n    sans-serif;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n  background-color: #1e1e1e;\n  color: #cccccc;\n  overflow: hidden;\n}\n\n#root {\n  height: 100vh;\n  width: 100vw;\n  display: flex;\n  flex-direction: column;\n}\n\n/* VS Code color scheme */\n:root {\n  --vscode-background: #1e1e1e;\n  --vscode-foreground: #cccccc;\n  --vscode-editor-background: #1e1e1e;\n  --vscode-editor-foreground: #d4d4d4;\n  --vscode-sidebar-background: #252526;\n  --vscode-sidebar-foreground: #cccccc;\n  --vscode-input-background: #3c3c3c;\n  --vscode-input-foreground: #cccccc;\n  --vscode-input-border: #3c3c3c;\n  --vscode-button-background: #0e639c;\n  --vscode-button-foreground: #ffffff;\n  --vscode-button-hover-background: #1177bb;\n  --vscode-list-hover-background: #2a2d2e;\n  --vscode-border: #3c3c3c;\n  --vscode-panel-background: #1e1e1e;\n  --vscode-panel-border: #3c3c3c;\n  --vscode-statusbar-background: #007acc;\n  --vscode-statusbar-foreground: #ffffff;\n  --vscode-terminal-background: #1e1e1e;\n  --vscode-terminal-foreground: #cccccc;\n  --vscode-success: #89d185;\n  --vscode-warning: #ffcc02;\n  --vscode-error: #f85149;\n  --vscode-info: #3794ff;\n}\n\n/* Custom scrollbar */\n::-webkit-scrollbar {\n  width: 14px;\n  height: 14px;\n}\n\n::-webkit-scrollbar-thumb {\n  background-color: rgba(121, 121, 121, 0.4);\n  border-radius: 10px;\n  border: 3px solid transparent;\n  background-clip: content-box;\n}\n\n::-webkit-scrollbar-thumb:hover {\n  background-color: rgba(121, 121, 121, 0.7);\n}\n\n::-webkit-scrollbar-track {\n  background-color: transparent;\n}\n\n/* Common styles */\n.button {\n  background-color: var(--vscode-button-background);\n  color: var(--vscode-button-foreground);\n  border: none;\n  padding: 8px 16px;\n  border-radius: 4px;\n  cursor: pointer;\n  font-size: 14px;\n  font-family: inherit;\n  transition: background-color 0.2s;\n}\n\n.button:hover {\n  background-color: var(--vscode-button-hover-background);\n}\n\n.button:disabled {\n  opacity: 0.6;\n  cursor: not-allowed;\n}\n\n.button.secondary {\n  background-color: transparent;\n  border: 1px solid var(--vscode-border);\n  color: var(--vscode-foreground);\n}\n\n.button.secondary:hover {\n  background-color: var(--vscode-list-hover-background);\n}\n\n.input {\n  background-color: var(--vscode-input-background);\n  color: var(--vscode-input-foreground);\n  border: 1px solid var(--vscode-input-border);\n  padding: 8px 12px;\n  border-radius: 4px;\n  font-size: 14px;\n  font-family: inherit;\n  outline: none;\n}\n\n.input:focus {\n  border-color: var(--vscode-button-background);\n  box-shadow: 0 0 0 1px var(--vscode-button-background);\n}\n\n.textarea {\n  background-color: var(--vscode-input-background);\n  color: var(--vscode-input-foreground);\n  border: 1px solid var(--vscode-input-border);\n  padding: 12px;\n  border-radius: 4px;\n  font-size: 14px;\n  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;\n  outline: none;\n  resize: vertical;\n  min-height: 100px;\n}\n\n.textarea:focus {\n  border-color: var(--vscode-button-background);\n  box-shadow: 0 0 0 1px var(--vscode-button-background);\n}\n\n.icon {\n  width: 16px;\n  height: 16px;\n  fill: currentColor;\n  display: inline-block;\n  vertical-align: middle;\n}\n\n.icon.large {\n  width: 24px;\n  height: 24px;\n}\n\n/* Status indicators */\n.status-success {\n  color: var(--vscode-success);\n}\n\n.status-warning {\n  color: var(--vscode-warning);\n}\n\n.status-error {\n  color: var(--vscode-error);\n}\n\n.status-info {\n  color: var(--vscode-info);\n}\n\n/* Loading spinner */\n.spinner {\n  border: 2px solid transparent;\n  border-top: 2px solid var(--vscode-button-background);\n  border-radius: 50%;\n  width: 16px;\n  height: 16px;\n  animation: spin 1s linear infinite;\n  display: inline-block;\n}\n\n@keyframes spin {\n  0% { transform: rotate(0deg); }\n  100% { transform: rotate(360deg); }\n}\n\n/* Utility classes */\n@import './grok.css';\n.flex {\n  display: flex;\n}\n\n.flex-column {\n  flex-direction: column;\n}\n\n.flex-1 {\n  flex: 1;\n}\n\n.gap-2 {\n  gap: 8px;\n}\n\n.gap-3 {\n  gap: 12px;\n}\n\n.gap-4 {\n  gap: 16px;\n}\n\n.p-2 {\n  padding: 8px;\n}\n\n.p-3 {\n  padding: 12px;\n}\n\n.p-4 {\n  padding: 16px;\n}\n\n.m-2 {\n  margin: 8px;\n}\n\n.m-3 {\n  margin: 12px;\n}\n\n.m-4 {\n  margin: 16px;\n}\n\n.text-center {\n  text-align: center;\n}\n\n.text-sm {\n  font-size: 12px;\n}\n\n.text-lg {\n  font-size: 16px;\n}\n\n.font-semibold {\n  font-weight: 600;\n}\n\n.opacity-50 {\n  opacity: 0.5;\n}\n\n.cursor-pointer {\n  cursor: pointer;\n}\n\n.select-none {\n  user-select: none;\n}\n\n.truncate {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.border-b {\n  border-bottom: 1px solid var(--vscode-border);\n}\n\n.border-r {\n  border-right: 1px solid var(--vscode-border);\n}\n\n.rounded {\n  border-radius: 4px;\n}\n\n.shadow {\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

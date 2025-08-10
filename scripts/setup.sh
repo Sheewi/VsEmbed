@@ -38,43 +38,7 @@ check_requirements() {
     echo "🔍 Checking system requirements..."
 
     # Check Node.js
-npm run build
-sudo systemctl restart docker
-diff --git a/jest.config.js b/jest.config.js
-index abc1234..def5678 100644
-++ b/jest.config.js
     if ! command -v node &> /dev/null; then
-        print_error "Node.js is not installed. Please install Node.js 18+ and try again."
-        exit 1
-    fi
-+  testPathIgnorePatterns: [
-+    "/node_modules/",
-+    "/tests/performance/"
-+  ]
- }
-EOF
-git apply jest.patch && rm jest.patch
-
-# Fix ModelCache implementation (automated patch)
-cat <<EOF > model-cache.patch
-diff --git a/src/shared/model-cache.ts b/src/shared/model-cache.ts
-index xyz987..abc123 100644
---- a/src/shared/model-cache.ts
-+++ b/src/shared/model-cache.ts
-@@ -1,3 +1,8 @@
- export class ModelCache {
-+  load(modelName: string): Promise<any>;
-+  clear(): void;
-+  getStats(): any;
-+  warmup(models: string[]): Promise<void>;
-   // ... existing implementation ...
- }
-EOF
-git apply model-cache.patch && rm model-cache.patch
-
-# Final verification
-npm test -- tests/integration/debug-adapter.test.ts && \
-npm start
         print_error "Node.js is not installed. Please install Node.js 18+ and try again."
         exit 1
     fi
@@ -86,16 +50,28 @@ npm start
     fi
     print_status "Node.js $(node --version) found"
 
-    print_status "npm $(npm --version) found"
-        DOCKER_AVAILABLE=true
-    fi
-
-++ b/jest.config.js
-    # Check Node.js
-    if ! command -v node &> /dev/null; then
-        print_error "Node.js is not installed. Please install Node.js 18+ and try again."
+    # Check npm
+    if ! command -v npm &> /dev/null; then
+        print_error "npm is not installed"
         exit 1
     fi
+    print_status "npm $(npm --version) found"
+
+    # Check Docker (optional)
+    if command -v docker &> /dev/null; then
+        print_status "Docker $(docker --version | cut -d' ' -f3 | cut -d',' -f1) found"
+        DOCKER_AVAILABLE=true
+    else
+        print_warning "Docker not found. Some security features will be disabled."
+        DOCKER_AVAILABLE=false
+    fi
+
+    # Check Git
+    if ! command -v git &> /dev/null; then
+        print_error "Git is not installed"
+        exit 1
+    fi
+    print_status "Git $(git --version | cut -d' ' -f3) found"
     print_status "Git $(git --version | cut -d' ' -f3) found"
 }
 

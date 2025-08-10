@@ -8498,6 +8498,471 @@ try {
 
 /***/ }),
 
+/***/ "./src/main/main.ts":
+/*!**************************!*\
+  !*** ./src/main/main.ts ***!
+  \**************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const electron_1 = __webpack_require__(/*! electron */ "electron");
+const path = __importStar(__webpack_require__(/*! path */ "path"));
+const AIOrchestratorService_1 = __webpack_require__(/*! ../services/AIOrchestratorService */ "./src/services/AIOrchestratorService.ts");
+const WorkspaceManager_1 = __webpack_require__(/*! ../services/WorkspaceManager */ "./src/services/WorkspaceManager.ts");
+const SecretsManager_1 = __webpack_require__(/*! ../services/SecretsManager */ "./src/services/SecretsManager.ts");
+const RunnerManager_1 = __webpack_require__(/*! ../services/RunnerManager */ "./src/services/RunnerManager.ts");
+const SecurityManager_1 = __webpack_require__(/*! ../services/SecurityManager */ "./src/services/SecurityManager.ts");
+class VSEmbedApplication {
+    constructor() {
+        this.mainWindow = null;
+        this.orchestrator = new AIOrchestratorService_1.AIOrchestratorService();
+        this.workspaceManager = new WorkspaceManager_1.WorkspaceManager();
+        this.secretsManager = new SecretsManager_1.SecretsManager();
+        this.runnerManager = new RunnerManager_1.RunnerManager();
+        this.securityManager = new SecurityManager_1.SecurityManager();
+        this.vscodeBridge = {};
+        this.extensionRecommender = {};
+        this.dockerManager = {};
+        this.performanceOptimizer = {};
+        this.aiStream = {};
+        this.permissionMiddleware = {
+            checkPermission: async () => ({ allowed: true }),
+            on: () => { },
+            getPolicies: () => [],
+            updatePolicy: () => { },
+            getAuditLog: () => []
+        };
+        electron_1.app.on('ready', this.createMainWindow.bind(this));
+        electron_1.app.on('window-all-closed', () => {
+            if (process.platform !== 'darwin') {
+                electron_1.app.quit();
+            }
+        });
+        electron_1.app.on('activate', () => {
+            if (this.mainWindow === null) {
+                this.createMainWindow();
+            }
+        });
+        // ...existing constructor logic (if any)...
+    }
+    createMainWindow() {
+        this.mainWindow = new electron_1.BrowserWindow({
+            width: 1200,
+            height: 800,
+            webPreferences: {
+                nodeIntegration: true,
+                contextIsolation: false,
+            },
+        });
+        // Load renderer output (index.html from .webpack/renderer)
+        const rendererPath = path.join(__dirname, '../renderer/index.html');
+        this.mainWindow.loadFile(rendererPath);
+        this.mainWindow.on('closed', () => {
+            this.mainWindow = null;
+        });
+    }
+    // Place menu handler methods here, after constructor and before final closing brace
+    async handleNewWorkspace() {
+        this.mainWindow?.webContents.send('menu:new-workspace');
+    }
+    async handleOpenWorkspace() {
+        const result = await electron_1.dialog.showOpenDialog(this.mainWindow, {
+            properties: ['openDirectory'],
+            title: 'Select Workspace Directory',
+        });
+        if (!result.canceled && result.filePaths.length > 0) {
+            const workspacePath = result.filePaths[0];
+            this.mainWindow?.webContents.send('workspace:open', workspacePath);
+        }
+    }
+    async handleExportWorkspace() {
+        const result = await electron_1.dialog.showSaveDialog(this.mainWindow, {
+            title: 'Export Workspace',
+            defaultPath: 'workspace.tar.gz',
+            filters: [
+                { name: 'Workspace Archive', extensions: ['tar.gz', 'zip'] },
+            ],
+        });
+        if (!result.canceled && result.filePath) {
+            this.mainWindow?.webContents.send('workspace:export', result.filePath);
+        }
+    }
+    async handleSettings() {
+        this.mainWindow?.webContents.send('menu:settings');
+    }
+    // Add missing menu handler stubs
+    handleClearConversation() {
+        // TODO: Implement clear conversation logic
+    }
+    handleChangeModel() {
+        // TODO: Implement change model logic
+    }
+    handleDocumentation() {
+        // TODO: Implement documentation logic
+    }
+    async handleAbout() {
+        if (!this.mainWindow)
+            return;
+        electron_1.dialog.showMessageBox(this.mainWindow, {
+            type: 'info',
+            title: 'About VSEmbed AI DevTool',
+            message: 'VSEmbed AI DevTool',
+            detail: 'Portable, embeddable AI-powered development environment\nVersion 0.1.0\nCopyright (c) 2025 Sheewi',
+        });
+    }
+    async handleAISettings() {
+        this.mainWindow?.webContents.send('ai:settings');
+    }
+    async handleStartRunner() {
+        this.mainWindow?.webContents.send('runner:start');
+    }
+    async handleStopRunner() {
+        this.mainWindow?.webContents.send('runner:stop');
+    }
+    async handleRestartRunner() {
+        this.mainWindow?.webContents.send('runner:restart');
+    }
+    async handleViewLogs() {
+        this.mainWindow?.webContents.send('runner:view-logs');
+    }
+    async handleManageSecrets() {
+        this.mainWindow?.webContents.send('security:manage-secrets');
+    }
+    async handleViewAuditLog() {
+        this.mainWindow?.webContents.send('security:view-audit-log');
+    }
+    async handleSecuritySettings() {
+        this.mainWindow?.webContents.send('security:settings');
+    }
+    async handlePerformanceReport() {
+        this.mainWindow?.webContents.send('performance:report');
+    }
+    async handleDockerStatus() {
+        this.mainWindow?.webContents.send('docker:status');
+    }
+    async handlePermissionAudit() {
+        this.mainWindow?.webContents.send('permissions:audit');
+    }
+    createMenu() {
+        const template = [
+            {
+                label: 'File',
+                submenu: [
+                    { label: 'New Workspace', click: () => this.handleNewWorkspace() },
+                    { label: 'Open Workspace', click: () => this.handleOpenWorkspace() },
+                    { label: 'Export Workspace', click: () => this.handleExportWorkspace() },
+                    { type: 'separator' },
+                    { label: 'Settings', click: () => this.handleSettings() },
+                    { type: 'separator' },
+                    { role: 'quit' },
+                ],
+            },
+            {
+                label: 'Edit',
+                submenu: [
+                    { role: 'undo' },
+                    { role: 'redo' },
+                    { type: 'separator' },
+                    { role: 'cut' },
+                    { role: 'copy' },
+                    { role: 'paste' },
+                ],
+            },
+            {
+                label: 'AI',
+                submenu: [
+                    { label: 'Clear Conversation', click: () => this.handleClearConversation?.() },
+                    { label: 'Change Model', click: () => this.handleChangeModel?.() },
+                    { type: 'separator' },
+                    { label: 'AI Settings', click: () => this.handleAISettings() },
+                ],
+            },
+            {
+                label: 'Runner',
+                submenu: [
+                    { label: 'Start', accelerator: 'F5', click: () => this.handleStartRunner() },
+                    { label: 'Stop', accelerator: 'Shift+F5', click: () => this.handleStopRunner() },
+                    { label: 'Restart', accelerator: 'Ctrl+F5', click: () => this.handleRestartRunner() },
+                    { type: 'separator' },
+                    { label: 'View Logs', click: () => this.handleViewLogs() },
+                ],
+            },
+            {
+                label: 'Security',
+                submenu: [
+                    { label: 'Manage Secrets', click: () => this.handleManageSecrets() },
+                    { label: 'View Audit Log', click: () => this.handleViewAuditLog() },
+                    { label: 'Security Settings', click: () => this.handleSecuritySettings() },
+                ],
+            },
+            {
+                label: 'Help',
+                submenu: [
+                    { label: 'About', click: () => this.handleAbout() },
+                    { label: 'Documentation', click: () => this.handleDocumentation?.() },
+                ],
+            },
+        ];
+        const menu = electron_1.Menu.buildFromTemplate(template);
+        electron_1.Menu.setApplicationMenu(menu);
+    }
+    setupIpcHandlers() {
+        // Workspace operations
+        electron_1.ipcMain.handle('workspace:create', async (event, name, template) => {
+            return await this.workspaceManager.createWorkspace(name, template);
+        });
+        electron_1.ipcMain.handle('workspace:open', async (event, path) => {
+            return await this.workspaceManager.openWorkspace(path);
+        });
+        electron_1.ipcMain.handle('workspace:export', async (event, targetPath) => {
+            return await this.workspaceManager.exportWorkspace(targetPath);
+        });
+        electron_1.ipcMain.handle('workspace:import', async (event, archivePath) => {
+            return await this.workspaceManager.importWorkspace(archivePath);
+        });
+        // AI Orchestrator operations
+        electron_1.ipcMain.handle('ai:process-request', async (event, userInput, context) => {
+            return await this.orchestrator.processRequest(userInput, context);
+        });
+        electron_1.ipcMain.handle('ai:execute-plan', async (event, planId) => {
+            return await this.orchestrator.executeActionPlan(planId);
+        });
+        electron_1.ipcMain.handle('ai:get-models', async () => {
+            return await this.orchestrator.getAvailableModels();
+        });
+        electron_1.ipcMain.handle('ai:set-model', async (event, modelName) => {
+            return await this.orchestrator.setModel(modelName);
+        });
+        // Runner operations
+        electron_1.ipcMain.handle('runner:start', async (event, config) => {
+            return await this.runnerManager.start(config);
+        });
+        electron_1.ipcMain.handle('runner:stop', async () => {
+            return await this.runnerManager.stop();
+        });
+        electron_1.ipcMain.handle('runner:status', async () => {
+            return await this.runnerManager.status();
+        });
+        electron_1.ipcMain.handle('runner:build', async (event, config) => {
+            return await this.runnerManager.build(config);
+        });
+        // Secrets operations
+        electron_1.ipcMain.handle('secrets:set', async (event, key, value) => {
+            return await this.secretsManager.setSecret(key, value);
+        });
+        electron_1.ipcMain.handle('secrets:get', async (event, key, requester) => {
+            return await this.secretsManager.getSecret(key, requester);
+        });
+        electron_1.ipcMain.handle('secrets:list', async () => {
+            return await this.secretsManager.listSecrets();
+        });
+        // Security operations
+        electron_1.ipcMain.handle('security:request-approval', async (event, summary, riskLevel, details) => {
+            const allowedRiskLevels = ['low', 'medium', 'high', 'critical'];
+            const castedRiskLevel = allowedRiskLevels.includes(riskLevel) ? riskLevel : 'low';
+            return await this.securityManager.requestApproval(summary, castedRiskLevel, details);
+        });
+        electron_1.ipcMain.handle('security:log-action', async (event, actionType, metadata, riskLevel) => {
+            const allowedRiskLevels = ['low', 'medium', 'high', 'critical'];
+            const castedRiskLevel = riskLevel && allowedRiskLevels.includes(riskLevel) ? riskLevel : undefined;
+            return await this.securityManager.logAction(actionType, metadata, castedRiskLevel);
+        });
+    }
+    setupNewComponentHandlers() {
+        // VS Code Bridge operations
+        electron_1.ipcMain.handle('vscode:execute-command', async (event, command, args) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.commands', { command, args });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.vscodeBridge.executeCommand(command, args);
+        });
+        electron_1.ipcMain.handle('vscode:get-file-content', async (event, filePath) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.read', { filePath });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.vscodeBridge.getFileContent(filePath);
+        });
+        electron_1.ipcMain.handle('vscode:write-file', async (event, filePath, content) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.write', { filePath, content });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.vscodeBridge.writeFile(filePath, content);
+        });
+        electron_1.ipcMain.handle('vscode:get-hover-info', async (event, filePath, position) => {
+            return await this.vscodeBridge.getHoverInfo(filePath, position);
+        });
+        electron_1.ipcMain.handle('vscode:get-completions', async (event, filePath, position) => {
+            return await this.vscodeBridge.getCompletions(filePath, position);
+        });
+        electron_1.ipcMain.handle('vscode:get-definitions', async (event, filePath, position) => {
+            return await this.vscodeBridge.getDefinitions(filePath, position);
+        });
+        electron_1.ipcMain.handle('vscode:get-references', async (event, filePath, position) => {
+            return await this.vscodeBridge.getReferences(filePath, position);
+        });
+        // Extension operations
+        electron_1.ipcMain.handle('extensions:recommend', async (event, context) => {
+            return await this.extensionRecommender.recommendExtensions(context);
+        });
+        electron_1.ipcMain.handle('extensions:install', async (event, extensionId) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'extensions.install', { extensionId });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.extensionRecommender.installExtension(extensionId);
+        });
+        electron_1.ipcMain.handle('extensions:get-info', async (event, extensionId) => {
+            return await this.extensionRecommender.getExtensionInfo(extensionId);
+        });
+        // Docker sandbox operations
+        electron_1.ipcMain.handle('docker:create-sandbox', async (event, extensionId, config) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.create', { extensionId, config });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.dockerManager.createExtensionSandbox(extensionId, config);
+        });
+        electron_1.ipcMain.handle('docker:stop-sandbox', async (event, containerId) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.stop', { containerId });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.dockerManager.stopSandbox(containerId);
+        });
+        electron_1.ipcMain.handle('docker:execute-command', async (event, containerId, command) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.execute', { containerId, command });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return await this.dockerManager.executeSandboxCommand(containerId, command);
+        });
+        electron_1.ipcMain.handle('docker:get-logs', async (event, containerId, tail) => {
+            return await this.dockerManager.getSandboxLogs(containerId, tail);
+        });
+        electron_1.ipcMain.handle('docker:list-sandboxes', async () => {
+            return this.dockerManager.listSandboxes();
+        });
+        electron_1.ipcMain.handle('docker:get-metrics', async () => {
+            return this.dockerManager.getMetrics();
+        });
+        // Performance operations
+        electron_1.ipcMain.handle('performance:get-metrics', async () => {
+            return this.performanceOptimizer.getMetrics();
+        });
+        electron_1.ipcMain.handle('performance:generate-report', async () => {
+            return this.performanceOptimizer.generateReport();
+        });
+        electron_1.ipcMain.handle('performance:get-recommendations', async () => {
+            return this.performanceOptimizer.getOptimizationRecommendations();
+        });
+        electron_1.ipcMain.handle('performance:force-gc', async () => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'performance.gc');
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return this.performanceOptimizer.forceGarbageCollection();
+        });
+        // Permission middleware operations
+        electron_1.ipcMain.handle('permissions:check', async (event, actor, resource, context) => {
+            return await this.permissionMiddleware.checkPermission(actor, resource, context);
+        });
+        electron_1.ipcMain.handle('permissions:get-policies', async () => {
+            return this.permissionMiddleware.getPolicies();
+        });
+        electron_1.ipcMain.handle('permissions:update-policy', async (event, policyId, updates) => {
+            const permission = await this.permissionMiddleware.checkPermission('user', 'permissions.policy.update', { policyId, updates });
+            if (!permission.allowed) {
+                throw new Error(`Permission denied: ${permission.reason}`);
+            }
+            return this.permissionMiddleware.updatePolicy(policyId, updates);
+        });
+        electron_1.ipcMain.handle('permissions:get-audit-log', async (event, filters) => {
+            return this.permissionMiddleware.getAuditLog(filters);
+        });
+        // AI Streaming operations
+        electron_1.ipcMain.handle('ai-stream:get-connection-info', async () => {
+            return {
+                port: 8081,
+                url: 'ws://localhost:8081',
+                connections: this.aiStream.getActiveConnections(),
+                streams: this.aiStream.getActiveStreams()
+            };
+        });
+        // Event forwarding from components
+        // (No menu handler methods should be here; move them below)
+        // Forward permission events to renderer
+        this.permissionMiddleware.on('permissionDenied', (data) => {
+            this.mainWindow?.webContents.send('permissions:denied', data);
+        });
+        this.permissionMiddleware.on('auditEvent', (data) => {
+            this.mainWindow?.webContents.send('permissions:audit-event', data);
+        });
+        // Forward VS Code bridge events to renderer
+        this.vscodeBridge.on('extensionInstalled', (data) => {
+            this.mainWindow?.webContents.send('vscode:extension-installed', data);
+        });
+        this.vscodeBridge.on('languageServerReady', (data) => {
+            this.mainWindow?.webContents.send('vscode:language-server-ready', data);
+        });
+        this.permissionMiddleware.on('permissionDenied', (data) => {
+            this.mainWindow?.webContents.send('permissions:denied', data);
+        });
+        this.permissionMiddleware.on('auditEvent', (data) => {
+            this.mainWindow?.webContents.send('permissions:audit-event', data);
+        });
+        // Forward VS Code bridge events to renderer
+        this.vscodeBridge.on('extensionInstalled', (data) => {
+            this.mainWindow?.webContents.send('vscode:extension-installed', data);
+        });
+        this.vscodeBridge.on('languageServerReady', (data) => {
+            this.mainWindow?.webContents.send('vscode:language-server-ready', data);
+        });
+    }
+}
+// Initialize the application
+new VSEmbedApplication();
+
+
+/***/ }),
+
 /***/ "./src/services/AIOrchestratorService.ts":
 /*!***********************************************!*\
   !*** ./src/services/AIOrchestratorService.ts ***!
@@ -11472,409 +11937,12 @@ module.exports = require("zlib");
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
-(() => {
-"use strict";
-var exports = __webpack_exports__;
-/*!**************************!*\
-  !*** ./src/main/main.ts ***!
-  \**************************/
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const electron_1 = __webpack_require__(/*! electron */ "electron");
-const AIOrchestratorService_1 = __webpack_require__(/*! ../services/AIOrchestratorService */ "./src/services/AIOrchestratorService.ts");
-const WorkspaceManager_1 = __webpack_require__(/*! ../services/WorkspaceManager */ "./src/services/WorkspaceManager.ts");
-const SecretsManager_1 = __webpack_require__(/*! ../services/SecretsManager */ "./src/services/SecretsManager.ts");
-const RunnerManager_1 = __webpack_require__(/*! ../services/RunnerManager */ "./src/services/RunnerManager.ts");
-const SecurityManager_1 = __webpack_require__(/*! ../services/SecurityManager */ "./src/services/SecurityManager.ts");
-class VSEmbedApplication {
-    constructor() {
-        this.mainWindow = null;
-        this.orchestrator = new AIOrchestratorService_1.AIOrchestratorService();
-        this.workspaceManager = new WorkspaceManager_1.WorkspaceManager();
-        this.secretsManager = new SecretsManager_1.SecretsManager();
-        this.runnerManager = new RunnerManager_1.RunnerManager();
-        this.securityManager = new SecurityManager_1.SecurityManager();
-        this.vscodeBridge = {};
-        this.extensionRecommender = {};
-        this.dockerManager = {};
-        this.performanceOptimizer = {};
-        this.aiStream = {};
-        this.permissionMiddleware = {
-            checkPermission: async () => ({ allowed: true }),
-            on: () => { },
-            getPolicies: () => [],
-            updatePolicy: () => { },
-            getAuditLog: () => []
-        };
-    }
-    // Place menu handler methods here, after constructor and before final closing brace
-    async handleNewWorkspace() {
-        this.mainWindow?.webContents.send('menu:new-workspace');
-    }
-    async handleOpenWorkspace() {
-        const result = await electron_1.dialog.showOpenDialog(this.mainWindow, {
-            properties: ['openDirectory'],
-            title: 'Select Workspace Directory',
-        });
-        if (!result.canceled && result.filePaths.length > 0) {
-            const workspacePath = result.filePaths[0];
-            this.mainWindow?.webContents.send('workspace:open', workspacePath);
-        }
-    }
-    async handleExportWorkspace() {
-        const result = await electron_1.dialog.showSaveDialog(this.mainWindow, {
-            title: 'Export Workspace',
-            defaultPath: 'workspace.tar.gz',
-            filters: [
-                { name: 'Workspace Archive', extensions: ['tar.gz', 'zip'] },
-            ],
-        });
-        if (!result.canceled && result.filePath) {
-            this.mainWindow?.webContents.send('workspace:export', result.filePath);
-        }
-    }
-    async handleSettings() {
-        this.mainWindow?.webContents.send('menu:settings');
-    }
-    // Add missing menu handler stubs
-    handleClearConversation() {
-        // TODO: Implement clear conversation logic
-    }
-    handleChangeModel() {
-        // TODO: Implement change model logic
-    }
-    handleDocumentation() {
-        // TODO: Implement documentation logic
-    }
-    async handleAbout() {
-        if (!this.mainWindow)
-            return;
-        electron_1.dialog.showMessageBox(this.mainWindow, {
-            type: 'info',
-            title: 'About VSEmbed AI DevTool',
-            message: 'VSEmbed AI DevTool',
-            detail: 'Portable, embeddable AI-powered development environment\nVersion 0.1.0\nCopyright (c) 2025 Sheewi',
-        });
-    }
-    async handleAISettings() {
-        this.mainWindow?.webContents.send('ai:settings');
-    }
-    async handleStartRunner() {
-        this.mainWindow?.webContents.send('runner:start');
-    }
-    async handleStopRunner() {
-        this.mainWindow?.webContents.send('runner:stop');
-    }
-    async handleRestartRunner() {
-        this.mainWindow?.webContents.send('runner:restart');
-    }
-    async handleViewLogs() {
-        this.mainWindow?.webContents.send('runner:view-logs');
-    }
-    async handleManageSecrets() {
-        this.mainWindow?.webContents.send('security:manage-secrets');
-    }
-    async handleViewAuditLog() {
-        this.mainWindow?.webContents.send('security:view-audit-log');
-    }
-    async handleSecuritySettings() {
-        this.mainWindow?.webContents.send('security:settings');
-    }
-    async handlePerformanceReport() {
-        this.mainWindow?.webContents.send('performance:report');
-    }
-    async handleDockerStatus() {
-        this.mainWindow?.webContents.send('docker:status');
-    }
-    async handlePermissionAudit() {
-        this.mainWindow?.webContents.send('permissions:audit');
-    }
-    createMenu() {
-        const template = [
-            {
-                label: 'File',
-                submenu: [
-                    { label: 'New Workspace', click: () => this.handleNewWorkspace() },
-                    { label: 'Open Workspace', click: () => this.handleOpenWorkspace() },
-                    { label: 'Export Workspace', click: () => this.handleExportWorkspace() },
-                    { type: 'separator' },
-                    { label: 'Settings', click: () => this.handleSettings() },
-                    { type: 'separator' },
-                    { role: 'quit' },
-                ],
-            },
-            {
-                label: 'Edit',
-                submenu: [
-                    { role: 'undo' },
-                    { role: 'redo' },
-                    { type: 'separator' },
-                    { role: 'cut' },
-                    { role: 'copy' },
-                    { role: 'paste' },
-                ],
-            },
-            {
-                label: 'AI',
-                submenu: [
-                    { label: 'Clear Conversation', click: () => this.handleClearConversation?.() },
-                    { label: 'Change Model', click: () => this.handleChangeModel?.() },
-                    { type: 'separator' },
-                    { label: 'AI Settings', click: () => this.handleAISettings() },
-                ],
-            },
-            {
-                label: 'Runner',
-                submenu: [
-                    { label: 'Start', accelerator: 'F5', click: () => this.handleStartRunner() },
-                    { label: 'Stop', accelerator: 'Shift+F5', click: () => this.handleStopRunner() },
-                    { label: 'Restart', accelerator: 'Ctrl+F5', click: () => this.handleRestartRunner() },
-                    { type: 'separator' },
-                    { label: 'View Logs', click: () => this.handleViewLogs() },
-                ],
-            },
-            {
-                label: 'Security',
-                submenu: [
-                    { label: 'Manage Secrets', click: () => this.handleManageSecrets() },
-                    { label: 'View Audit Log', click: () => this.handleViewAuditLog() },
-                    { label: 'Security Settings', click: () => this.handleSecuritySettings() },
-                ],
-            },
-            {
-                label: 'Help',
-                submenu: [
-                    { label: 'About', click: () => this.handleAbout() },
-                    { label: 'Documentation', click: () => this.handleDocumentation?.() },
-                ],
-            },
-        ];
-        const menu = electron_1.Menu.buildFromTemplate(template);
-        electron_1.Menu.setApplicationMenu(menu);
-    }
-    setupIpcHandlers() {
-        // Workspace operations
-        electron_1.ipcMain.handle('workspace:create', async (event, name, template) => {
-            return await this.workspaceManager.createWorkspace(name, template);
-        });
-        electron_1.ipcMain.handle('workspace:open', async (event, path) => {
-            return await this.workspaceManager.openWorkspace(path);
-        });
-        electron_1.ipcMain.handle('workspace:export', async (event, targetPath) => {
-            return await this.workspaceManager.exportWorkspace(targetPath);
-        });
-        electron_1.ipcMain.handle('workspace:import', async (event, archivePath) => {
-            return await this.workspaceManager.importWorkspace(archivePath);
-        });
-        // AI Orchestrator operations
-        electron_1.ipcMain.handle('ai:process-request', async (event, userInput, context) => {
-            return await this.orchestrator.processRequest(userInput, context);
-        });
-        electron_1.ipcMain.handle('ai:execute-plan', async (event, planId) => {
-            return await this.orchestrator.executeActionPlan(planId);
-        });
-        electron_1.ipcMain.handle('ai:get-models', async () => {
-            return await this.orchestrator.getAvailableModels();
-        });
-        electron_1.ipcMain.handle('ai:set-model', async (event, modelName) => {
-            return await this.orchestrator.setModel(modelName);
-        });
-        // Runner operations
-        electron_1.ipcMain.handle('runner:start', async (event, config) => {
-            return await this.runnerManager.start(config);
-        });
-        electron_1.ipcMain.handle('runner:stop', async () => {
-            return await this.runnerManager.stop();
-        });
-        electron_1.ipcMain.handle('runner:status', async () => {
-            return await this.runnerManager.status();
-        });
-        electron_1.ipcMain.handle('runner:build', async (event, config) => {
-            return await this.runnerManager.build(config);
-        });
-        // Secrets operations
-        electron_1.ipcMain.handle('secrets:set', async (event, key, value) => {
-            return await this.secretsManager.setSecret(key, value);
-        });
-        electron_1.ipcMain.handle('secrets:get', async (event, key, requester) => {
-            return await this.secretsManager.getSecret(key, requester);
-        });
-        electron_1.ipcMain.handle('secrets:list', async () => {
-            return await this.secretsManager.listSecrets();
-        });
-        // Security operations
-        electron_1.ipcMain.handle('security:request-approval', async (event, summary, riskLevel, details) => {
-            const allowedRiskLevels = ['low', 'medium', 'high', 'critical'];
-            const castedRiskLevel = allowedRiskLevels.includes(riskLevel) ? riskLevel : 'low';
-            return await this.securityManager.requestApproval(summary, castedRiskLevel, details);
-        });
-        electron_1.ipcMain.handle('security:log-action', async (event, actionType, metadata, riskLevel) => {
-            const allowedRiskLevels = ['low', 'medium', 'high', 'critical'];
-            const castedRiskLevel = riskLevel && allowedRiskLevels.includes(riskLevel) ? riskLevel : undefined;
-            return await this.securityManager.logAction(actionType, metadata, castedRiskLevel);
-        });
-    }
-    setupNewComponentHandlers() {
-        // VS Code Bridge operations
-        electron_1.ipcMain.handle('vscode:execute-command', async (event, command, args) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.commands', { command, args });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.vscodeBridge.executeCommand(command, args);
-        });
-        electron_1.ipcMain.handle('vscode:get-file-content', async (event, filePath) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.read', { filePath });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.vscodeBridge.getFileContent(filePath);
-        });
-        electron_1.ipcMain.handle('vscode:write-file', async (event, filePath, content) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'vscode.files.write', { filePath, content });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.vscodeBridge.writeFile(filePath, content);
-        });
-        electron_1.ipcMain.handle('vscode:get-hover-info', async (event, filePath, position) => {
-            return await this.vscodeBridge.getHoverInfo(filePath, position);
-        });
-        electron_1.ipcMain.handle('vscode:get-completions', async (event, filePath, position) => {
-            return await this.vscodeBridge.getCompletions(filePath, position);
-        });
-        electron_1.ipcMain.handle('vscode:get-definitions', async (event, filePath, position) => {
-            return await this.vscodeBridge.getDefinitions(filePath, position);
-        });
-        electron_1.ipcMain.handle('vscode:get-references', async (event, filePath, position) => {
-            return await this.vscodeBridge.getReferences(filePath, position);
-        });
-        // Extension operations
-        electron_1.ipcMain.handle('extensions:recommend', async (event, context) => {
-            return await this.extensionRecommender.recommendExtensions(context);
-        });
-        electron_1.ipcMain.handle('extensions:install', async (event, extensionId) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'extensions.install', { extensionId });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.extensionRecommender.installExtension(extensionId);
-        });
-        electron_1.ipcMain.handle('extensions:get-info', async (event, extensionId) => {
-            return await this.extensionRecommender.getExtensionInfo(extensionId);
-        });
-        // Docker sandbox operations
-        electron_1.ipcMain.handle('docker:create-sandbox', async (event, extensionId, config) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.create', { extensionId, config });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.dockerManager.createExtensionSandbox(extensionId, config);
-        });
-        electron_1.ipcMain.handle('docker:stop-sandbox', async (event, containerId) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.stop', { containerId });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.dockerManager.stopSandbox(containerId);
-        });
-        electron_1.ipcMain.handle('docker:execute-command', async (event, containerId, command) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'docker.execute', { containerId, command });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return await this.dockerManager.executeSandboxCommand(containerId, command);
-        });
-        electron_1.ipcMain.handle('docker:get-logs', async (event, containerId, tail) => {
-            return await this.dockerManager.getSandboxLogs(containerId, tail);
-        });
-        electron_1.ipcMain.handle('docker:list-sandboxes', async () => {
-            return this.dockerManager.listSandboxes();
-        });
-        electron_1.ipcMain.handle('docker:get-metrics', async () => {
-            return this.dockerManager.getMetrics();
-        });
-        // Performance operations
-        electron_1.ipcMain.handle('performance:get-metrics', async () => {
-            return this.performanceOptimizer.getMetrics();
-        });
-        electron_1.ipcMain.handle('performance:generate-report', async () => {
-            return this.performanceOptimizer.generateReport();
-        });
-        electron_1.ipcMain.handle('performance:get-recommendations', async () => {
-            return this.performanceOptimizer.getOptimizationRecommendations();
-        });
-        electron_1.ipcMain.handle('performance:force-gc', async () => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'performance.gc');
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return this.performanceOptimizer.forceGarbageCollection();
-        });
-        // Permission middleware operations
-        electron_1.ipcMain.handle('permissions:check', async (event, actor, resource, context) => {
-            return await this.permissionMiddleware.checkPermission(actor, resource, context);
-        });
-        electron_1.ipcMain.handle('permissions:get-policies', async () => {
-            return this.permissionMiddleware.getPolicies();
-        });
-        electron_1.ipcMain.handle('permissions:update-policy', async (event, policyId, updates) => {
-            const permission = await this.permissionMiddleware.checkPermission('user', 'permissions.policy.update', { policyId, updates });
-            if (!permission.allowed) {
-                throw new Error(`Permission denied: ${permission.reason}`);
-            }
-            return this.permissionMiddleware.updatePolicy(policyId, updates);
-        });
-        electron_1.ipcMain.handle('permissions:get-audit-log', async (event, filters) => {
-            return this.permissionMiddleware.getAuditLog(filters);
-        });
-        // AI Streaming operations
-        electron_1.ipcMain.handle('ai-stream:get-connection-info', async () => {
-            return {
-                port: 8081,
-                url: 'ws://localhost:8081',
-                connections: this.aiStream.getActiveConnections(),
-                streams: this.aiStream.getActiveStreams()
-            };
-        });
-        // Event forwarding from components
-        // (No menu handler methods should be here; move them below)
-        // Forward permission events to renderer
-        this.permissionMiddleware.on('permissionDenied', (data) => {
-            this.mainWindow?.webContents.send('permissions:denied', data);
-        });
-        this.permissionMiddleware.on('auditEvent', (data) => {
-            this.mainWindow?.webContents.send('permissions:audit-event', data);
-        });
-        // Forward VS Code bridge events to renderer
-        this.vscodeBridge.on('extensionInstalled', (data) => {
-            this.mainWindow?.webContents.send('vscode:extension-installed', data);
-        });
-        this.vscodeBridge.on('languageServerReady', (data) => {
-            this.mainWindow?.webContents.send('vscode:language-server-ready', data);
-        });
-        this.permissionMiddleware.on('permissionDenied', (data) => {
-            this.mainWindow?.webContents.send('permissions:denied', data);
-        });
-        this.permissionMiddleware.on('auditEvent', (data) => {
-            this.mainWindow?.webContents.send('permissions:audit-event', data);
-        });
-        // Forward VS Code bridge events to renderer
-        this.vscodeBridge.on('extensionInstalled', (data) => {
-            this.mainWindow?.webContents.send('vscode:extension-installed', data);
-        });
-        this.vscodeBridge.on('languageServerReady', (data) => {
-            this.mainWindow?.webContents.send('vscode:language-server-ready', data);
-        });
-    }
-}
-// Initialize the application
-new VSEmbedApplication();
-
-})();
-
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/main/main.ts");
+/******/ 	
 /******/ })()
 ;
 //# sourceMappingURL=index.js.map
