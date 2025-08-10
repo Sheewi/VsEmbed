@@ -73,7 +73,8 @@ export class DockerManager extends EventEmitter {
 			containerHealth: new Map()
 		};
 
-		this.initializeDocker();
+		// Docker initialization disabled
+		console.log('Docker sandbox disabled - using local execution only');
 		this.startMonitoring();
 		this.setupCleanup();
 	}

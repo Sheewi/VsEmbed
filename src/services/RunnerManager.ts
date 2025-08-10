@@ -1,13 +1,12 @@
 import { RunnerAPI } from '../api/interfaces';
 import { RunnerConfig, RunnerStatus, BuildResult } from '../types';
 import { TerminalService } from './TerminalService';
-// import Docker from 'dockerode'; // Disabled due to constructor issues
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
 export class RunnerManager implements RunnerAPI {
-	private docker: any | null = null; // Disabled Docker functionality
-	private currentContainer: any | null = null; // Disabled Docker functionality
+	private docker: any = null; // Disabled Docker support
+	private currentContainer: any = null; // Disabled Docker support
 	private currentStatus: RunnerStatus;
 	private terminalService: TerminalService;
 	private workspacePath: string | null = null;
@@ -51,13 +50,8 @@ export class RunnerManager implements RunnerAPI {
 		try {
 			const buildConfig = config || await this.getDefaultConfig();
 
-			let buildResult: BuildResult;
-
-			if (this.docker && buildConfig.type === 'docker') {
-				buildResult = await this.buildWithDocker(buildConfig);
-			} else {
-				buildResult = await this.buildLocally(buildConfig);
-			}
+			// Force local build only - no Docker support
+			const buildResult = await this.buildLocally(buildConfig);
 
 			this.currentStatus.last_build = buildResult;
 			return buildResult;
@@ -79,11 +73,8 @@ export class RunnerManager implements RunnerAPI {
 		try {
 			const runConfig = config || await this.getDefaultConfig();
 
-			if (this.docker && runConfig.type === 'docker') {
-				await this.startWithDocker(runConfig);
-			} else {
-				await this.startLocally(runConfig);
-			}
+			// Force local start only - no Docker support
+			await this.startLocally(runConfig);
 
 			this.currentStatus.running = true;
 			return this.currentStatus;
