@@ -192,10 +192,10 @@ export class RunnerManager implements RunnerAPI {
 
 			// Parse build output
 			await new Promise<void>((resolve, reject) => {
-				this.docker!.modem.followProgress(buildStream, (err, res) => {
+				this.docker!.modem.followProgress(buildStream, (err: any, res: any) => {
 					if (err) reject(err);
 					else resolve();
-				}, (event) => {
+				}, (event: { stream?: string; error?: string }) => {
 					if (event.stream) {
 						buildOutput.push(event.stream);
 
@@ -408,7 +408,7 @@ export class RunnerManager implements RunnerAPI {
 			docker: 'alpine:latest',
 		};
 
-		return images[runtime] || images.nodejs;
+		return images[runtime as keyof typeof images] || images.nodejs;
 	}
 
 	private getDefaultPorts(runtime: string): { [localPort: number]: number } {

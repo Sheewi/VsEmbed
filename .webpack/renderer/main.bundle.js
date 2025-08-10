@@ -1479,263 +1479,239 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `/* Layout.css */
-.layout {
+___CSS_LOADER_EXPORT___.push([module.id, `/* VS Code-inspired Layout CSS */
+.vsembed-app {
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
   overflow: hidden;
 }
 
-.main-content {
-  display: flex;
+/* Main content area (below menu bar) */
+.vsembed-main {
   flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
-.sidebar {
-  width: 300px;
+/* Sidebar */
+.vsembed-sidebar {
+  width: 240px;
   min-width: 200px;
-  max-width: 500px;
+  max-width: 400px;
   background-color: var(--vscode-sideBar-background);
   border-right: 1px solid var(--vscode-sideBar-border);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   resize: horizontal;
-}
-
-.editor-area {
-  display: flex;
-  flex: 1;
   overflow: hidden;
 }
 
-.editor-container {
-  display: flex;
+/* Content area (editor + preview + chat) */
+.vsembed-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-.chat-panel {
-  width: 400px;
-  min-width: 300px;
-  max-width: 600px;
-  background-color: var(--vscode-sideBar-background);
+/* Main panels area */
+.vsembed-panels {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Editor area */
+.vsembed-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid var(--vscode-panel-border);
   overflow: hidden;
-  resize: horizontal;
 }
 
-.code-editor {
-  flex: 1;
-  background-color: var(--vscode-editor-background);
-  overflow: hidden;
-}
-
-.preview-panel {
-  width: 400px;
-  min-width: 300px;
-  max-width: 600px;
-  background-color: var(--vscode-panel-background);
+/* AI Chat panel */
+.vsembed-chat-panel {
+  width: 320px;
+  min-width: 250px;
+  max-width: 500px;
+  background-color: var(--vscode-sideBar-background);
   border-left: 1px solid var(--vscode-panel-border);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   resize: horizontal;
+  overflow: hidden;
 }
 
-.terminal-panel {
+/* Bottom panel (terminal) */
+.vsembed-bottom-panel {
   height: 250px;
-  min-height: 150px;
+  min-height: 100px;
   max-height: 400px;
   background-color: var(--vscode-panel-background);
   border-top: 1px solid var(--vscode-panel-border);
+  display: flex;
+  flex-direction: column;
+  resize: vertical;
   overflow: hidden;
+}
+
+/* Panel headers */
+.vsembed-panel-header {
+  height: 32px;
+  min-height: 32px;
+  background-color: var(--vscode-tab-inactiveBackground);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vscode-tab-inactiveForeground);
+  user-select: none;
+}
+
+.vsembed-panel-header span {
+  flex: 1;
+}
+
+/* Panel content */
+.vsembed-panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+  background-color: var(--vscode-editor-background);
+}
+
+/* Utility classes */
+.vsembed-flex {
+  display: flex;
+  align-items: center;
+}
+
+.vsembed-gap {
+  gap: 4px;
+}
+
+/* Button styles */
+.vsembed-btn-secondary {
+  background: transparent;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground);
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vsembed-btn-secondary:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+.vsembed-btn-secondary:active {
+  background-color: var(--vscode-button-background);
+}
+
+/* Scrollbars */
+.vsembed-app ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.vsembed-app ::-webkit-scrollbar-track {
+  background: var(--vscode-scrollbar-shadow);
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+  border-radius: 6px;
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+/* Resize handles */
+.vsembed-sidebar:hover {
+  resize: horizontal;
+}
+
+.vsembed-chat-panel:hover {
+  resize: horizontal;
+}
+
+.vsembed-bottom-panel:hover {
   resize: vertical;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .chat-panel {
-    width: 300px;
-    min-width: 250px;
-  }
+/* Focus styles */
+.vsembed-panel-content:focus-within {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
 
-  .preview-panel {
-    width: 300px;
-    min-width: 250px;
+/* Responsive design */
+@media (max-width: 768px) {
+  .vsembed-sidebar {
+    width: 200px;
+    min-width: 150px;
   }
-
-  .sidebar {
-    width: 250px;
+  
+  .vsembed-chat-panel {
+    width: 280px;
     min-width: 200px;
+  }
+  
+  .vsembed-bottom-panel {
+    height: 200px;
+    min-height: 80px;
   }
 }
 
-@media (max-width: 768px) {
-  .editor-container {
+@media (max-width: 480px) {
+  .vsembed-panels {
     flex-direction: column;
   }
-
-  .chat-panel {
+  
+  .vsembed-chat-panel {
     width: 100%;
     height: 200px;
-    min-height: 150px;
-    border-right: none;
-    border-bottom: 1px solid var(--vscode-panel-border);
-    resize: vertical;
-  }
-
-  .preview-panel {
-    width: 100%;
-    height: 200px;
-    min-height: 150px;
     border-left: none;
     border-top: 1px solid var(--vscode-panel-border);
-    resize: vertical;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: 200px;
-    min-height: 150px;
-    border-right: none;
-    border-bottom: 1px solid var(--vscode-sideBar-border);
-    resize: vertical;
-  }
-
-  .main-content {
-    flex-direction: column;
-  }
-
-  .editor-area {
-    flex-direction: column;
   }
 }
 
 /* Animation for panel transitions */
-.sidebar,
-.chat-panel,
-.preview-panel,
-.terminal-panel {
+.vsembed-sidebar,
+.vsembed-chat-panel,
+.vsembed-bottom-panel {
   transition: all 0.2s ease-in-out;
 }
 
-/* Focus styles for accessibility */
-.sidebar:focus-within,
-.chat-panel:focus-within,
-.code-editor:focus-within,
-.preview-panel:focus-within,
-.terminal-panel:focus-within {
-  outline: 2px solid var(--vscode-focusBorder);
-  outline-offset: -2px;
+/* Panel shadows for depth */
+.vsembed-chat-panel,
+.vsembed-bottom-panel {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .sidebar,
-  .chat-panel,
-  .preview-panel,
-  .terminal-panel {
+  .vsembed-sidebar,
+  .vsembed-chat-panel,
+  .vsembed-bottom-panel {
     border-width: 2px;
   }
 }
-
-/* Dark/Light theme adjustments */
-.vscode-dark {
-  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.vscode-light {
-  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Panel shadow for depth */
-.chat-panel,
-.preview-panel,
-.terminal-panel {
-  box-shadow: var(--panel-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-/* Scrollbar styling for consistency */
-.sidebar::-webkit-scrollbar,
-.chat-panel::-webkit-scrollbar,
-.preview-panel::-webkit-scrollbar,
-.terminal-panel::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track,
-.chat-panel::-webkit-scrollbar-track,
-.preview-panel::-webkit-scrollbar-track,
-.terminal-panel::-webkit-scrollbar-track {
-  background: var(--vscode-scrollbar-shadow);
-}
-
-.sidebar::-webkit-scrollbar-thumb,
-.chat-panel::-webkit-scrollbar-thumb,
-.preview-panel::-webkit-scrollbar-thumb,
-.terminal-panel::-webkit-scrollbar-thumb {
-  background: var(--vscode-scrollbarSlider-background);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover,
-.chat-panel::-webkit-scrollbar-thumb:hover,
-.preview-panel::-webkit-scrollbar-thumb:hover,
-.terminal-panel::-webkit-scrollbar-thumb:hover {
-  background: var(--vscode-scrollbarSlider-hoverBackground);
-}
-
-/* Panel resize handles */
-.sidebar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  cursor: ew-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.sidebar::after:hover {
-  background: var(--vscode-sash-hoverBorder);
-}
-
-.chat-panel::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  cursor: ew-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.chat-panel::after:hover {
-  background: var(--vscode-sash-hoverBorder);
-}
-
-.terminal-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  cursor: ns-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.terminal-panel::before:hover {
-  background: var(--vscode-sash-hoverBorder);
-}
-`, "",{"version":3,"sources":["webpack://./src/renderer/styles/Layout.css"],"names":[],"mappings":"AAAA,eAAe;AACf;EACE,aAAa;EACb,sBAAsB;EACtB,aAAa;EACb,iDAAiD;EACjD,sCAAsC;EACtC,gBAAgB;AAClB;;AAEA;EACE,aAAa;EACb,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,gBAAgB;EAChB,kDAAkD;EAClD,oDAAoD;EACpD,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,aAAa;EACb,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,aAAa;EACb,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,gBAAgB;EAChB,kDAAkD;EAClD,kDAAkD;EAClD,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,OAAO;EACP,iDAAiD;EACjD,gBAAgB;AAClB;;AAEA;EACE,YAAY;EACZ,gBAAgB;EAChB,gBAAgB;EAChB,gDAAgD;EAChD,iDAAiD;EACjD,gBAAgB;EAChB,kBAAkB;AACpB;;AAEA;EACE,aAAa;EACb,iBAAiB;EACjB,iBAAiB;EACjB,gDAAgD;EAChD,gDAAgD;EAChD,gBAAgB;EAChB,gBAAgB;AAClB;;AAEA,sBAAsB;AACtB;EACE;IACE,YAAY;IACZ,gBAAgB;EAClB;;EAEA;IACE,YAAY;IACZ,gBAAgB;EAClB;;EAEA;IACE,YAAY;IACZ,gBAAgB;EAClB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;;EAEA;IACE,WAAW;IACX,aAAa;IACb,iBAAiB;IACjB,kBAAkB;IAClB,mDAAmD;IACnD,gBAAgB;EAClB;;EAEA;IACE,WAAW;IACX,aAAa;IACb,iBAAiB;IACjB,iBAAiB;IACjB,gDAAgD;IAChD,gBAAgB;EAClB;;EAEA;IACE,WAAW;IACX,aAAa;IACb,iBAAiB;IACjB,kBAAkB;IAClB,qDAAqD;IACrD,gBAAgB;EAClB;;EAEA;IACE,sBAAsB;EACxB;;EAEA;IACE,sBAAsB;EACxB;AACF;;AAEA,oCAAoC;AACpC;;;;EAIE,gCAAgC;AAClC;;AAEA,mCAAmC;AACnC;;;;;EAKE,4CAA4C;EAC5C,oBAAoB;AACtB;;AAEA,+BAA+B;AAC/B;EACE;;;;IAIE,iBAAiB;EACnB;AACF;;AAEA,iCAAiC;AACjC;EACE,4CAA4C;AAC9C;;AAEA;EACE,4CAA4C;AAC9C;;AAEA,2BAA2B;AAC3B;;;EAGE,6DAA6D;AAC/D;;AAEA,sCAAsC;AACtC;;;;EAIE,UAAU;EACV,WAAW;AACb;;AAEA;;;;EAIE,0CAA0C;AAC5C;;AAEA;;;;EAIE,oDAAoD;EACpD,kBAAkB;AACpB;;AAEA;;;;EAIE,yDAAyD;AAC3D;;AAEA,yBAAyB;AACzB;EACE,WAAW;EACX,kBAAkB;EAClB,MAAM;EACN,QAAQ;EACR,UAAU;EACV,YAAY;EACZ,iBAAiB;EACjB,uBAAuB;EACvB,aAAa;AACf;;AAEA;EACE,0CAA0C;AAC5C;;AAEA;EACE,WAAW;EACX,kBAAkB;EAClB,MAAM;EACN,QAAQ;EACR,UAAU;EACV,YAAY;EACZ,iBAAiB;EACjB,uBAAuB;EACvB,aAAa;AACf;;AAEA;EACE,0CAA0C;AAC5C;;AAEA;EACE,WAAW;EACX,kBAAkB;EAClB,MAAM;EACN,OAAO;EACP,WAAW;EACX,WAAW;EACX,iBAAiB;EACjB,uBAAuB;EACvB,aAAa;AACf;;AAEA;EACE,0CAA0C;AAC5C","sourcesContent":["/* Layout.css */\n.layout {\n  display: flex;\n  flex-direction: column;\n  height: 100vh;\n  background-color: var(--vscode-editor-background);\n  color: var(--vscode-editor-foreground);\n  overflow: hidden;\n}\n\n.main-content {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.sidebar {\n  width: 300px;\n  min-width: 200px;\n  max-width: 500px;\n  background-color: var(--vscode-sideBar-background);\n  border-right: 1px solid var(--vscode-sideBar-border);\n  overflow: hidden;\n  resize: horizontal;\n}\n\n.editor-area {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.editor-container {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.chat-panel {\n  width: 400px;\n  min-width: 300px;\n  max-width: 600px;\n  background-color: var(--vscode-sideBar-background);\n  border-right: 1px solid var(--vscode-panel-border);\n  overflow: hidden;\n  resize: horizontal;\n}\n\n.code-editor {\n  flex: 1;\n  background-color: var(--vscode-editor-background);\n  overflow: hidden;\n}\n\n.preview-panel {\n  width: 400px;\n  min-width: 300px;\n  max-width: 600px;\n  background-color: var(--vscode-panel-background);\n  border-left: 1px solid var(--vscode-panel-border);\n  overflow: hidden;\n  resize: horizontal;\n}\n\n.terminal-panel {\n  height: 250px;\n  min-height: 150px;\n  max-height: 400px;\n  background-color: var(--vscode-panel-background);\n  border-top: 1px solid var(--vscode-panel-border);\n  overflow: hidden;\n  resize: vertical;\n}\n\n/* Responsive Design */\n@media (max-width: 1200px) {\n  .chat-panel {\n    width: 300px;\n    min-width: 250px;\n  }\n\n  .preview-panel {\n    width: 300px;\n    min-width: 250px;\n  }\n\n  .sidebar {\n    width: 250px;\n    min-width: 200px;\n  }\n}\n\n@media (max-width: 768px) {\n  .editor-container {\n    flex-direction: column;\n  }\n\n  .chat-panel {\n    width: 100%;\n    height: 200px;\n    min-height: 150px;\n    border-right: none;\n    border-bottom: 1px solid var(--vscode-panel-border);\n    resize: vertical;\n  }\n\n  .preview-panel {\n    width: 100%;\n    height: 200px;\n    min-height: 150px;\n    border-left: none;\n    border-top: 1px solid var(--vscode-panel-border);\n    resize: vertical;\n  }\n\n  .sidebar {\n    width: 100%;\n    height: 200px;\n    min-height: 150px;\n    border-right: none;\n    border-bottom: 1px solid var(--vscode-sideBar-border);\n    resize: vertical;\n  }\n\n  .main-content {\n    flex-direction: column;\n  }\n\n  .editor-area {\n    flex-direction: column;\n  }\n}\n\n/* Animation for panel transitions */\n.sidebar,\n.chat-panel,\n.preview-panel,\n.terminal-panel {\n  transition: all 0.2s ease-in-out;\n}\n\n/* Focus styles for accessibility */\n.sidebar:focus-within,\n.chat-panel:focus-within,\n.code-editor:focus-within,\n.preview-panel:focus-within,\n.terminal-panel:focus-within {\n  outline: 2px solid var(--vscode-focusBorder);\n  outline-offset: -2px;\n}\n\n/* High contrast mode support */\n@media (prefers-contrast: high) {\n  .sidebar,\n  .chat-panel,\n  .preview-panel,\n  .terminal-panel {\n    border-width: 2px;\n  }\n}\n\n/* Dark/Light theme adjustments */\n.vscode-dark {\n  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);\n}\n\n.vscode-light {\n  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n}\n\n/* Panel shadow for depth */\n.chat-panel,\n.preview-panel,\n.terminal-panel {\n  box-shadow: var(--panel-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));\n}\n\n/* Scrollbar styling for consistency */\n.sidebar::-webkit-scrollbar,\n.chat-panel::-webkit-scrollbar,\n.preview-panel::-webkit-scrollbar,\n.terminal-panel::-webkit-scrollbar {\n  width: 8px;\n  height: 8px;\n}\n\n.sidebar::-webkit-scrollbar-track,\n.chat-panel::-webkit-scrollbar-track,\n.preview-panel::-webkit-scrollbar-track,\n.terminal-panel::-webkit-scrollbar-track {\n  background: var(--vscode-scrollbar-shadow);\n}\n\n.sidebar::-webkit-scrollbar-thumb,\n.chat-panel::-webkit-scrollbar-thumb,\n.preview-panel::-webkit-scrollbar-thumb,\n.terminal-panel::-webkit-scrollbar-thumb {\n  background: var(--vscode-scrollbarSlider-background);\n  border-radius: 4px;\n}\n\n.sidebar::-webkit-scrollbar-thumb:hover,\n.chat-panel::-webkit-scrollbar-thumb:hover,\n.preview-panel::-webkit-scrollbar-thumb:hover,\n.terminal-panel::-webkit-scrollbar-thumb:hover {\n  background: var(--vscode-scrollbarSlider-hoverBackground);\n}\n\n/* Panel resize handles */\n.sidebar::after {\n  content: '';\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 4px;\n  height: 100%;\n  cursor: ew-resize;\n  background: transparent;\n  z-index: 1000;\n}\n\n.sidebar::after:hover {\n  background: var(--vscode-sash-hoverBorder);\n}\n\n.chat-panel::after {\n  content: '';\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 4px;\n  height: 100%;\n  cursor: ew-resize;\n  background: transparent;\n  z-index: 1000;\n}\n\n.chat-panel::after:hover {\n  background: var(--vscode-sash-hoverBorder);\n}\n\n.terminal-panel::before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 4px;\n  cursor: ns-resize;\n  background: transparent;\n  z-index: 1000;\n}\n\n.terminal-panel::before:hover {\n  background: var(--vscode-sash-hoverBorder);\n}\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/renderer/styles/Layout.css"],"names":[],"mappings":"AAAA,gCAAgC;AAChC;EACE,aAAa;EACb,YAAY;EACZ,aAAa;EACb,sBAAsB;EACtB,iDAAiD;EACjD,sCAAsC;EACtC,sCAAsC;EACtC,kCAAkC;EAClC,gBAAgB;AAClB;;AAEA,uCAAuC;AACvC;EACE,OAAO;EACP,aAAa;EACb,gBAAgB;AAClB;;AAEA,YAAY;AACZ;EACE,YAAY;EACZ,gBAAgB;EAChB,gBAAgB;EAChB,kDAAkD;EAClD,oDAAoD;EACpD,aAAa;EACb,sBAAsB;EACtB,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA,2CAA2C;AAC3C;EACE,OAAO;EACP,aAAa;EACb,sBAAsB;EACtB,gBAAgB;AAClB;;AAEA,qBAAqB;AACrB;EACE,OAAO;EACP,aAAa;EACb,gBAAgB;AAClB;;AAEA,gBAAgB;AAChB;EACE,OAAO;EACP,aAAa;EACb,sBAAsB;EACtB,kDAAkD;EAClD,gBAAgB;AAClB;;AAEA,kBAAkB;AAClB;EACE,YAAY;EACZ,gBAAgB;EAChB,gBAAgB;EAChB,kDAAkD;EAClD,iDAAiD;EACjD,aAAa;EACb,sBAAsB;EACtB,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA,4BAA4B;AAC5B;EACE,aAAa;EACb,iBAAiB;EACjB,iBAAiB;EACjB,gDAAgD;EAChD,gDAAgD;EAChD,aAAa;EACb,sBAAsB;EACtB,gBAAgB;EAChB,gBAAgB;AAClB;;AAEA,kBAAkB;AAClB;EACE,YAAY;EACZ,gBAAgB;EAChB,sDAAsD;EACtD,mDAAmD;EACnD,aAAa;EACb,mBAAmB;EACnB,8BAA8B;EAC9B,eAAe;EACf,eAAe;EACf,gBAAgB;EAChB,2CAA2C;EAC3C,iBAAiB;AACnB;;AAEA;EACE,OAAO;AACT;;AAEA,kBAAkB;AAClB;EACE,OAAO;EACP,cAAc;EACd,YAAY;EACZ,iDAAiD;AACnD;;AAEA,oBAAoB;AACpB;EACE,aAAa;EACb,mBAAmB;AACrB;;AAEA;EACE,QAAQ;AACV;;AAEA,kBAAkB;AAClB;EACE,uBAAuB;EACvB,YAAY;EACZ,2CAA2C;EAC3C,gBAAgB;EAChB,kBAAkB;EAClB,eAAe;EACf,eAAe;EACf,yBAAyB;AAC3B;;AAEA;EACE,uDAAuD;EACvD,+BAA+B;AACjC;;AAEA;EACE,iDAAiD;AACnD;;AAEA,eAAe;AACf;EACE,WAAW;EACX,YAAY;AACd;;AAEA;EACE,0CAA0C;AAC5C;;AAEA;EACE,oDAAoD;EACpD,kBAAkB;AACpB;;AAEA;EACE,yDAAyD;AAC3D;;AAEA,mBAAmB;AACnB;EACE,kBAAkB;AACpB;;AAEA;EACE,kBAAkB;AACpB;;AAEA;EACE,gBAAgB;AAClB;;AAEA,iBAAiB;AACjB;EACE,4CAA4C;EAC5C,oBAAoB;AACtB;;AAEA,sBAAsB;AACtB;EACE;IACE,YAAY;IACZ,gBAAgB;EAClB;;EAEA;IACE,YAAY;IACZ,gBAAgB;EAClB;;EAEA;IACE,aAAa;IACb,gBAAgB;EAClB;AACF;;AAEA;EACE;IACE,sBAAsB;EACxB;;EAEA;IACE,WAAW;IACX,aAAa;IACb,iBAAiB;IACjB,gDAAgD;EAClD;AACF;;AAEA,oCAAoC;AACpC;;;EAGE,gCAAgC;AAClC;;AAEA,4BAA4B;AAC5B;;EAEE,wCAAwC;AAC1C;;AAEA,+BAA+B;AAC/B;EACE;;;IAGE,iBAAiB;EACnB;AACF","sourcesContent":["/* VS Code-inspired Layout CSS */\n.vsembed-app {\n  height: 100vh;\n  width: 100vw;\n  display: flex;\n  flex-direction: column;\n  background-color: var(--vscode-editor-background);\n  color: var(--vscode-editor-foreground);\n  font-family: var(--vscode-font-family);\n  font-size: var(--vscode-font-size);\n  overflow: hidden;\n}\n\n/* Main content area (below menu bar) */\n.vsembed-main {\n  flex: 1;\n  display: flex;\n  overflow: hidden;\n}\n\n/* Sidebar */\n.vsembed-sidebar {\n  width: 240px;\n  min-width: 200px;\n  max-width: 400px;\n  background-color: var(--vscode-sideBar-background);\n  border-right: 1px solid var(--vscode-sideBar-border);\n  display: flex;\n  flex-direction: column;\n  resize: horizontal;\n  overflow: hidden;\n}\n\n/* Content area (editor + preview + chat) */\n.vsembed-content {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  overflow: hidden;\n}\n\n/* Main panels area */\n.vsembed-panels {\n  flex: 1;\n  display: flex;\n  overflow: hidden;\n}\n\n/* Editor area */\n.vsembed-editor-area {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  border-right: 1px solid var(--vscode-panel-border);\n  overflow: hidden;\n}\n\n/* AI Chat panel */\n.vsembed-chat-panel {\n  width: 320px;\n  min-width: 250px;\n  max-width: 500px;\n  background-color: var(--vscode-sideBar-background);\n  border-left: 1px solid var(--vscode-panel-border);\n  display: flex;\n  flex-direction: column;\n  resize: horizontal;\n  overflow: hidden;\n}\n\n/* Bottom panel (terminal) */\n.vsembed-bottom-panel {\n  height: 250px;\n  min-height: 100px;\n  max-height: 400px;\n  background-color: var(--vscode-panel-background);\n  border-top: 1px solid var(--vscode-panel-border);\n  display: flex;\n  flex-direction: column;\n  resize: vertical;\n  overflow: hidden;\n}\n\n/* Panel headers */\n.vsembed-panel-header {\n  height: 32px;\n  min-height: 32px;\n  background-color: var(--vscode-tab-inactiveBackground);\n  border-bottom: 1px solid var(--vscode-panel-border);\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 0 12px;\n  font-size: 12px;\n  font-weight: 500;\n  color: var(--vscode-tab-inactiveForeground);\n  user-select: none;\n}\n\n.vsembed-panel-header span {\n  flex: 1;\n}\n\n/* Panel content */\n.vsembed-panel-content {\n  flex: 1;\n  overflow: auto;\n  padding: 8px;\n  background-color: var(--vscode-editor-background);\n}\n\n/* Utility classes */\n.vsembed-flex {\n  display: flex;\n  align-items: center;\n}\n\n.vsembed-gap {\n  gap: 4px;\n}\n\n/* Button styles */\n.vsembed-btn-secondary {\n  background: transparent;\n  border: none;\n  color: var(--vscode-tab-inactiveForeground);\n  padding: 4px 6px;\n  border-radius: 3px;\n  font-size: 11px;\n  cursor: pointer;\n  transition: all 0.2s ease;\n}\n\n.vsembed-btn-secondary:hover {\n  background-color: var(--vscode-toolbar-hoverBackground);\n  color: var(--vscode-foreground);\n}\n\n.vsembed-btn-secondary:active {\n  background-color: var(--vscode-button-background);\n}\n\n/* Scrollbars */\n.vsembed-app ::-webkit-scrollbar {\n  width: 12px;\n  height: 12px;\n}\n\n.vsembed-app ::-webkit-scrollbar-track {\n  background: var(--vscode-scrollbar-shadow);\n}\n\n.vsembed-app ::-webkit-scrollbar-thumb {\n  background: var(--vscode-scrollbarSlider-background);\n  border-radius: 6px;\n}\n\n.vsembed-app ::-webkit-scrollbar-thumb:hover {\n  background: var(--vscode-scrollbarSlider-hoverBackground);\n}\n\n/* Resize handles */\n.vsembed-sidebar:hover {\n  resize: horizontal;\n}\n\n.vsembed-chat-panel:hover {\n  resize: horizontal;\n}\n\n.vsembed-bottom-panel:hover {\n  resize: vertical;\n}\n\n/* Focus styles */\n.vsembed-panel-content:focus-within {\n  outline: 1px solid var(--vscode-focusBorder);\n  outline-offset: -1px;\n}\n\n/* Responsive design */\n@media (max-width: 768px) {\n  .vsembed-sidebar {\n    width: 200px;\n    min-width: 150px;\n  }\n  \n  .vsembed-chat-panel {\n    width: 280px;\n    min-width: 200px;\n  }\n  \n  .vsembed-bottom-panel {\n    height: 200px;\n    min-height: 80px;\n  }\n}\n\n@media (max-width: 480px) {\n  .vsembed-panels {\n    flex-direction: column;\n  }\n  \n  .vsembed-chat-panel {\n    width: 100%;\n    height: 200px;\n    border-left: none;\n    border-top: 1px solid var(--vscode-panel-border);\n  }\n}\n\n/* Animation for panel transitions */\n.vsembed-sidebar,\n.vsembed-chat-panel,\n.vsembed-bottom-panel {\n  transition: all 0.2s ease-in-out;\n}\n\n/* Panel shadows for depth */\n.vsembed-chat-panel,\n.vsembed-bottom-panel {\n  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);\n}\n\n/* High contrast mode support */\n@media (prefers-contrast: high) {\n  .vsembed-sidebar,\n  .vsembed-chat-panel,\n  .vsembed-bottom-panel {\n    border-width: 2px;\n  }\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3628,268 +3604,268 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `/* --- GROK UX STYLES --- */
-/* Merged from example/inlinestylesheet1-5 and example/*.css */
+___CSS_LOADER_EXPORT___.push([module.id, `/* VsEmbed AI Development Tool Styles */
 
-/* Inline stylesheets */
-.r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}
-.r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}
+:root {
+  /* VS Code Color Theme */
+  --vscode-editor-background: #1e1e1e;
+  --vscode-editor-foreground: #cccccc;
+  --vscode-sideBar-background: #252526;
+  --vscode-activityBar-background: #333333;
+  --vscode-statusBar-background: #007acc;
+  --vscode-terminal-background: #1e1e1e;
+  --vscode-panel-background: #1e1e1e;
+  
+  /* Button colors */
+  --vscode-button-background: #0e639c;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-hoverBackground: #1177bb;
+  
+  /* Input colors */
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-foreground: #cccccc;
+  --vscode-input-border: #3c3c3c;
+  
+  /* Focus colors */
+  --vscode-focusBorder: #007acc;
+  
+  /* List colors */
+  --vscode-list-activeSelectionBackground: #094771;
+  --vscode-list-hoverBackground: #2a2d2e;
+  
+  /* Badge colors */
+  --vscode-badge-background: #4d4d4d;
+  --vscode-badge-foreground: #ffffff;
 
-:where(html[dir="ltr"]),:where([data-sonner-toaster][dir="ltr"]) {
-  --toast-icon-margin-start: -3px;
-  --toast-icon-margin-end: 4px;
-  --toast-svg-margin-start: -1px;
-  --toast-svg-margin-end: 0px;
-  --toast-button-margin-start: auto;
-  --toast-button-margin-end: 0;
-  --toast-close-button-start: 0;
-  --toast-close-button-end: unset;
-  --toast-close-button-transform: translate(-35%, -35%)
-}
-:where(html[dir="rtl"]),:where([data-sonner-toaster][dir="rtl"]) {
-  --toast-icon-margin-start: 4px;
-  --toast-icon-margin-end: -3px;
-  --toast-svg-margin-start: 0px;
-  --toast-svg-margin-end: -1px;
-  --toast-button-margin-start: 0;
-  --toast-button-margin-end: auto;
-  --toast-close-button-start: unset;
-  --toast-close-button-end: 0;
-  --toast-close-button-transform: translate(35%, -35%)
-}
-:where([data-sonner-toaster]) {
-  position:fixed;
-  width:var(--width);
-  font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
-  --gray1: hsl(0, 0%, 99%);
-  --gray2: hsl(0, 0%, 97.3%);
-  --gray3: hsl(0, 0%, 95.1%);
-  --gray4: hsl(0, 0%, 93%);
-  --gray5: hsl(0, 0%, 90.9%);
-  --gray6: hsl(0, 0%, 88.7%);
-  --gray7: hsl(0, 0%, 85.8%);
-  --gray8: hsl(0, 0%, 78%);
-  --gray9: hsl(0, 0%, 56.1%);
-  --gray10: hsl(0, 0%, 52.3%);
-  --gray11: hsl(0, 0%, 43.5%);
-  --gray12: hsl(0, 0%, 9%);
-  --border-radius: 8px;
-  box-sizing:border-box;
-  padding:0;
-  margin:0;
-  list-style:none;
-  outline:none;
-  z-index:999999999;
-  transition:transform .4s ease
-}
-:where([data-sonner-toaster][data-lifted="true"]) {
-  transform:translateY(-10px)
-}
-@media (hover: none) and (pointer: coarse) {
-  :where([data-sonner-toaster][data-lifted="true"]) {
-    transform:none
-  }
-}
-:where([data-sonner-toaster][data-x-position="right"]) {
-  right:max(var(--offset),env(safe-area-inset-right))
-}
-:where([data-sonner-toaster][data-x-position="left"]) {
-  left:max(var(--offset),env(safe-area-inset-left))
+  /* VsEmbed specific */
+  --vsembed-border: #3c3c3c;
+  --vsembed-hover: #2a2d2e;
+  --vsembed-active: #094771;
 }
 
-[vaul-drawer] {
-  touch-action:none;
-  will-change:transform;
-  transition:transform .5s cubic-bezier(.32, .72, 0, 1)
-}
-[vaul-drawer][vaul-drawer-direction=bottom] {
-  transform:translate3d(0,100%,0)
-}
-[vaul-drawer][vaul-drawer-direction=top] {
-  transform:translate3d(0,-100%,0)
-}
-[vaul-drawer][vaul-drawer-direction=left] {
-  transform:translate3d(-100%,0,0)
-}
-[vaul-drawer][vaul-drawer-direction=right] {
-  transform:translate3d(100%,0,0)
-}
-.vaul-dragging .vaul-scrollable [vault-drawer-direction=top] {
-  overflow-y:hidden!important
-}
-.vaul-dragging .vaul-scrollable [vault-drawer-direction=bottom] {
-  overflow-y:hidden!important
-}
-.vaul-dragging .vaul-scrollable [vault-drawer-direction=left] {
-  overflow-x:hidden!important
-}
-.vaul-dragging .vaul-scrollable [vault-drawer-direction=right] {
-  overflow-x:hidden!important
-}
-[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=top] {
-  transform:translate3d(0,var(--snap-point-height,0),0)
-}
-[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=bottom] {
-  transform:translate3d(0,var(--snap-point-height,0),0)
-}
-[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=left] {
-  transform:translate3d(var(--snap-point-height,0),0,0)
-}
-[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=right] {
-  transform:translate3d(var(--snap-point-height,0),0,0)
-}
-[vaul-overlay] {
-  opacity:0;
-  transition:opacity .5s cubic-bezier(.32, .72, 0, 1)
-}
-[vaul-overlay][vaul-drawer-visible=true] {
-  opacity:1
-}
-[vaul-drawer]::after {
-  content:'';
-  position:absolute;
-  background:inherit;
-  background-color:inherit
-}
-[vaul-drawer][vaul-drawer-direction=top]::after {
-  top:initial;
-  bottom:100%;
-  left:0;
-  right:0;
-  height:200%
-}
-
-.transform-component-module_wrapper__SPB86 {
-  position: relative;
-  width: -moz-fit-content;
-  width: fit-content;
-  height: -moz-fit-content;
-  height: fit-content;
-  overflow: hidden;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  margin: 0;
-  padding: 0;
-}
-.transform-component-module_content__FBWxo {
+/* Main Application Container */
+.vsembed-app {
+  height: 100vh;
   display: flex;
-  flex-wrap: wrap;
-  width: -moz-fit-content;
-  width: fit-content;
-  height: -moz-fit-content;
-  height: fit-content;
-  margin: 0;
-  padding: 0;
-  transform-origin: 0% 0%;
-}
-.transform-component-module_content__FBWxo img {
-  pointer-events: none;
+  flex-direction: column;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
 }
 
-.picker-dialog-frame {
-  width:100%;
-  height:100%;
-  border:0;
-  overflow:hidden
-}
-.picker-dialog-bg {
-  position:absolute;
-  top:0;
-  left:0;
-  background-color:#fff;
-  z-index:1000
-}
-.picker-dialog {
-  position:absolute;
-  top:0;
-  left:0;
-  background-color:#fff;
-  border:1px solid #acacac;
-  width:auto;
-  padding:0;
-  z-index:1001;
-  overflow:auto;
-  box-shadow:0 4px 16px rgba(0,0,0,.2)
-}
-.picker-dialog-content {
-  height:100%;
-  font-size:0;
-  padding:0
-}
-.picker-dialog-buttons,
-.picker-dialog-title {
-  display:none
+/* Layout Components */
+.vsembed-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
 
-/* Example CSS (partial, for brevity) */
-.gdg-r17m35ur {
-  flex-grow:1;
-  border:none;
-  outline:none;
-  background-color:var(--gdg-bg-header-has-focus);
-  border-radius:9px;
-  padding:0 8px;
-  box-shadow:0 0 0 1px var(--gdg-border-color);
-  color:var(--gdg-text-group-header);
-  min-height:var(--r17m35ur-0);
-  font:var(--gdg-header-font-style) var(--gdg-font-family)
+.vsembed-sidebar {
+  width: 250px;
+  background: var(--vscode-sideBar-background);
+  border-right: 1px solid var(--vsembed-border);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: 400px;
+  resize: horizontal;
+  overflow: auto;
 }
-.gdg-c1tqibwd {
-  padding:0 8px;
-  display:flex;
-  align-items:center;
-  background-color:var(--gdg-bg-header)
+
+.vsembed-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-.gdg-seveqep {
-  position:absolute;
-  top:4px;
-  right:20px;
-  background-color:var(--gdg-bg-cell);
-  color:var(--gdg-text-dark);
-  padding:8px;
-  border:1px solid var(--gdg-border-color);
-  border-radius:6px;
-  font-size:var(--gdg-editor-font-size);
-  animation:gdg-search-fadein-gdg-seveqep .15s forwards
+
+.vsembed-panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
 }
-.gdg-seveqep.out {
-  animation:gdg-search-fadeout-gdg-seveqep .15s forwards
+
+.vsembed-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-.gdg-seveqep .gdg-search-bar-inner {
-  display:flex
+
+.vsembed-chat-panel {
+  width: 350px;
+  background: var(--vscode-panel-background);
+  border-left: 1px solid var(--vsembed-border);
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  max-width: 600px;
+  resize: horizontal;
+  overflow: hidden;
 }
-.gdg-seveqep .gdg-search-status {
-  padding-top:4px;
-  font-size:11px
+
+.vsembed-bottom-panel {
+  height: 250px;
+  background: var(--vscode-terminal-background);
+  border-top: 1px solid var(--vsembed-border);
+  min-height: 150px;
+  max-height: 400px;
+  resize: vertical;
+  overflow: hidden;
 }
-.gdg-seveqep .gdg-search-progress {
-  position:absolute;
-  height:4px;
-  left:0;
-  bottom:0;
-  background-color:var(--gdg-text-light)
+
+/* Buttons */
+.vsembed-btn {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s;
 }
-.gdg-seveqep input {
-  width:220px;
-  color:var(--gdg-textDark);
-  background-color:var(--gdg-bg-cell);
-  border:0;
-  outline:none
+
+.vsembed-btn:hover {
+  background: var(--vscode-button-hoverBackground);
 }
-.gdg-seveqep button {
-  width:24px;
-  height:24px;
-  padding:0;
-  border:none;
-  outline:none;
-  background:none;
+
+.vsembed-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-/* ...additional Grok CSS omitted for brevity... */
-`, "",{"version":3,"sources":["webpack://./src/renderer/styles/grok.css"],"names":[],"mappings":"AAAA,2BAA2B;AAC3B,8DAA8D;;AAE9D,uBAAuB;AACvB,WAAW,iBAAiB,CAAC,iBAAiB,CAAC,KAAK,CAAC,UAAU,CAAC,mBAAmB;AACnF,kBAAkB,kBAAkB,CAAC,QAAQ,CAAC,UAAU;;AAExD;EACE,+BAA+B;EAC/B,4BAA4B;EAC5B,8BAA8B;EAC9B,2BAA2B;EAC3B,iCAAiC;EACjC,4BAA4B;EAC5B,6BAA6B;EAC7B,+BAA+B;EAC/B;AACF;AACA;EACE,8BAA8B;EAC9B,6BAA6B;EAC7B,6BAA6B;EAC7B,4BAA4B;EAC5B,8BAA8B;EAC9B,+BAA+B;EAC/B,iCAAiC;EACjC,2BAA2B;EAC3B;AACF;AACA;EACE,cAAc;EACd,kBAAkB;EAClB,gMAAgM;EAChM,wBAAwB;EACxB,0BAA0B;EAC1B,0BAA0B;EAC1B,wBAAwB;EACxB,0BAA0B;EAC1B,0BAA0B;EAC1B,0BAA0B;EAC1B,wBAAwB;EACxB,0BAA0B;EAC1B,2BAA2B;EAC3B,2BAA2B;EAC3B,wBAAwB;EACxB,oBAAoB;EACpB,qBAAqB;EACrB,SAAS;EACT,QAAQ;EACR,eAAe;EACf,YAAY;EACZ,iBAAiB;EACjB;AACF;AACA;EACE;AACF;AACA;EACE;IACE;EACF;AACF;AACA;EACE;AACF;AACA;EACE;AACF;;AAEA;EACE,iBAAiB;EACjB,qBAAqB;EACrB;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE,SAAS;EACT;AACF;AACA;EACE;AACF;AACA;EACE,UAAU;EACV,iBAAiB;EACjB,kBAAkB;EAClB;AACF;AACA;EACE,WAAW;EACX,WAAW;EACX,MAAM;EACN,OAAO;EACP;AACF;;AAEA;EACE,kBAAkB;EAClB,uBAAuB;EACvB,kBAAkB;EAClB,wBAAwB;EACxB,mBAAmB;EACnB,gBAAgB;EAChB,2BAA2B;EAC3B,yBAAyB;EACzB,wBAAwB;EACxB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;AACA;EACE,aAAa;EACb,eAAe;EACf,uBAAuB;EACvB,kBAAkB;EAClB,wBAAwB;EACxB,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,uBAAuB;AACzB;AACA;EACE,oBAAoB;AACtB;;AAEA;EACE,UAAU;EACV,WAAW;EACX,QAAQ;EACR;AACF;AACA;EACE,iBAAiB;EACjB,KAAK;EACL,MAAM;EACN,qBAAqB;EACrB;AACF;AACA;EACE,iBAAiB;EACjB,KAAK;EACL,MAAM;EACN,qBAAqB;EACrB,wBAAwB;EACxB,UAAU;EACV,SAAS;EACT,YAAY;EACZ,aAAa;EACb;AACF;AACA;EACE,WAAW;EACX,WAAW;EACX;AACF;AACA;;EAEE;AACF;;AAEA,uCAAuC;AACvC;EACE,WAAW;EACX,WAAW;EACX,YAAY;EACZ,+CAA+C;EAC/C,iBAAiB;EACjB,aAAa;EACb,4CAA4C;EAC5C,kCAAkC;EAClC,4BAA4B;EAC5B;AACF;AACA;EACE,aAAa;EACb,YAAY;EACZ,kBAAkB;EAClB;AACF;AACA;EACE,iBAAiB;EACjB,OAAO;EACP,UAAU;EACV,mCAAmC;EACnC,0BAA0B;EAC1B,WAAW;EACX,wCAAwC;EACxC,iBAAiB;EACjB,qCAAqC;EACrC;AACF;AACA;EACE;AACF;AACA;EACE;AACF;AACA;EACE,eAAe;EACf;AACF;AACA;EACE,iBAAiB;EACjB,UAAU;EACV,MAAM;EACN,QAAQ;EACR;AACF;AACA;EACE,WAAW;EACX,yBAAyB;EACzB,mCAAmC;EACnC,QAAQ;EACR;AACF;AACA;EACE,UAAU;EACV,WAAW;EACX,SAAS;EACT,WAAW;EACX,YAAY;EACZ,eAAe;AACjB;AACA,kDAAkD","sourcesContent":["/* --- GROK UX STYLES --- */\n/* Merged from example/inlinestylesheet1-5 and example/*.css */\n\n/* Inline stylesheets */\n.r-3stbr0 {position:absolute;visibility:hidden;top:0;width:50px;pointer-events:none}\n.r-3stbr0.loaded {visibility:visible;top:50vh;width:50px}\n\n:where(html[dir=\"ltr\"]),:where([data-sonner-toaster][dir=\"ltr\"]) {\n  --toast-icon-margin-start: -3px;\n  --toast-icon-margin-end: 4px;\n  --toast-svg-margin-start: -1px;\n  --toast-svg-margin-end: 0px;\n  --toast-button-margin-start: auto;\n  --toast-button-margin-end: 0;\n  --toast-close-button-start: 0;\n  --toast-close-button-end: unset;\n  --toast-close-button-transform: translate(-35%, -35%)\n}\n:where(html[dir=\"rtl\"]),:where([data-sonner-toaster][dir=\"rtl\"]) {\n  --toast-icon-margin-start: 4px;\n  --toast-icon-margin-end: -3px;\n  --toast-svg-margin-start: 0px;\n  --toast-svg-margin-end: -1px;\n  --toast-button-margin-start: 0;\n  --toast-button-margin-end: auto;\n  --toast-close-button-start: unset;\n  --toast-close-button-end: 0;\n  --toast-close-button-transform: translate(35%, -35%)\n}\n:where([data-sonner-toaster]) {\n  position:fixed;\n  width:var(--width);\n  font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;\n  --gray1: hsl(0, 0%, 99%);\n  --gray2: hsl(0, 0%, 97.3%);\n  --gray3: hsl(0, 0%, 95.1%);\n  --gray4: hsl(0, 0%, 93%);\n  --gray5: hsl(0, 0%, 90.9%);\n  --gray6: hsl(0, 0%, 88.7%);\n  --gray7: hsl(0, 0%, 85.8%);\n  --gray8: hsl(0, 0%, 78%);\n  --gray9: hsl(0, 0%, 56.1%);\n  --gray10: hsl(0, 0%, 52.3%);\n  --gray11: hsl(0, 0%, 43.5%);\n  --gray12: hsl(0, 0%, 9%);\n  --border-radius: 8px;\n  box-sizing:border-box;\n  padding:0;\n  margin:0;\n  list-style:none;\n  outline:none;\n  z-index:999999999;\n  transition:transform .4s ease\n}\n:where([data-sonner-toaster][data-lifted=\"true\"]) {\n  transform:translateY(-10px)\n}\n@media (hover: none) and (pointer: coarse) {\n  :where([data-sonner-toaster][data-lifted=\"true\"]) {\n    transform:none\n  }\n}\n:where([data-sonner-toaster][data-x-position=\"right\"]) {\n  right:max(var(--offset),env(safe-area-inset-right))\n}\n:where([data-sonner-toaster][data-x-position=\"left\"]) {\n  left:max(var(--offset),env(safe-area-inset-left))\n}\n\n[vaul-drawer] {\n  touch-action:none;\n  will-change:transform;\n  transition:transform .5s cubic-bezier(.32, .72, 0, 1)\n}\n[vaul-drawer][vaul-drawer-direction=bottom] {\n  transform:translate3d(0,100%,0)\n}\n[vaul-drawer][vaul-drawer-direction=top] {\n  transform:translate3d(0,-100%,0)\n}\n[vaul-drawer][vaul-drawer-direction=left] {\n  transform:translate3d(-100%,0,0)\n}\n[vaul-drawer][vaul-drawer-direction=right] {\n  transform:translate3d(100%,0,0)\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=top] {\n  overflow-y:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=bottom] {\n  overflow-y:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=left] {\n  overflow-x:hidden!important\n}\n.vaul-dragging .vaul-scrollable [vault-drawer-direction=right] {\n  overflow-x:hidden!important\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=top] {\n  transform:translate3d(0,var(--snap-point-height,0),0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=bottom] {\n  transform:translate3d(0,var(--snap-point-height,0),0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=left] {\n  transform:translate3d(var(--snap-point-height,0),0,0)\n}\n[vaul-drawer][vaul-drawer-visible=true][vaul-drawer-direction=right] {\n  transform:translate3d(var(--snap-point-height,0),0,0)\n}\n[vaul-overlay] {\n  opacity:0;\n  transition:opacity .5s cubic-bezier(.32, .72, 0, 1)\n}\n[vaul-overlay][vaul-drawer-visible=true] {\n  opacity:1\n}\n[vaul-drawer]::after {\n  content:'';\n  position:absolute;\n  background:inherit;\n  background-color:inherit\n}\n[vaul-drawer][vaul-drawer-direction=top]::after {\n  top:initial;\n  bottom:100%;\n  left:0;\n  right:0;\n  height:200%\n}\n\n.transform-component-module_wrapper__SPB86 {\n  position: relative;\n  width: -moz-fit-content;\n  width: fit-content;\n  height: -moz-fit-content;\n  height: fit-content;\n  overflow: hidden;\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n  margin: 0;\n  padding: 0;\n}\n.transform-component-module_content__FBWxo {\n  display: flex;\n  flex-wrap: wrap;\n  width: -moz-fit-content;\n  width: fit-content;\n  height: -moz-fit-content;\n  height: fit-content;\n  margin: 0;\n  padding: 0;\n  transform-origin: 0% 0%;\n}\n.transform-component-module_content__FBWxo img {\n  pointer-events: none;\n}\n\n.picker-dialog-frame {\n  width:100%;\n  height:100%;\n  border:0;\n  overflow:hidden\n}\n.picker-dialog-bg {\n  position:absolute;\n  top:0;\n  left:0;\n  background-color:#fff;\n  z-index:1000\n}\n.picker-dialog {\n  position:absolute;\n  top:0;\n  left:0;\n  background-color:#fff;\n  border:1px solid #acacac;\n  width:auto;\n  padding:0;\n  z-index:1001;\n  overflow:auto;\n  box-shadow:0 4px 16px rgba(0,0,0,.2)\n}\n.picker-dialog-content {\n  height:100%;\n  font-size:0;\n  padding:0\n}\n.picker-dialog-buttons,\n.picker-dialog-title {\n  display:none\n}\n\n/* Example CSS (partial, for brevity) */\n.gdg-r17m35ur {\n  flex-grow:1;\n  border:none;\n  outline:none;\n  background-color:var(--gdg-bg-header-has-focus);\n  border-radius:9px;\n  padding:0 8px;\n  box-shadow:0 0 0 1px var(--gdg-border-color);\n  color:var(--gdg-text-group-header);\n  min-height:var(--r17m35ur-0);\n  font:var(--gdg-header-font-style) var(--gdg-font-family)\n}\n.gdg-c1tqibwd {\n  padding:0 8px;\n  display:flex;\n  align-items:center;\n  background-color:var(--gdg-bg-header)\n}\n.gdg-seveqep {\n  position:absolute;\n  top:4px;\n  right:20px;\n  background-color:var(--gdg-bg-cell);\n  color:var(--gdg-text-dark);\n  padding:8px;\n  border:1px solid var(--gdg-border-color);\n  border-radius:6px;\n  font-size:var(--gdg-editor-font-size);\n  animation:gdg-search-fadein-gdg-seveqep .15s forwards\n}\n.gdg-seveqep.out {\n  animation:gdg-search-fadeout-gdg-seveqep .15s forwards\n}\n.gdg-seveqep .gdg-search-bar-inner {\n  display:flex\n}\n.gdg-seveqep .gdg-search-status {\n  padding-top:4px;\n  font-size:11px\n}\n.gdg-seveqep .gdg-search-progress {\n  position:absolute;\n  height:4px;\n  left:0;\n  bottom:0;\n  background-color:var(--gdg-text-light)\n}\n.gdg-seveqep input {\n  width:220px;\n  color:var(--gdg-textDark);\n  background-color:var(--gdg-bg-cell);\n  border:0;\n  outline:none\n}\n.gdg-seveqep button {\n  width:24px;\n  height:24px;\n  padding:0;\n  border:none;\n  outline:none;\n  background:none;\n}\n/* ...additional Grok CSS omitted for brevity... */\n"],"sourceRoot":""}]);
+
+.vsembed-btn-secondary {
+  background: transparent;
+  color: var(--vscode-editor-foreground);
+  border: 1px solid var(--vsembed-border);
+}
+
+.vsembed-btn-secondary:hover {
+  background: var(--vsembed-hover);
+}
+
+/* Inputs */
+.vsembed-input {
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 6px 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.vsembed-input:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
+
+/* Panel Headers */
+.vsembed-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--vscode-sideBar-background);
+  border-bottom: 1px solid var(--vsembed-border);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vsembed-panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* Scrollbars */
+.vsembed-app ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.vsembed-app ::-webkit-scrollbar-track {
+  background: var(--vscode-editor-background);
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb {
+  background: var(--vsembed-border);
+  border-radius: 5px;
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+/* Status indicators */
+.vsembed-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.vsembed-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4a4a4a;
+}
+
+.vsembed-status-dot.running {
+  background: #00bc00;
+}
+
+.vsembed-status-dot.error {
+  background: #ff3333;
+}
+
+.vsembed-status-dot.warning {
+  background: #ffcc00;
+}
+
+/* Utility classes */
+.vsembed-flex {
+  display: flex;
+}
+
+.vsembed-flex-col {
+  flex-direction: column;
+}
+
+.vsembed-flex-1 {
+  flex: 1;
+}
+
+.vsembed-gap {
+  gap: 8px;
+}
+
+.vsembed-p {
+  padding: 8px;
+}
+
+.vsembed-m {
+  margin: 8px;
+}
+
+.vsembed-border {
+  border: 1px solid var(--vsembed-border);
+}
+
+.vsembed-rounded {
+  border-radius: 2px;
+}
+`, "",{"version":3,"sources":["webpack://./src/renderer/styles/grok.css"],"names":[],"mappings":"AAAA,uCAAuC;;AAEvC;EACE,wBAAwB;EACxB,mCAAmC;EACnC,mCAAmC;EACnC,oCAAoC;EACpC,wCAAwC;EACxC,sCAAsC;EACtC,qCAAqC;EACrC,kCAAkC;;EAElC,kBAAkB;EAClB,mCAAmC;EACnC,mCAAmC;EACnC,wCAAwC;;EAExC,iBAAiB;EACjB,kCAAkC;EAClC,kCAAkC;EAClC,8BAA8B;;EAE9B,iBAAiB;EACjB,6BAA6B;;EAE7B,gBAAgB;EAChB,gDAAgD;EAChD,sCAAsC;;EAEtC,iBAAiB;EACjB,kCAAkC;EAClC,kCAAkC;;EAElC,qBAAqB;EACrB,yBAAyB;EACzB,wBAAwB;EACxB,yBAAyB;AAC3B;;AAEA,+BAA+B;AAC/B;EACE,aAAa;EACb,aAAa;EACb,sBAAsB;EACtB,2CAA2C;EAC3C,sCAAsC;EACtC,4DAA4D;EAC5D,eAAe;EACf,gBAAgB;AAClB;;AAEA,sBAAsB;AACtB;EACE,aAAa;EACb,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,YAAY;EACZ,4CAA4C;EAC5C,6CAA6C;EAC7C,aAAa;EACb,sBAAsB;EACtB,gBAAgB;EAChB,gBAAgB;EAChB,kBAAkB;EAClB,cAAc;AAChB;;AAEA;EACE,OAAO;EACP,aAAa;EACb,sBAAsB;EACtB,YAAY;AACd;;AAEA;EACE,aAAa;EACb,OAAO;EACP,gBAAgB;AAClB;;AAEA;EACE,OAAO;EACP,aAAa;EACb,sBAAsB;EACtB,YAAY;AACd;;AAEA;EACE,YAAY;EACZ,0CAA0C;EAC1C,4CAA4C;EAC5C,aAAa;EACb,sBAAsB;EACtB,gBAAgB;EAChB,gBAAgB;EAChB,kBAAkB;EAClB,gBAAgB;AAClB;;AAEA;EACE,aAAa;EACb,6CAA6C;EAC7C,2CAA2C;EAC3C,iBAAiB;EACjB,iBAAiB;EACjB,gBAAgB;EAChB,gBAAgB;AAClB;;AAEA,YAAY;AACZ;EACE,2CAA2C;EAC3C,sCAAsC;EACtC,YAAY;EACZ,iBAAiB;EACjB,kBAAkB;EAClB,eAAe;EACf,eAAe;EACf,oBAAoB;EACpB,mBAAmB;EACnB,QAAQ;EACR,iCAAiC;AACnC;;AAEA;EACE,gDAAgD;AAClD;;AAEA;EACE,YAAY;EACZ,mBAAmB;AACrB;;AAEA;EACE,uBAAuB;EACvB,sCAAsC;EACtC,uCAAuC;AACzC;;AAEA;EACE,gCAAgC;AAClC;;AAEA,WAAW;AACX;EACE,0CAA0C;EAC1C,qCAAqC;EACrC,4CAA4C;EAC5C,gBAAgB;EAChB,kBAAkB;EAClB,eAAe;EACf,oBAAoB;AACtB;;AAEA;EACE,aAAa;EACb,uCAAuC;EACvC,+CAA+C;AACjD;;AAEA,kBAAkB;AAClB;EACE,aAAa;EACb,mBAAmB;EACnB,8BAA8B;EAC9B,iBAAiB;EACjB,4CAA4C;EAC5C,8CAA8C;EAC9C,gBAAgB;EAChB,eAAe;EACf,yBAAyB;EACzB,qBAAqB;AACvB;;AAEA;EACE,OAAO;EACP,cAAc;EACd,YAAY;AACd;;AAEA,eAAe;AACf;EACE,WAAW;EACX,YAAY;AACd;;AAEA;EACE,2CAA2C;AAC7C;;AAEA;EACE,iCAAiC;EACjC,kBAAkB;AACpB;;AAEA;EACE,mBAAmB;AACrB;;AAEA,sBAAsB;AACtB;EACE,oBAAoB;EACpB,mBAAmB;EACnB,QAAQ;EACR,eAAe;AACjB;;AAEA;EACE,UAAU;EACV,WAAW;EACX,kBAAkB;EAClB,mBAAmB;AACrB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,mBAAmB;AACrB;;AAEA,oBAAoB;AACpB;EACE,aAAa;AACf;;AAEA;EACE,sBAAsB;AACxB;;AAEA;EACE,OAAO;AACT;;AAEA;EACE,QAAQ;AACV;;AAEA;EACE,YAAY;AACd;;AAEA;EACE,WAAW;AACb;;AAEA;EACE,uCAAuC;AACzC;;AAEA;EACE,kBAAkB;AACpB","sourcesContent":["/* VsEmbed AI Development Tool Styles */\n\n:root {\n  /* VS Code Color Theme */\n  --vscode-editor-background: #1e1e1e;\n  --vscode-editor-foreground: #cccccc;\n  --vscode-sideBar-background: #252526;\n  --vscode-activityBar-background: #333333;\n  --vscode-statusBar-background: #007acc;\n  --vscode-terminal-background: #1e1e1e;\n  --vscode-panel-background: #1e1e1e;\n  \n  /* Button colors */\n  --vscode-button-background: #0e639c;\n  --vscode-button-foreground: #ffffff;\n  --vscode-button-hoverBackground: #1177bb;\n  \n  /* Input colors */\n  --vscode-input-background: #3c3c3c;\n  --vscode-input-foreground: #cccccc;\n  --vscode-input-border: #3c3c3c;\n  \n  /* Focus colors */\n  --vscode-focusBorder: #007acc;\n  \n  /* List colors */\n  --vscode-list-activeSelectionBackground: #094771;\n  --vscode-list-hoverBackground: #2a2d2e;\n  \n  /* Badge colors */\n  --vscode-badge-background: #4d4d4d;\n  --vscode-badge-foreground: #ffffff;\n\n  /* VsEmbed specific */\n  --vsembed-border: #3c3c3c;\n  --vsembed-hover: #2a2d2e;\n  --vsembed-active: #094771;\n}\n\n/* Main Application Container */\n.vsembed-app {\n  height: 100vh;\n  display: flex;\n  flex-direction: column;\n  background: var(--vscode-editor-background);\n  color: var(--vscode-editor-foreground);\n  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n  font-size: 13px;\n  overflow: hidden;\n}\n\n/* Layout Components */\n.vsembed-main {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.vsembed-sidebar {\n  width: 250px;\n  background: var(--vscode-sideBar-background);\n  border-right: 1px solid var(--vsembed-border);\n  display: flex;\n  flex-direction: column;\n  min-width: 200px;\n  max-width: 400px;\n  resize: horizontal;\n  overflow: auto;\n}\n\n.vsembed-content {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n}\n\n.vsembed-panels {\n  display: flex;\n  flex: 1;\n  overflow: hidden;\n}\n\n.vsembed-editor-area {\n  flex: 1;\n  display: flex;\n  flex-direction: column;\n  min-width: 0;\n}\n\n.vsembed-chat-panel {\n  width: 350px;\n  background: var(--vscode-panel-background);\n  border-left: 1px solid var(--vsembed-border);\n  display: flex;\n  flex-direction: column;\n  min-width: 300px;\n  max-width: 600px;\n  resize: horizontal;\n  overflow: hidden;\n}\n\n.vsembed-bottom-panel {\n  height: 250px;\n  background: var(--vscode-terminal-background);\n  border-top: 1px solid var(--vsembed-border);\n  min-height: 150px;\n  max-height: 400px;\n  resize: vertical;\n  overflow: hidden;\n}\n\n/* Buttons */\n.vsembed-btn {\n  background: var(--vscode-button-background);\n  color: var(--vscode-button-foreground);\n  border: none;\n  padding: 6px 12px;\n  border-radius: 2px;\n  cursor: pointer;\n  font-size: 12px;\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n  transition: background-color 0.2s;\n}\n\n.vsembed-btn:hover {\n  background: var(--vscode-button-hoverBackground);\n}\n\n.vsembed-btn:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}\n\n.vsembed-btn-secondary {\n  background: transparent;\n  color: var(--vscode-editor-foreground);\n  border: 1px solid var(--vsembed-border);\n}\n\n.vsembed-btn-secondary:hover {\n  background: var(--vsembed-hover);\n}\n\n/* Inputs */\n.vsembed-input {\n  background: var(--vscode-input-background);\n  color: var(--vscode-input-foreground);\n  border: 1px solid var(--vscode-input-border);\n  padding: 6px 8px;\n  border-radius: 2px;\n  font-size: 12px;\n  font-family: inherit;\n}\n\n.vsembed-input:focus {\n  outline: none;\n  border-color: var(--vscode-focusBorder);\n  box-shadow: 0 0 0 1px var(--vscode-focusBorder);\n}\n\n/* Panel Headers */\n.vsembed-panel-header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 8px 12px;\n  background: var(--vscode-sideBar-background);\n  border-bottom: 1px solid var(--vsembed-border);\n  font-weight: 600;\n  font-size: 11px;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n}\n\n.vsembed-panel-content {\n  flex: 1;\n  overflow: auto;\n  padding: 8px;\n}\n\n/* Scrollbars */\n.vsembed-app ::-webkit-scrollbar {\n  width: 10px;\n  height: 10px;\n}\n\n.vsembed-app ::-webkit-scrollbar-track {\n  background: var(--vscode-editor-background);\n}\n\n.vsembed-app ::-webkit-scrollbar-thumb {\n  background: var(--vsembed-border);\n  border-radius: 5px;\n}\n\n.vsembed-app ::-webkit-scrollbar-thumb:hover {\n  background: #4a4a4a;\n}\n\n/* Status indicators */\n.vsembed-status {\n  display: inline-flex;\n  align-items: center;\n  gap: 4px;\n  font-size: 11px;\n}\n\n.vsembed-status-dot {\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background: #4a4a4a;\n}\n\n.vsembed-status-dot.running {\n  background: #00bc00;\n}\n\n.vsembed-status-dot.error {\n  background: #ff3333;\n}\n\n.vsembed-status-dot.warning {\n  background: #ffcc00;\n}\n\n/* Utility classes */\n.vsembed-flex {\n  display: flex;\n}\n\n.vsembed-flex-col {\n  flex-direction: column;\n}\n\n.vsembed-flex-1 {\n  flex: 1;\n}\n\n.vsembed-gap {\n  gap: 8px;\n}\n\n.vsembed-p {\n  padding: 8px;\n}\n\n.vsembed-m {\n  margin: 8px;\n}\n\n.vsembed-border {\n  border: 1px solid var(--vsembed-border);\n}\n\n.vsembed-rounded {\n  border-radius: 2px;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -4208,287 +4184,6 @@ body {
 
 /***/ }),
 
-/***/ "./src/debug/components/DebugTestPanel.tsx":
-/*!*************************************************!*\
-  !*** ./src/debug/components/DebugTestPanel.tsx ***!
-  \*************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DebugTestPanel: () => (/* binding */ DebugTestPanel)
-/* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-check-big.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/circle-x.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/triangle-alert.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/bug.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/clock.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye-off.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/eye.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/file-text.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/play.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/refresh-cw.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/square-stop.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/target.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/test-tube.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/trending-up.js");
-/* harmony import */ var lucide_react__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! lucide-react */ "./node_modules/lucide-react/dist/esm/icons/zap.js");
-
-
-
-const DebugTestPanel = ({ workspaceRoot, activeFile, onTestRun, onDebugStart }) => {
-    const [activeTab, setActiveTab] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('debug');
-    const [debugSession, setDebugSession] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
-    const [testCases, setTestCases] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [isAutoTestEnabled, setIsAutoTestEnabled] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
-    const [isWatchingFiles, setIsWatchingFiles] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
-    const [metrics, setMetrics] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
-        totalTests: 0,
-        passedTests: 0,
-        failedTests: 0,
-        coverage: 0,
-        executionTime: 0
-    });
-    const [debugOutput, setDebugOutput] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [testOutput, setTestOutput] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [smartBreakpoints, setSmartBreakpoints] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [variableAnomalies, setVariableAnomalies] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [aiSuggestions, setAiSuggestions] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [isGeneratingTests, setIsGeneratingTests] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-    const [isDebugging, setIsDebugging] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-    const debugOutputRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
-    const testOutputRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
-    const wsRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
-    // WebSocket connection for real-time updates
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        const connectWebSocket = () => {
-            try {
-                wsRef.current = new WebSocket('ws://localhost:8080/debug-test');
-                wsRef.current.onopen = () => {
-                    console.log('Debug-Test WebSocket connected');
-                };
-                wsRef.current.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    handleWebSocketMessage(data);
-                };
-                wsRef.current.onclose = () => {
-                    console.log('Debug-Test WebSocket disconnected');
-                    // Reconnect after 3 seconds
-                    setTimeout(connectWebSocket, 3000);
-                };
-                wsRef.current.onerror = (error) => {
-                    console.error('Debug-Test WebSocket error:', error);
-                };
-            }
-            catch (error) {
-                console.error('Failed to connect WebSocket:', error);
-            }
-        };
-        connectWebSocket();
-        return () => {
-            if (wsRef.current) {
-                wsRef.current.close();
-            }
-        };
-    }, []);
-    const handleWebSocketMessage = (0,react__WEBPACK_IMPORTED_MODULE_1__.useCallback)((data) => {
-        switch (data.type) {
-            case 'debug-session-started':
-                setDebugSession(data.session);
-                setIsDebugging(true);
-                break;
-            case 'debug-session-paused':
-                setDebugSession(prev => prev ? { ...prev, status: 'paused' } : null);
-                break;
-            case 'debug-session-stopped':
-                setDebugSession(null);
-                setIsDebugging(false);
-                break;
-            case 'test-started':
-                updateTestCase(data.test.id, { status: 'running' });
-                break;
-            case 'test-completed':
-                updateTestCase(data.test.id, {
-                    status: data.result.status,
-                    duration: data.result.duration,
-                    error: data.result.error
-                });
-                updateMetrics();
-                break;
-            case 'smart-breakpoints-suggested':
-                setSmartBreakpoints(data.breakpoints);
-                break;
-            case 'variable-anomaly-detected':
-                setVariableAnomalies(prev => [...prev, data.anomaly]);
-                break;
-            case 'ai-suggestion':
-                setAiSuggestions(prev => [...prev, data.suggestion]);
-                break;
-            case 'debug-output':
-                setDebugOutput(prev => [...prev, data.message]);
-                break;
-            case 'test-output':
-                setTestOutput(prev => [...prev, data.message]);
-                break;
-        }
-    }, []);
-    const updateTestCase = (id, updates) => {
-        setTestCases(prev => prev.map(test => test.id === id ? { ...test, ...updates } : test));
-    };
-    const updateMetrics = () => {
-        setMetrics(prev => {
-            const total = testCases.length;
-            const passed = testCases.filter(t => t.status === 'passed').length;
-            const failed = testCases.filter(t => t.status === 'failed').length;
-            const avgTime = testCases
-                .filter(t => t.duration)
-                .reduce((sum, t) => sum + (t.duration || 0), 0) / total;
-            return {
-                totalTests: total,
-                passedTests: passed,
-                failedTests: failed,
-                coverage: Math.random() * 100, // TODO: Calculate real coverage
-                executionTime: avgTime
-            };
-        });
-    };
-    const startDebugSession = async () => {
-        if (!activeFile)
-            return;
-        try {
-            setIsDebugging(true);
-            // Send debug start command via WebSocket
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({
-                    type: 'start-debug',
-                    file: activeFile,
-                    breakpoints: smartBreakpoints
-                }));
-            }
-            onDebugStart?.({ file: activeFile });
-        }
-        catch (error) {
-            console.error('Failed to start debug session:', error);
-            setIsDebugging(false);
-        }
-    };
-    const stopDebugSession = () => {
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({
-                type: 'stop-debug'
-            }));
-        }
-        setDebugSession(null);
-        setIsDebugging(false);
-    };
-    const generateTests = async () => {
-        if (!activeFile)
-            return;
-        try {
-            setIsGeneratingTests(true);
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({
-                    type: 'generate-tests',
-                    file: activeFile,
-                    testType: 'unit',
-                    coverage: 80
-                }));
-            }
-        }
-        catch (error) {
-            console.error('Failed to generate tests:', error);
-        }
-        finally {
-            setIsGeneratingTests(false);
-        }
-    };
-    const runAllTests = async () => {
-        try {
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({
-                    type: 'run-all-tests',
-                    tests: testCases.map(t => t.id)
-                }));
-            }
-            onTestRun?.(testCases);
-        }
-        catch (error) {
-            console.error('Failed to run tests:', error);
-        }
-    };
-    const runSingleTest = async (testId) => {
-        try {
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify({
-                    type: 'run-test',
-                    testId
-                }));
-            }
-        }
-        catch (error) {
-            console.error('Failed to run test:', error);
-        }
-    };
-    const toggleAutoTest = () => {
-        setIsAutoTestEnabled(!isAutoTestEnabled);
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({
-                type: 'toggle-auto-test',
-                enabled: !isAutoTestEnabled
-            }));
-        }
-    };
-    const toggleFileWatching = () => {
-        setIsWatchingFiles(!isWatchingFiles);
-        if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(JSON.stringify({
-                type: 'toggle-file-watching',
-                enabled: !isWatchingFiles
-            }));
-        }
-    };
-    // Auto-scroll debug/test output
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        if (debugOutputRef.current) {
-            debugOutputRef.current.scrollTop = debugOutputRef.current.scrollHeight;
-        }
-    }, [debugOutput]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        if (testOutputRef.current) {
-            testOutputRef.current.scrollTop = testOutputRef.current.scrollHeight;
-        }
-    }, [testOutput]);
-    const renderDebugTab = () => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-4 space-y-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 p-3 bg-gray-50 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: isDebugging ? stopDebugSession : startDebugSession, className: `flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium ${isDebugging
-                            ? 'bg-red-600 text-white hover:bg-red-700'
-                            : 'bg-green-600 text-white hover:bg-green-700'}`, children: [isDebugging ? (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_12__["default"], { size: 16 }) : (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_10__["default"], { size: 16 }), isDebugging ? 'Stop Debug' : 'Start Debug'] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: generateTests, disabled: isGeneratingTests, className: "flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50", children: [isGeneratingTests ? (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_11__["default"], { size: 16, className: "animate-spin" }) : (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_16__["default"], { size: 16 }), "Generate AI Tests"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 ml-auto", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: toggleAutoTest, className: `flex items-center gap-1 px-2 py-1 rounded text-xs ${isAutoTestEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`, children: [isAutoTestEnabled ? (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], { size: 14 }) : (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_7__["default"], { size: 14 }), "Auto Test"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: toggleFileWatching, className: `flex items-center gap-1 px-2 py-1 rounded text-xs ${isWatchingFiles ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'}`, children: [isWatchingFiles ? (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_8__["default"], { size: 14 }) : (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_7__["default"], { size: 14 }), "Watch Files"] })] })] }), debugSession && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 bg-blue-50 border border-blue-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_5__["default"], { size: 16, className: "text-blue-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "font-medium text-blue-800", children: "Debug Session Active" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: `px-2 py-0.5 rounded text-xs font-medium ${debugSession.status === 'active' ? 'bg-green-100 text-green-700' :
-                                    debugSession.status === 'paused' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700'}`, children: debugSession.status })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "text-sm text-blue-700", children: ["Stack Frames: ", debugSession.stackFrames?.length || 0, " | Variables: ", debugSession.variables?.length || 0, " | Breakpoints: ", debugSession.breakpoints?.length || 0] })] })), smartBreakpoints.length > 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 border border-orange-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", { className: "flex items-center gap-2 font-medium text-orange-800 mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_13__["default"], { size: 16 }), "AI Suggested Breakpoints"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-y-1", children: smartBreakpoints.map((bp, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 text-sm", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "w-8 text-orange-600 font-mono", children: ["L", bp.line] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-gray-700", children: bp.reason }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: `px-1.5 py-0.5 rounded text-xs ${bp.confidence > 0.8 ? 'bg-green-100 text-green-700' :
-                                        bp.confidence > 0.6 ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'}`, children: [Math.round(bp.confidence * 100), "%"] })] }, index))) })] })), variableAnomalies.length > 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 border border-red-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", { className: "flex items-center gap-2 font-medium text-red-800 mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_4__["default"], { size: 16 }), "Variable Anomalies"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-y-2", children: variableAnomalies.map((anomaly, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-2 bg-red-50 rounded", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("code", { className: "text-sm font-mono text-red-700", children: anomaly.variableName }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: `px-1.5 py-0.5 rounded text-xs font-medium ${anomaly.severity === 'critical' ? 'bg-red-200 text-red-800' :
-                                                anomaly.severity === 'high' ? 'bg-orange-200 text-orange-800' :
-                                                    anomaly.severity === 'medium' ? 'bg-yellow-200 text-yellow-800' :
-                                                        'bg-blue-200 text-blue-800'}`, children: anomaly.severity })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { className: "text-sm text-red-700", children: anomaly.suggestion })] }, index))) })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "h-64 border border-gray-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-2 bg-gray-100 border-b border-gray-200 rounded-t-lg", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", { className: "flex items-center gap-2 font-medium text-gray-700", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_9__["default"], { size: 16 }), "Debug Output"] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { ref: debugOutputRef, className: "h-48 p-3 overflow-y-auto bg-black text-green-400 font-mono text-sm", children: [debugOutput.map((line, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "whitespace-pre-wrap", children: line }, index))), debugOutput.length === 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-gray-500", children: "Start debugging to see output..." }))] })] })] }));
-    const renderTestTab = () => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-4 space-y-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 p-3 bg-gray-50 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: runAllTests, className: "flex items-center gap-2 px-3 py-1.5 bg-green-600 text-white rounded text-sm font-medium hover:bg-green-700", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_10__["default"], { size: 16 }), "Run All Tests"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: generateTests, disabled: isGeneratingTests, className: "flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700 disabled:opacity-50", children: [isGeneratingTests ? (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_11__["default"], { size: 16, className: "animate-spin" }) : (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_14__["default"], { size: 16 }), "Generate Tests"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "ml-auto text-sm text-gray-600", children: ["Total: ", metrics.totalTests, " | Passed: ", metrics.passedTests, " | Failed: ", metrics.failedTests] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "grid grid-cols-4 gap-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 bg-blue-50 border border-blue-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_14__["default"], { size: 16, className: "text-blue-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-sm font-medium text-blue-800", children: "Total Tests" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-2xl font-bold text-blue-900", children: metrics.totalTests })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 bg-green-50 border border-green-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_2__["default"], { size: 16, className: "text-green-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-sm font-medium text-green-800", children: "Passed" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-2xl font-bold text-green-900", children: metrics.passedTests })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 bg-red-50 border border-red-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_3__["default"], { size: 16, className: "text-red-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-sm font-medium text-red-800", children: "Failed" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-2xl font-bold text-red-900", children: metrics.failedTests })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 bg-yellow-50 border border-yellow-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-1", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_6__["default"], { size: 16, className: "text-yellow-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "text-sm font-medium text-yellow-800", children: "Avg Time" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "text-2xl font-bold text-yellow-900", children: [metrics.executionTime.toFixed(1), "ms"] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "border border-gray-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-3 bg-gray-100 border-b border-gray-200 rounded-t-lg", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", { className: "font-medium text-gray-700", children: "Test Cases" }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "max-h-64 overflow-y-auto", children: [testCases.map((test) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 border-b border-gray-100 last:border-b-0", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: `w-3 h-3 rounded-full ${test.status === 'passed' ? 'bg-green-500' :
-                                                    test.status === 'failed' ? 'bg-red-500' :
-                                                        test.status === 'running' ? 'bg-blue-500 animate-pulse' :
-                                                            test.status === 'error' ? 'bg-orange-500' :
-                                                                'bg-gray-300'}` }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "font-medium text-gray-900", children: test.name }), test.duration && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "text-sm text-gray-500", children: ["(", test.duration, "ms)"] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => runSingleTest(test.id), className: "ml-auto p-1 text-gray-400 hover:text-blue-600", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_10__["default"], { size: 14 }) })] }), test.error && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700", children: test.error }))] }, test.id))), testCases.length === 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-8 text-center text-gray-500", children: "No tests available. Generate some AI tests to get started!" }))] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "h-48 border border-gray-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-2 bg-gray-100 border-b border-gray-200 rounded-t-lg", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", { className: "flex items-center gap-2 font-medium text-gray-700", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_9__["default"], { size: 16 }), "Test Output"] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { ref: testOutputRef, className: "h-36 p-3 overflow-y-auto bg-black text-green-400 font-mono text-sm", children: [testOutput.map((line, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "whitespace-pre-wrap", children: line }, index))), testOutput.length === 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-gray-500", children: "Run tests to see output..." }))] })] })] }));
-    const renderCoverageTab = () => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-4 space-y-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2 mb-3", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_15__["default"], { size: 20, className: "text-blue-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h3", { className: "text-lg font-semibold text-blue-900", children: "Code Coverage" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "grid grid-cols-2 gap-4", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "text-3xl font-bold text-blue-900", children: [metrics.coverage.toFixed(1), "%"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-sm text-blue-700", children: "Overall Coverage" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "space-y-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Lines" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "font-medium", children: [(metrics.coverage * 0.9).toFixed(1), "%"] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Functions" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "font-medium", children: [(metrics.coverage * 0.95).toFixed(1), "%"] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center justify-between text-sm", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Branches" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "font-medium", children: [(metrics.coverage * 0.8).toFixed(1), "%"] })] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "mt-3", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "w-full bg-gray-200 rounded-full h-2", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "bg-blue-600 h-2 rounded-full transition-all duration-300", style: { width: `${metrics.coverage}%` } }) }) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "border border-gray-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-3 bg-gray-100 border-b border-gray-200 rounded-t-lg", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", { className: "font-medium text-gray-700", children: "Coverage by File" }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-4", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "text-center text-gray-500 py-8", children: "Coverage details will appear here when tests run with coverage enabled." }) })] }), aiSuggestions.length > 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-3 border border-purple-200 rounded-lg", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", { className: "flex items-center gap-2 font-medium text-purple-800 mb-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_16__["default"], { size: 16 }), "AI Coverage Suggestions"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "space-y-2", children: aiSuggestions.map((suggestion, index) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "p-2 bg-purple-50 rounded", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { className: "text-sm text-purple-700", children: suggestion.description }), suggestion.confidence && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "inline-block mt-1 px-2 py-0.5 bg-purple-200 text-purple-800 text-xs rounded", children: ["Confidence: ", Math.round(suggestion.confidence * 100), "%"] }))] }, index))) })] }))] }));
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "w-full h-full bg-white border border-gray-300 rounded-lg shadow-sm flex flex-col", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "p-3 border-b border-gray-200", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex items-center gap-2", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(lucide_react__WEBPACK_IMPORTED_MODULE_5__["default"], { size: 18, className: "text-blue-600" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", { className: "font-semibold text-gray-900", children: "AI Debug & Test Panel" }), activeFile && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "ml-auto text-sm text-gray-500 truncate max-w-48", children: activeFile.split('/').pop() }))] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "flex border-b border-gray-200 bg-gray-50", children: [
-                    { id: 'debug', label: 'Debug', icon: lucide_react__WEBPACK_IMPORTED_MODULE_5__["default"] },
-                    { id: 'test', label: 'Live Tests', icon: lucide_react__WEBPACK_IMPORTED_MODULE_14__["default"] },
-                    { id: 'coverage', label: 'Coverage', icon: lucide_react__WEBPACK_IMPORTED_MODULE_15__["default"] }
-                ].map(({ id, label, icon: Icon }) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: () => setActiveTab(id), className: `flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === id
-                        ? 'border-blue-500 text-blue-600 bg-white'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(Icon, { size: 16 }), label] }, id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "flex-1 overflow-auto", children: [activeTab === 'debug' && renderDebugTab(), activeTab === 'test' && renderTestTab(), activeTab === 'coverage' && renderCoverageTab()] })] }));
-};
-
-
-/***/ }),
-
 /***/ "./src/renderer/App.tsx":
 /*!******************************!*\
   !*** ./src/renderer/App.tsx ***!
@@ -4503,24 +4198,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _components_Layout__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/Layout */ "./src/renderer/components/Layout.tsx");
-/* harmony import */ var _components_ChatPane__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/ChatPane */ "./src/renderer/components/ChatPane.tsx");
-/* harmony import */ var _components_EditorPane__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/EditorPane */ "./src/renderer/components/EditorPane.tsx");
-/* harmony import */ var _components_TerminalPane__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/TerminalPane */ "./src/renderer/components/TerminalPane.tsx");
-/* harmony import */ var _components_PreviewPane__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/PreviewPane */ "./src/renderer/components/PreviewPane.tsx");
-/* harmony import */ var _components_FileExplorer__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/FileExplorer */ "./src/renderer/components/FileExplorer.tsx");
-/* harmony import */ var _components_StatusBar__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/StatusBar */ "./src/renderer/components/StatusBar.tsx");
-/* harmony import */ var _components_MenuHandler__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/MenuHandler */ "./src/renderer/components/MenuHandler.tsx");
-/* harmony import */ var _contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./contexts/NotificationContext */ "./src/renderer/contexts/NotificationContext.tsx");
-/* harmony import */ var _contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./contexts/WorkspaceContext */ "./src/renderer/contexts/WorkspaceContext.tsx");
-/* harmony import */ var _contexts_AIContext__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./contexts/AIContext */ "./src/renderer/contexts/AIContext.tsx");
-/* harmony import */ var _contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./contexts/RunnerContext */ "./src/renderer/contexts/RunnerContext.tsx");
-
-
-
-
-
-
-
+/* harmony import */ var _contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contexts/NotificationContext */ "./src/renderer/contexts/NotificationContext.tsx");
+/* harmony import */ var _contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./contexts/WorkspaceContext */ "./src/renderer/contexts/WorkspaceContext.tsx");
+/* harmony import */ var _contexts_AIContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./contexts/AIContext */ "./src/renderer/contexts/AIContext.tsx");
+/* harmony import */ var _contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./contexts/RunnerContext */ "./src/renderer/contexts/RunnerContext.tsx");
 
 
 
@@ -4533,8 +4214,9 @@ const App = () => {
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
         // Apply theme to document
         document.documentElement.setAttribute('data-theme', theme);
+        document.body.className = 'vsembed-app';
     }, [theme]);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_10__.NotificationProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_11__.WorkspaceProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_AIContext__WEBPACK_IMPORTED_MODULE_12__.AIProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_13__.RunnerProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "app", "data-theme": theme, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_MenuHandler__WEBPACK_IMPORTED_MODULE_9__.MenuHandler, {}), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout.Sidebar, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_FileExplorer__WEBPACK_IMPORTED_MODULE_7__.FileExplorer, {}) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout.Main, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout.TopPanel, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_ChatPane__WEBPACK_IMPORTED_MODULE_3__.ChatPane, {}) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout.MiddlePanel, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_EditorPane__WEBPACK_IMPORTED_MODULE_4__.EditorPane, {}), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_PreviewPane__WEBPACK_IMPORTED_MODULE_6__.PreviewPane, {})] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout.BottomPanel, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_TerminalPane__WEBPACK_IMPORTED_MODULE_5__.TerminalPane, {}) })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_StatusBar__WEBPACK_IMPORTED_MODULE_8__.StatusBar, {})] }) }) }) }) }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_3__.NotificationProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_4__.WorkspaceProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_AIContext__WEBPACK_IMPORTED_MODULE_5__.AIProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_6__.RunnerProvider, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-app", "data-theme": theme, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_Layout__WEBPACK_IMPORTED_MODULE_2__.Layout, {}) }) }) }) }) }));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (App);
 
@@ -5326,7 +5008,6 @@ __webpack_require__.r(__webpack_exports__);
 const Layout = ({ children }) => {
     const [sidebarVisible, setSidebarVisible] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
     const [terminalVisible, setTerminalVisible] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
-    const [previewVisible, setPreviewVisible] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
     const [chatVisible, setChatVisible] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true);
     const [showModelSettings, setShowModelSettings] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
     const handleViewToggle = (view) => {
@@ -5336,9 +5017,6 @@ const Layout = ({ children }) => {
                 break;
             case 'terminal':
                 setTerminalVisible(!terminalVisible);
-                break;
-            case 'preview':
-                setPreviewVisible(!previewVisible);
                 break;
             case 'chat':
                 setChatVisible(!chatVisible);
@@ -5350,21 +5028,14 @@ const Layout = ({ children }) => {
     };
     const handlePanelToggle = (panel) => {
         switch (panel) {
-            case 'problems':
-                // TODO: Implement problems panel
-                break;
-            case 'notifications':
-                // TODO: Implement notifications panel
-                break;
             case 'terminal':
                 setTerminalVisible(!terminalVisible);
                 break;
-            case 'output':
-                // TODO: Implement output panel
+            default:
                 break;
         }
     };
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_PermissionRequestDialog__WEBPACK_IMPORTED_MODULE_10__.PermissionRequestManager, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "layout", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_MenuHandler__WEBPACK_IMPORTED_MODULE_2__.MenuHandler, { onViewToggle: handleViewToggle }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "main-content", children: [sidebarVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "sidebar", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_FileExplorer__WEBPACK_IMPORTED_MODULE_7__.FileExplorer, {}) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "editor-area", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "editor-container", children: [chatVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "chat-panel", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ChatPane__WEBPACK_IMPORTED_MODULE_3__.ChatPane, {}) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "code-editor", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_EditorPane__WEBPACK_IMPORTED_MODULE_4__.EditorPane, {}) })] }), previewVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-panel", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_PreviewPane__WEBPACK_IMPORTED_MODULE_6__.PreviewPane, {}) }))] })] }), terminalVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "terminal-panel", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_TerminalPane__WEBPACK_IMPORTED_MODULE_5__.TerminalPane, {}) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_StatusBar__WEBPACK_IMPORTED_MODULE_8__.StatusBar, { onTogglePanel: handlePanelToggle }), showModelSettings && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ModelSettings__WEBPACK_IMPORTED_MODULE_9__.ModelSettings, { onClose: () => setShowModelSettings(false) }))] }) }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_PermissionRequestDialog__WEBPACK_IMPORTED_MODULE_10__.PermissionRequestManager, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-app", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_MenuHandler__WEBPACK_IMPORTED_MODULE_2__.MenuHandler, { onViewToggle: handleViewToggle }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-main", children: [sidebarVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-sidebar", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-panel-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Explorer" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "vsembed-btn-secondary", onClick: () => setSidebarVisible(false), title: "Hide Sidebar", children: "\u2715" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-panel-content", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_FileExplorer__WEBPACK_IMPORTED_MODULE_7__.FileExplorer, {}) })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-content", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-panels", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-editor-area", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-panel-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Editor" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-flex vsembed-gap", children: [!sidebarVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "vsembed-btn-secondary", onClick: () => setSidebarVisible(true), title: "Show Explorer", children: "\uD83D\uDCC1" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "vsembed-btn-secondary", onClick: () => setChatVisible(!chatVisible), title: chatVisible ? "Hide AI Chat" : "Show AI Chat", children: "\uD83E\uDD16" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-panel-content", style: { padding: 0 }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { style: { display: 'flex', height: '100%' }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { style: { flex: 1 }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_EditorPane__WEBPACK_IMPORTED_MODULE_4__.EditorPane, {}) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { style: { width: '50%', borderLeft: '1px solid var(--vsembed-border)' }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_PreviewPane__WEBPACK_IMPORTED_MODULE_6__.PreviewPane, {}) })] }) })] }), chatVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-chat-panel", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-panel-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "\uD83E\uDD16 AI Assistant" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "vsembed-btn-secondary", onClick: () => setChatVisible(false), title: "Hide AI Chat", children: "\u2715" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-panel-content", style: { padding: 0 }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ChatPane__WEBPACK_IMPORTED_MODULE_3__.ChatPane, {}) })] }))] }), terminalVisible && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-bottom-panel", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "vsembed-panel-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Terminal" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-flex vsembed-gap", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "vsembed-btn-secondary", onClick: () => setTerminalVisible(false), title: "Hide Terminal", children: "\u2715" }) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "vsembed-panel-content", style: { padding: 0 }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_TerminalPane__WEBPACK_IMPORTED_MODULE_5__.TerminalPane, {}) })] }))] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_StatusBar__WEBPACK_IMPORTED_MODULE_8__.StatusBar, { onTogglePanel: handlePanelToggle }), showModelSettings && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ModelSettings__WEBPACK_IMPORTED_MODULE_9__.ModelSettings, { onClose: () => setShowModelSettings(false) }))] }) }));
 };
 
 
@@ -6173,184 +5844,88 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../contexts/RunnerContext */ "./src/renderer/contexts/RunnerContext.tsx");
-/* harmony import */ var _contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../contexts/WorkspaceContext */ "./src/renderer/contexts/WorkspaceContext.tsx");
-/* harmony import */ var _contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/NotificationContext */ "./src/renderer/contexts/NotificationContext.tsx");
-/* harmony import */ var _styles_PreviewPane_css__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../styles/PreviewPane.css */ "./src/renderer/styles/PreviewPane.css");
-
-
+/* harmony import */ var _styles_PreviewPane_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../styles/PreviewPane.css */ "./src/renderer/styles/PreviewPane.css");
 
 
 
 
 const PreviewPane = () => {
-    const { runStatus, previewUrl } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__.useRunner)();
-    const { currentWorkspace } = (0,_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_3__.useWorkspace)();
-    const { addNotification } = (0,_contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_4__.useNotifications)();
+    const { status: runnerStatus } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__.useRunner)();
     const [currentMode, setCurrentMode] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
         id: 'web',
         name: 'Web Preview',
         icon: '🌐',
-        url: previewUrl || 'http://localhost:3000',
+        url: '',
         refreshable: true,
     });
     const [isLoading, setIsLoading] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
     const [error, setError] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
     const [customUrl, setCustomUrl] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('');
     const [showUrlInput, setShowUrlInput] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-    const [devTools, setDevTools] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-    const [zoomLevel, setZoomLevel] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(100);
     const iframeRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
-    const electronAPI = window.electronAPI;
     const previewModes = [
         {
             id: 'web',
             name: 'Web Preview',
             icon: '🌐',
-            url: previewUrl || 'http://localhost:3000',
+            url: runnerStatus.preview_url || '',
             refreshable: true,
         },
         {
             id: 'mobile',
-            name: 'Mobile View',
+            name: 'Mobile Preview',
             icon: '📱',
-            url: previewUrl || 'http://localhost:3000',
+            url: runnerStatus.preview_url || '',
             refreshable: true,
         },
         {
             id: 'desktop',
-            name: 'Desktop View',
-            icon: '🖥️',
-            url: previewUrl || 'http://localhost:3000',
-            refreshable: true,
-        },
-        {
-            id: 'docs',
-            name: 'Documentation',
-            icon: '📚',
-            url: 'http://localhost:8080/docs',
+            name: 'Desktop Preview',
+            icon: '💻',
+            url: runnerStatus.preview_url || '',
             refreshable: true,
         },
     ];
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        if (previewUrl && previewUrl !== currentMode.url) {
-            setCurrentMode(prev => ({ ...prev, url: previewUrl }));
+        // Update current mode URL when runner status changes
+        if (runnerStatus.preview_url) {
+            setCurrentMode(prev => ({
+                ...prev,
+                url: runnerStatus.preview_url || '',
+            }));
+            setError(null);
         }
-    }, [previewUrl, currentMode.url]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        // Auto-refresh when project starts running
-        if (runStatus === 'running' && currentMode.refreshable) {
-            setTimeout(() => {
-                handleRefresh();
-            }, 2000); // Give the server time to start
-        }
-    }, [runStatus, currentMode.refreshable]);
-    const handleRefresh = () => {
-        if (!iframeRef.current)
-            return;
-        setIsLoading(true);
-        setError(null);
-        try {
-            iframeRef.current.src = iframeRef.current.src;
-        }
-        catch (err) {
-            setError('Failed to refresh preview');
-            setIsLoading(false);
-        }
-    };
+    }, [runnerStatus.preview_url]);
     const handleModeChange = (mode) => {
         setCurrentMode(mode);
         setError(null);
-        setIsLoading(true);
+    };
+    const handleRefresh = () => {
+        if (iframeRef.current && currentMode.url) {
+            setIsLoading(true);
+            setError(null);
+            iframeRef.current.src = currentMode.url;
+        }
     };
     const handleCustomUrl = () => {
-        if (!customUrl.trim())
-            return;
-        let url = customUrl.trim();
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'http://' + url;
+        if (customUrl.trim()) {
+            setCurrentMode(prev => ({
+                ...prev,
+                url: customUrl.trim(),
+            }));
+            setShowUrlInput(false);
+            setCustomUrl('');
+            setError(null);
         }
-        setCurrentMode({
-            id: 'custom',
-            name: 'Custom URL',
-            icon: '🔗',
-            url,
-            refreshable: true,
-        });
-        setShowUrlInput(false);
-        setCustomUrl('');
-        setError(null);
-        setIsLoading(true);
     };
     const handleIframeLoad = () => {
         setIsLoading(false);
-        setError(null);
     };
     const handleIframeError = () => {
         setIsLoading(false);
-        setError('Failed to load preview. Make sure the server is running.');
+        setError('Failed to load preview. Make sure the application is running.');
     };
-    const handleOpenExternal = () => {
-        if (electronAPI?.shell) {
-            electronAPI.shell.openExternal(currentMode.url);
-        }
-        else {
-            window.open(currentMode.url, '_blank');
-        }
-    };
-    const handleDevTools = () => {
-        if (iframeRef.current && electronAPI?.webContents) {
-            setDevTools(!devTools);
-            // In a real implementation, this would open dev tools for the iframe
-            addNotification({
-                type: 'info',
-                title: 'Developer Tools',
-                message: devTools ? 'Developer tools closed' : 'Developer tools opened',
-            });
-        }
-    };
-    const handleZoom = (direction) => {
-        let newZoom = zoomLevel;
-        switch (direction) {
-            case 'in':
-                newZoom = Math.min(200, zoomLevel + 10);
-                break;
-            case 'out':
-                newZoom = Math.max(50, zoomLevel - 10);
-                break;
-            case 'reset':
-                newZoom = 100;
-                break;
-        }
-        setZoomLevel(newZoom);
-        if (iframeRef.current) {
-            iframeRef.current.style.transform = `scale(${newZoom / 100})`;
-            iframeRef.current.style.transformOrigin = 'top left';
-        }
-    };
-    const getContainerClass = () => {
-        switch (currentMode.id) {
-            case 'mobile':
-                return 'preview-container mobile';
-            case 'desktop':
-                return 'preview-container desktop';
-            default:
-                return 'preview-container';
-        }
-    };
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-pane", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-modes", children: previewModes.map(mode => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { className: `mode-btn ${currentMode.id === mode.id ? 'active' : ''}`, onClick: () => handleModeChange(mode), title: mode.name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "mode-icon", children: mode.icon }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "mode-name", children: mode.name })] }, mode.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "url-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "url-display", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "url-text", children: currentMode.url }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "url-edit-btn", onClick: () => setShowUrlInput(true), title: "Edit URL", children: "\u270F\uFE0F" })] }), showUrlInput && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "url-input-container", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { type: "text", value: customUrl, onChange: (e) => setCustomUrl(e.target.value), onKeyDown: (e) => {
-                                                    if (e.key === 'Enter') {
-                                                        handleCustomUrl();
-                                                    }
-                                                    else if (e.key === 'Escape') {
-                                                        setShowUrlInput(false);
-                                                        setCustomUrl('');
-                                                    }
-                                                }, placeholder: "http://localhost:3000", autoFocus: true }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: handleCustomUrl, disabled: !customUrl.trim(), children: "Go" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => { setShowUrlInput(false); setCustomUrl(''); }, children: "Cancel" })] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "action-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: handleRefresh, disabled: isLoading, title: "Refresh (F5)", children: isLoading ? '⏳' : '🔄' }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: handleOpenExternal, title: "Open in External Browser", children: "\uD83D\uDE80" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "zoom-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: () => handleZoom('out'), disabled: zoomLevel <= 50, title: "Zoom Out", children: "\uD83D\uDD0D\u2796" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "zoom-level", children: [zoomLevel, "%"] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: () => handleZoom('in'), disabled: zoomLevel >= 200, title: "Zoom In", children: "\uD83D\uDD0D\u2795" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: () => handleZoom('reset'), title: "Reset Zoom", children: "\uD83C\uDFAF" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `control-btn ${devTools ? 'active' : ''}`, onClick: handleDevTools, title: "Toggle Developer Tools", children: "\uD83D\uDEE0\uFE0F" })] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: getContainerClass(), children: error ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-error", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "error-content", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h3", { children: "\uD83D\uDEAB Preview Error" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: error }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "error-suggestions", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", { children: "Troubleshooting:" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("ul", { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: "Make sure your development server is running" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("li", { children: ["Check if the URL is correct: ", (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("code", { children: currentMode.url })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: "Try starting your project with the Run button" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: "Check the terminal for any error messages" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "error-actions", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: handleRefresh, className: "retry-btn", children: "\uD83D\uDD04 Retry" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowUrlInput(true), className: "change-url-btn", children: "\uD83D\uDD17 Change URL" })] })] }) })) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [isLoading && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-loading", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "loading-spinner" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: "Loading preview..." })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("iframe", { ref: iframeRef, src: currentMode.url, onLoad: handleIframeLoad, onError: handleIframeError, className: "preview-iframe", sandbox: "allow-same-origin allow-scripts allow-forms allow-popups allow-modals", style: {
-                                transform: `scale(${zoomLevel / 100})`,
-                                transformOrigin: 'top left',
-                                width: `${10000 / zoomLevel}%`,
-                                height: `${10000 / zoomLevel}%`,
-                            } })] })) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-left", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: `connection-status ${runStatus}`, children: [runStatus === 'running' && '🟢 Server Running', runStatus === 'stopped' && '🔴 Server Stopped', runStatus === 'error' && '🟡 Server Error'] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-right", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "preview-info", children: [currentMode.name, " \u2022 ", currentMode.url] }) })] })] }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-pane", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-modes", children: previewModes.map(mode => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { className: `mode-btn ${currentMode.id === mode.id ? 'active' : ''}`, onClick: () => handleModeChange(mode), title: mode.name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "mode-icon", children: mode.icon }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "mode-name", children: mode.name })] }, mode.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "url-controls", children: showUrlInput ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "url-input-container", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { type: "url", value: customUrl, onChange: (e) => setCustomUrl(e.target.value), onKeyPress: (e) => e.key === 'Enter' && handleCustomUrl(), placeholder: "Enter URL...", className: "url-input", autoFocus: true }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: handleCustomUrl, className: "url-btn", children: "\u2713" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowUrlInput(false), className: "url-btn", children: "\u2717" })] })) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "url-display", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "current-url", children: currentMode.url || 'No URL set' }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => setShowUrlInput(true), className: "control-btn", title: "Set Custom URL", children: "\uD83D\uDD17" })] })) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "action-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: handleRefresh, disabled: !currentMode.url || isLoading, className: "control-btn", title: "Refresh Preview", children: "\uD83D\uDD04" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => window.open(currentMode.url, '_blank'), disabled: !currentMode.url, className: "control-btn", title: "Open in Browser", children: "\uD83D\uDD17" })] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-content", children: error ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-error", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "error-icon", children: "\u26A0\uFE0F" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "error-message", children: error }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: handleRefresh, className: "retry-btn", children: "Retry" })] })) : !currentMode.url ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-placeholder", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "placeholder-icon", children: "\uD83C\uDF10" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "placeholder-message", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h3", { children: "No Preview Available" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: "Start your application to see the preview" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: "Or set a custom URL using the link button above" })] })] })) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-frame-container", children: [isLoading && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-loading", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "loading-spinner" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "loading-text", children: "Loading preview..." })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("iframe", { ref: iframeRef, src: currentMode.url, className: `preview-frame ${currentMode.id}`, onLoad: handleIframeLoad, onError: handleIframeError, title: "Application Preview", sandbox: "allow-same-origin allow-scripts allow-forms allow-popups" })] })) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-footer", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "preview-info", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "info-item", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "info-label", children: "Mode:" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "info-value", children: currentMode.name })] }), currentMode.url && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "info-item", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "info-label", children: "URL:" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "info-value", children: currentMode.url })] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "preview-status", children: runnerStatus.running ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-indicator running", children: "\uD83D\uDFE2 App Running" })) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-indicator stopped", children: "\uD83D\uDD34 App Stopped" })) })] })] }));
 };
 
 
@@ -6382,9 +5957,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const StatusBar = ({ onTogglePanel }) => {
-    const { currentWorkspace, isLoading: workspaceLoading } = (0,_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_2__.useWorkspace)();
-    const { runStatus, buildStatus, errors } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_3__.useRunner)();
-    const { isProcessing, currentModel } = (0,_contexts_AIContext__WEBPACK_IMPORTED_MODULE_4__.useAI)();
+    const workspace = (0,_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_2__.useWorkspace)();
+    const { status: runnerStatus, isBuilding, isStarting } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_3__.useRunner)();
+    const ai = (0,_contexts_AIContext__WEBPACK_IMPORTED_MODULE_4__.useAI)();
     const { notifications } = (0,_contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_5__.useNotifications)();
     const [currentTime, setCurrentTime] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(new Date());
     const [connectionStatus, setConnectionStatus] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('connected');
@@ -6462,13 +6037,13 @@ const StatusBar = ({ onTogglePanel }) => {
         return `${Math.round(percent)}%`;
     };
     const getErrorCount = () => {
-        return errors.filter(e => e.severity === 'error').length;
+        return runnerStatus.last_build?.errors?.length || 0;
     };
     const getWarningCount = () => {
-        return errors.filter(e => e.severity === 'warning').length;
+        return runnerStatus.last_build?.warnings?.length || 0;
     };
     const getUnreadNotificationCount = () => {
-        return notifications.filter(n => !n.read).length;
+        return notifications?.length || 0;
     };
     const handleStatusClick = (section) => {
         switch (section) {
@@ -6488,7 +6063,23 @@ const StatusBar = ({ onTogglePanel }) => {
                 break;
         }
     };
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-bar", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-left", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-item workspace-status", children: workspaceLoading ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\u23F3" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "Loading..." })] })) : currentWorkspace ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDCC1" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: currentWorkspace.name })] })) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDCC2" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "No Workspace" })] })) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item git-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83C\uDF3F" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "main" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable problems-status", onClick: () => handleStatusClick('errors'), title: "Problems", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDEA8" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [getErrorCount(), " errors, ", getWarningCount(), " warnings"] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-center", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item build-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getStatusIcon(buildStatus) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [buildStatus === 'building' && 'Building...', buildStatus === 'success' && 'Build Ready', buildStatus === 'error' && 'Build Failed', buildStatus === 'idle' && 'Ready'] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable run-status", onClick: () => handleStatusClick('terminal'), title: "Runtime Status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getStatusIcon(runStatus) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [runStatus === 'running' && 'Running', runStatus === 'stopped' && 'Stopped', runStatus === 'error' && 'Error'] })] }), isProcessing && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item ai-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83E\uDD16" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text processing", children: "AI Thinking..." })] })] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-right", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-item cursor-position", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: ["Ln ", cursorPosition.line, ", Col ", cursorPosition.column] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item ai-model", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83E\uDDE0" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: currentModel })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable notifications-status", onClick: () => handleStatusClick('notifications'), title: "Notifications", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDD14" }), getUnreadNotificationCount() > 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "notification-badge", children: getUnreadNotificationCount() }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-item connection-status", title: "Connection Status", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getConnectionIcon() }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item memory-usage", title: "Memory Usage", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDCBE" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: formatMemory(memoryUsage) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item time-display", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDD52" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: formatTime(currentTime) })] })] })] }));
+    const getBuildStatus = () => {
+        if (isBuilding)
+            return 'building';
+        if (runnerStatus.last_build?.success)
+            return 'success';
+        if (runnerStatus.last_build?.errors?.length > 0)
+            return 'error';
+        return 'idle';
+    };
+    const getRunStatus = () => {
+        if (isStarting)
+            return 'starting';
+        if (runnerStatus.running)
+            return 'running';
+        return 'stopped';
+    };
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-bar", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-left", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item workspace-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uFFFD" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "Workspace" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item git-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83C\uDF3F" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "main" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable problems-status", onClick: () => handleStatusClick('errors'), title: "Problems", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDEA8" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [getErrorCount(), " errors, ", getWarningCount(), " warnings"] })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-center", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item build-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getStatusIcon(getBuildStatus()) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [getBuildStatus() === 'building' && 'Building...', getBuildStatus() === 'success' && 'Build Ready', getBuildStatus() === 'error' && 'Build Failed', getBuildStatus() === 'idle' && 'Ready'] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable run-status", onClick: () => handleStatusClick('terminal'), title: "Runtime Status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getStatusIcon(getRunStatus()) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: [getRunStatus() === 'running' && 'Running', getRunStatus() === 'stopped' && 'Stopped', getRunStatus() === 'starting' && 'Starting...'] })] }), ai && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item ai-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83E\uDD16" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "AI Ready" })] })] }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-right", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-item cursor-position", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "status-text", children: ["Ln ", cursorPosition.line, ", Col ", cursorPosition.column] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item ai-model", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83E\uDDE0" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: "AI Model" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item clickable notifications-status", onClick: () => handleStatusClick('notifications'), title: "Notifications", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDD14" }), getUnreadNotificationCount() > 0 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "notification-badge", children: getUnreadNotificationCount() }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-item connection-status", title: "Connection Status", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: getConnectionIcon() }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item memory-usage", title: "Memory Usage", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDCBE" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: formatMemory(memoryUsage) })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-separator", children: "|" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-item time-display", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-icon", children: "\uD83D\uDD52" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-text", children: formatTime(currentTime) })] })] })] }));
 };
 
 
@@ -6508,21 +6099,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../contexts/RunnerContext */ "./src/renderer/contexts/RunnerContext.tsx");
-/* harmony import */ var _contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../contexts/WorkspaceContext */ "./src/renderer/contexts/WorkspaceContext.tsx");
-/* harmony import */ var _contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../contexts/NotificationContext */ "./src/renderer/contexts/NotificationContext.tsx");
-/* harmony import */ var _debug_components_DebugTestPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../debug/components/DebugTestPanel */ "./src/debug/components/DebugTestPanel.tsx");
-/* harmony import */ var _styles_TerminalPane_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../styles/TerminalPane.css */ "./src/renderer/styles/TerminalPane.css");
-
-
-
+/* harmony import */ var _styles_TerminalPane_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../styles/TerminalPane.css */ "./src/renderer/styles/TerminalPane.css");
 
 
 
 
 const TerminalPane = () => {
-    const { runStatus, buildStatus, output, executeCommand, buildProject, startProject, stopProject } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__.useRunner)();
-    const { currentWorkspace } = (0,_contexts_WorkspaceContext__WEBPACK_IMPORTED_MODULE_3__.useWorkspace)();
-    const { addNotification } = (0,_contexts_NotificationContext__WEBPACK_IMPORTED_MODULE_4__.useNotifications)();
+    const { status: runnerStatus, isBuilding, isStarting, logs, build, start, stop } = (0,_contexts_RunnerContext__WEBPACK_IMPORTED_MODULE_2__.useRunner)();
     const [tabs, setTabs] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([
         {
             id: 'main',
@@ -6531,22 +6114,18 @@ const TerminalPane = () => {
             isActive: true,
             history: [
                 {
-                    id: '1',
+                    id: 'welcome',
                     type: 'system',
-                    content: 'Welcome to VSEmbed AI DevTool Terminal',
+                    content: 'VsEmbed Terminal - Ready',
                     timestamp: new Date(),
-                }
+                },
             ],
             currentInput: '',
-        }
+        },
     ]);
     const [activeTabId, setActiveTabId] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)('main');
-    const [commandHistory, setCommandHistory] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]);
-    const [historyIndex, setHistoryIndex] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(-1);
-    const [showDebugTestPanel, setShowDebugTestPanel] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
     const terminalRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
     const inputRef = (0,react__WEBPACK_IMPORTED_MODULE_1__.useRef)(null);
-    const electronAPI = window.electronAPI;
     const scrollToBottom = () => {
         if (terminalRef.current) {
             terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -6554,208 +6133,100 @@ const TerminalPane = () => {
     };
     (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
         scrollToBottom();
-    }, [tabs, output]);
-    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => {
-        // Update terminal output when runner output changes
-        if (output.length > 0) {
-            const activeTab = tabs.find(tab => tab.id === activeTabId);
-            if (activeTab) {
-                const newMessages = output.map((line, index) => ({
-                    id: `output_${Date.now()}_${index}`,
-                    type: line.includes('Error:') || line.includes('error:') ? 'error' : 'output',
-                    content: line,
-                    timestamp: new Date(),
-                }));
-                setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
-                    ? { ...tab, history: [...tab.history, ...newMessages] }
-                    : tab));
-            }
-        }
-    }, [output, activeTabId]);
-    const getActiveTab = () => tabs.find(tab => tab.id === activeTabId);
-    const addMessage = (tabId, message) => {
-        const newMessage = {
-            ...message,
-            id: `msg_${Date.now()}_${Math.random()}`,
-            timestamp: new Date(),
-        };
-        setTabs(prevTabs => prevTabs.map(tab => tab.id === tabId
-            ? { ...tab, history: [...tab.history, newMessage] }
-            : tab));
-    };
-    const updateTabInput = (tabId, input) => {
-        setTabs(prevTabs => prevTabs.map(tab => tab.id === tabId ? { ...tab, currentInput: input } : tab));
-    };
-    const executeTerminalCommand = async (command) => {
-        const activeTab = getActiveTab();
-        if (!activeTab || !electronAPI)
-            return;
-        // Add command to history
-        addMessage(activeTabId, {
-            type: 'input',
-            content: `$ ${command}`,
-        });
-        // Update command history
-        setCommandHistory(prev => [...prev, command]);
-        setHistoryIndex(-1);
-        // Clear current input
-        updateTabInput(activeTabId, '');
-        try {
-            // Handle built-in commands
-            if (command.startsWith('cd ')) {
-                const path = command.substring(3).trim();
-                await electronAPI.terminal?.changeDirectory(path);
-                addMessage(activeTabId, {
-                    type: 'system',
-                    content: `Changed directory to: ${path}`,
-                });
-                return;
-            }
-            if (command === 'clear') {
-                setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
-                    ? { ...tab, history: [] }
-                    : tab));
-                return;
-            }
-            if (command === 'pwd') {
-                const cwd = currentWorkspace?.path || process.cwd();
-                addMessage(activeTabId, {
-                    type: 'output',
-                    content: cwd,
-                });
-                return;
-            }
-            // Execute command through runner context
-            await executeCommand(command);
-        }
-        catch (error) {
-            addMessage(activeTabId, {
-                type: 'error',
-                content: `Error: ${error instanceof Error ? error.message : 'Command failed'}`,
-            });
-        }
-    };
-    const handleKeyDown = (e) => {
-        const activeTab = getActiveTab();
+    }, [tabs]);
+    const handleCommand = async (command) => {
+        const activeTab = tabs.find(tab => tab.id === activeTabId);
         if (!activeTab)
             return;
-        if (e.key === 'Enter') {
-            const command = activeTab.currentInput.trim();
-            if (command) {
-                executeTerminalCommand(command);
-            }
-        }
-        else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (commandHistory.length > 0) {
-                const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
-                setHistoryIndex(newIndex);
-                updateTabInput(activeTabId, commandHistory[newIndex]);
-            }
-        }
-        else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex !== -1) {
-                const newIndex = historyIndex + 1;
-                if (newIndex >= commandHistory.length) {
-                    setHistoryIndex(-1);
-                    updateTabInput(activeTabId, '');
-                }
-                else {
-                    setHistoryIndex(newIndex);
-                    updateTabInput(activeTabId, commandHistory[newIndex]);
-                }
-            }
-        }
-        else if (e.key === 'Tab') {
-            e.preventDefault();
-            // TODO: Implement command completion
-        }
-    };
-    const createNewTab = (type) => {
-        const newTab = {
-            id: `tab_${Date.now()}`,
-            name: type.charAt(0).toUpperCase() + type.slice(1),
-            type,
-            isActive: false,
-            history: [
-                {
-                    id: '1',
-                    type: 'system',
-                    content: `${type} terminal ready`,
-                    timestamp: new Date(),
-                }
-            ],
-            currentInput: '',
+        // Add command to history
+        const commandMessage = {
+            id: `cmd_${Date.now()}`,
+            type: 'input',
+            content: `$ ${command}`,
+            timestamp: new Date(),
         };
-        setTabs(prevTabs => [
-            ...prevTabs.map(tab => ({ ...tab, isActive: false })),
-            { ...newTab, isActive: true }
-        ]);
-        setActiveTabId(newTab.id);
-    };
-    const closeTab = (tabId) => {
-        if (tabs.length <= 1)
-            return; // Keep at least one tab
-        setTabs(prevTabs => {
-            const newTabs = prevTabs.filter(tab => tab.id !== tabId);
-            // If closing active tab, switch to first remaining tab
-            if (tabId === activeTabId && newTabs.length > 0) {
-                setActiveTabId(newTabs[0].id);
-                newTabs[0].isActive = true;
+        setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
+            ? {
+                ...tab,
+                history: [...tab.history, commandMessage],
+                currentInput: ''
             }
-            return newTabs;
-        });
-    };
-    const switchTab = (tabId) => {
-        setTabs(prevTabs => prevTabs.map(tab => ({ ...tab, isActive: tab.id === tabId })));
-        setActiveTabId(tabId);
-        // Focus input after tab switch
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 0);
-    };
-    const getPrompt = (tab) => {
-        const cwd = currentWorkspace?.name || 'vsembed';
-        switch (tab.type) {
-            case 'node':
-                return `node:${cwd}> `;
-            case 'python':
-                return `python:${cwd}> `;
-            case 'docker':
-                return `docker:${cwd}> `;
-            default:
-                return `${cwd}$ `;
+            : tab));
+        // Handle special commands
+        try {
+            let output = '';
+            switch (command.trim()) {
+                case 'clear':
+                    setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
+                        ? { ...tab, history: [] }
+                        : tab));
+                    return;
+                case 'build':
+                    output = 'Starting build...';
+                    await build();
+                    break;
+                case 'start':
+                    output = 'Starting application...';
+                    await start();
+                    break;
+                case 'stop':
+                    output = 'Stopping application...';
+                    await stop();
+                    break;
+                case 'status':
+                    output = `Status: ${runnerStatus.running ? 'Running' : 'Stopped'}\nBuild: ${runnerStatus.last_build?.success ? 'Success' : 'Failed'}`;
+                    break;
+                case 'help':
+                    output = `Available commands:
+  build  - Build the project
+  start  - Start the application
+  stop   - Stop the application
+  status - Show current status
+  clear  - Clear terminal
+  help   - Show this help`;
+                    break;
+                default:
+                    output = `Command not recognized: ${command}. Type 'help' for available commands.`;
+            }
+            // Add output to history
+            const outputMessage = {
+                id: `out_${Date.now()}`,
+                type: 'output',
+                content: output,
+                timestamp: new Date(),
+            };
+            setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
+                ? { ...tab, history: [...tab.history, outputMessage] }
+                : tab));
+        }
+        catch (error) {
+            const errorMessage = {
+                id: `err_${Date.now()}`,
+                type: 'error',
+                content: error instanceof Error ? error.message : 'Unknown error',
+                timestamp: new Date(),
+            };
+            setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
+                ? { ...tab, history: [...tab.history, errorMessage] }
+                : tab));
         }
     };
-    const formatTimestamp = (timestamp) => {
-        return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            const command = event.currentTarget.value.trim();
+            if (command) {
+                handleCommand(command);
+            }
+        }
     };
-    const activeTab = getActiveTab();
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-pane", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "terminal-tabs", children: tabs.map(tab => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: `terminal-tab ${tab.id === activeTabId ? 'active' : ''}`, onClick: () => switchTab(tab.id), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "tab-icon", children: [tab.type === 'bash' && '🖥️', tab.type === 'node' && '🟢', tab.type === 'python' && '🐍', tab.type === 'docker' && '🐳'] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "tab-name", children: tab.name }), tabs.length > 1 && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "tab-close", onClick: (e) => {
-                                        e.stopPropagation();
-                                        closeTab(tab.id);
-                                    }, children: "\u00D7" }))] }, tab.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-actions", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "new-terminal-dropdown", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "action-btn", title: "New Terminal", children: "\u2795" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "dropdown-content", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => createNewTab('bash'), children: "\uD83D\uDDA5\uFE0F Bash" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => createNewTab('node'), children: "\uD83D\uDFE2 Node.js" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => createNewTab('python'), children: "\uD83D\uDC0D Python" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => createNewTab('docker'), children: "\uD83D\uDC33 Docker" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "runner-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `control-btn ${buildStatus === 'building' ? 'active' : ''}`, onClick: buildProject, disabled: buildStatus === 'building', title: "Build Project", children: "\uD83D\uDD28" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: `control-btn ${runStatus === 'running' ? 'active' : ''}`, onClick: runStatus === 'running' ? stopProject : startProject, title: runStatus === 'running' ? 'Stop Project' : 'Start Project', children: runStatus === 'running' ? '⏹️' : '▶️' })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "action-btn", onClick: () => {
-                                    if (activeTab) {
-                                        setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
-                                            ? { ...tab, history: [] }
-                                            : tab));
-                                    }
-                                }, title: "Clear Terminal", children: "\uD83D\uDDD1\uFE0F" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "terminal-content", ref: terminalRef, children: activeTab && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-messages", children: [activeTab.history.map(message => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: `terminal-message ${message.type}`, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "message-timestamp", children: formatTimestamp(message.timestamp) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "message-content", children: message.content })] }, message.id))), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-input-line", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "terminal-prompt", children: getPrompt(activeTab) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { ref: inputRef, type: "text", value: activeTab.currentInput, onChange: (e) => updateTabInput(activeTabId, e.target.value), onKeyDown: handleKeyDown, className: "terminal-input", autoFocus: true, spellCheck: false })] })] })) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-left", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: `status-indicator ${runStatus}`, children: [runStatus === 'running' && '🟢 Running', runStatus === 'stopped' && '🔴 Stopped', runStatus === 'error' && '🟡 Error'] }), buildStatus === 'building' && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "status-indicator building", children: "\uD83D\uDD28 Building..." }))] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "status-right", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", { onClick: () => setShowDebugTestPanel(!showDebugTestPanel), className: `debug-test-toggle ${showDebugTestPanel ? 'active' : ''}`, title: "Toggle AI Debug & Test Panel", children: [showDebugTestPanel ? '🐛' : '🧪', " Debug & Test"] }), currentWorkspace && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "workspace-info", children: ["\uD83D\uDCC1 ", currentWorkspace.name] }))] })] }), showDebugTestPanel && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "debug-test-panel-container", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_debug_components_DebugTestPanel__WEBPACK_IMPORTED_MODULE_5__.DebugTestPanel, { workspaceRoot: currentWorkspace?.path || '', activeFile: currentWorkspace?.activeFile, onTestRun: (results) => {
-                        addNotification({
-                            id: Date.now().toString(),
-                            type: 'success',
-                            message: `Test run completed: ${results.length} tests`,
-                            timestamp: new Date()
-                        });
-                    }, onDebugStart: (session) => {
-                        addNotification({
-                            id: Date.now().toString(),
-                            type: 'info',
-                            message: `Debug session started for ${session.file}`,
-                            timestamp: new Date()
-                        });
-                    } }) }))] }));
+    const handleInputChange = (event) => {
+        const value = event.target.value;
+        setTabs(prevTabs => prevTabs.map(tab => tab.id === activeTabId
+            ? { ...tab, currentInput: value }
+            : tab));
+    };
+    const activeTab = tabs.find(tab => tab.id === activeTabId);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-pane", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-header", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "terminal-tabs", children: tabs.map(tab => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: `terminal-tab ${tab.isActive ? 'active' : ''}`, onClick: () => setActiveTabId(tab.id), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "tab-icon", children: "\uD83D\uDCB2" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "tab-name", children: tab.name })] }, tab.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-controls", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: () => build(), disabled: isBuilding, title: "Build Project", children: "\uD83D\uDD28" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: runnerStatus.running ? () => stop() : () => start(), title: runnerStatus.running ? 'Stop Project' : 'Start Project', children: runnerStatus.running ? '⏹️' : '▶️' }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { className: "control-btn", onClick: () => handleCommand('clear'), title: "Clear Terminal", children: "\uD83D\uDDD1\uFE0F" })] })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "terminal-content", ref: terminalRef, children: activeTab?.history.map(message => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: `terminal-message ${message.type}`, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "timestamp", children: message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "content", children: message.content })] }, message.id))) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-input-container", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "prompt", children: "$" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { ref: inputRef, type: "text", className: "terminal-input", value: activeTab?.currentInput || '', onChange: handleInputChange, onKeyPress: handleKeyPress, placeholder: "Type a command...", autoFocus: true })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "terminal-status", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-section", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: `status-indicator ${runnerStatus.running ? 'running' : 'stopped'}`, children: [runnerStatus.running ? '🟢 Running' : '🔴 Stopped', isStarting && '🟡 Starting...'] }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "status-section", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: `status-indicator ${isBuilding ? 'building' : 'idle'}`, children: isBuilding ? '🔨 Building...' : '⚪ Ready' }) })] })] }));
 };
 
 

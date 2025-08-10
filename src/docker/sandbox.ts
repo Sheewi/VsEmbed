@@ -57,8 +57,8 @@ export class DockerManager extends EventEmitter {
 	private imageCache: Map<string, boolean> = new Map();
 	private networkIds: Set<string> = new Set();
 	private metrics: SandboxMetrics;
-	private cleanupInterval?: NodeJS.Timer;
-	private monitoringInterval?: NodeJS.Timer;
+	private cleanupInterval?: NodeJS.Timeout;
+	private monitoringInterval?: NodeJS.Timeout;
 
 	constructor(private recommender: ExtensionRecommender) {
 		super();
@@ -148,10 +148,10 @@ export class DockerManager extends EventEmitter {
 			// Remove container
 			await this.executeDockerCommand(['rm', containerId]);
 
-			sandbox.status = 'stopped';
 			if (sandbox.status === 'running') {
 				this.metrics.runningContainers--;
 			}
+			sandbox.status = 'stopped';
 
 			this.emit('sandboxStopped', { containerId, extensionId: sandbox.extensionId });
 

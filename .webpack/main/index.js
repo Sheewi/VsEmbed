@@ -8555,7 +8555,17 @@ class VSEmbedApplication {
         this.secretsManager = new SecretsManager_1.SecretsManager();
         this.runnerManager = new RunnerManager_1.RunnerManager();
         this.securityManager = new SecurityManager_1.SecurityManager();
-        this.vscodeBridge = {};
+        this.vscodeBridge = {
+            executeCommand: async () => ({ success: false, message: 'VS Code bridge disabled' }),
+            getFileContent: async () => '',
+            writeFile: async () => true,
+            getHoverInfo: async () => null,
+            getCompletions: async () => [],
+            getDefinitions: async () => [],
+            getReferences: async () => [],
+            on: () => { },
+            initialize: async () => true
+        };
         this.extensionRecommender = {};
         this.dockerManager = {};
         this.performanceOptimizer = {};
@@ -8588,13 +8598,21 @@ class VSEmbedApplication {
                 nodeIntegration: true,
                 contextIsolation: false,
             },
+            show: true, // Ensure window is visible
         });
         // Load renderer output (index.html from .webpack/renderer)
-        const rendererPath = path.join(__dirname, '../renderer/index.html');
+        const rendererPath = path.join(__dirname, '../../.webpack/renderer/index.html');
+        console.log('Loading renderer from:', rendererPath);
         this.mainWindow.loadFile(rendererPath);
+        // Open dev tools for debugging
+        this.mainWindow.webContents.openDevTools();
         this.mainWindow.on('closed', () => {
             this.mainWindow = null;
         });
+        // Initialize application components
+        this.createMenu();
+        this.setupIpcHandlers();
+        this.setupNewComponentHandlers();
     }
     // Place menu handler methods here, after constructor and before final closing brace
     async handleNewWorkspace() {
@@ -9781,13 +9799,12 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RunnerManager = void 0;
 const TerminalService_1 = __webpack_require__(/*! ./TerminalService */ "./src/services/TerminalService.ts");
-const Docker = __importStar(__webpack_require__(/*! dockerode */ "dockerode"));
 const path = __importStar(__webpack_require__(/*! path */ "path"));
 const fs = __importStar(__webpack_require__(/*! fs/promises */ "fs/promises"));
 class RunnerManager {
     constructor() {
-        this.docker = null;
-        this.currentContainer = null;
+        this.docker = null; // Disabled Docker support
+        this.currentContainer = null; // Disabled Docker support
         this.workspacePath = null;
         this.terminalService = new TerminalService_1.TerminalService();
         this.currentStatus = {
@@ -9806,34 +9823,24 @@ class RunnerManager {
                 artifacts: [],
             },
         };
-        this.initializeDocker();
+        // Skip Docker initialization completely to avoid issues
+        console.log('Docker initialization disabled - using local runner only');
+        this.docker = null;
     }
     setWorkspacePath(workspacePath) {
         this.workspacePath = workspacePath;
         this.terminalService.setWorkspacePath(workspacePath);
     }
     async initializeDocker() {
-        try {
-            this.docker = new Docker();
-            // Test Docker connection
-            await this.docker.ping();
-            console.log('Docker connection established');
-        }
-        catch (error) {
-            console.warn('Docker not available, falling back to local runner:', error);
-            this.docker = null;
-        }
+        // Docker initialization completely disabled
+        console.log('Docker initialization skipped - using local runner only');
+        this.docker = null;
     }
     async build(config) {
         try {
             const buildConfig = config || await this.getDefaultConfig();
-            let buildResult;
-            if (this.docker && buildConfig.type === 'docker') {
-                buildResult = await this.buildWithDocker(buildConfig);
-            }
-            else {
-                buildResult = await this.buildLocally(buildConfig);
-            }
+            // Force local build only - no Docker support
+            const buildResult = await this.buildLocally(buildConfig);
             this.currentStatus.last_build = buildResult;
             return buildResult;
         }
@@ -9852,12 +9859,8 @@ class RunnerManager {
     async start(config) {
         try {
             const runConfig = config || await this.getDefaultConfig();
-            if (this.docker && runConfig.type === 'docker') {
-                await this.startWithDocker(runConfig);
-            }
-            else {
-                await this.startLocally(runConfig);
-            }
+            // Force local start only - no Docker support
+            await this.startLocally(runConfig);
             this.currentStatus.running = true;
             return this.currentStatus;
         }
@@ -11734,17 +11737,6 @@ module.exports = require("child_process");
 
 "use strict";
 module.exports = require("crypto");
-
-/***/ }),
-
-/***/ "dockerode":
-/*!****************************!*\
-  !*** external "dockerode" ***!
-  \****************************/
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("dockerode");
 
 /***/ }),
 

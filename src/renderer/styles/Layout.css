@@ -1,256 +1,232 @@
-/* Layout.css */
-.layout {
+/* VS Code-inspired Layout CSS */
+.vsembed-app {
+  height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size);
   overflow: hidden;
 }
 
-.main-content {
-  display: flex;
+/* Main content area (below menu bar) */
+.vsembed-main {
   flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
-.sidebar {
-  width: 300px;
+/* Sidebar */
+.vsembed-sidebar {
+  width: 240px;
   min-width: 200px;
-  max-width: 500px;
+  max-width: 400px;
   background-color: var(--vscode-sideBar-background);
   border-right: 1px solid var(--vscode-sideBar-border);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   resize: horizontal;
-}
-
-.editor-area {
-  display: flex;
-  flex: 1;
   overflow: hidden;
 }
 
-.editor-container {
-  display: flex;
+/* Content area (editor + preview + chat) */
+.vsembed-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-.chat-panel {
-  width: 400px;
-  min-width: 300px;
-  max-width: 600px;
-  background-color: var(--vscode-sideBar-background);
+/* Main panels area */
+.vsembed-panels {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Editor area */
+.vsembed-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid var(--vscode-panel-border);
   overflow: hidden;
-  resize: horizontal;
 }
 
-.code-editor {
-  flex: 1;
-  background-color: var(--vscode-editor-background);
-  overflow: hidden;
-}
-
-.preview-panel {
-  width: 400px;
-  min-width: 300px;
-  max-width: 600px;
-  background-color: var(--vscode-panel-background);
+/* AI Chat panel */
+.vsembed-chat-panel {
+  width: 320px;
+  min-width: 250px;
+  max-width: 500px;
+  background-color: var(--vscode-sideBar-background);
   border-left: 1px solid var(--vscode-panel-border);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   resize: horizontal;
+  overflow: hidden;
 }
 
-.terminal-panel {
+/* Bottom panel (terminal) */
+.vsembed-bottom-panel {
   height: 250px;
-  min-height: 150px;
+  min-height: 100px;
   max-height: 400px;
   background-color: var(--vscode-panel-background);
   border-top: 1px solid var(--vscode-panel-border);
+  display: flex;
+  flex-direction: column;
+  resize: vertical;
   overflow: hidden;
+}
+
+/* Panel headers */
+.vsembed-panel-header {
+  height: 32px;
+  min-height: 32px;
+  background-color: var(--vscode-tab-inactiveBackground);
+  border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vscode-tab-inactiveForeground);
+  user-select: none;
+}
+
+.vsembed-panel-header span {
+  flex: 1;
+}
+
+/* Panel content */
+.vsembed-panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+  background-color: var(--vscode-editor-background);
+}
+
+/* Utility classes */
+.vsembed-flex {
+  display: flex;
+  align-items: center;
+}
+
+.vsembed-gap {
+  gap: 4px;
+}
+
+/* Button styles */
+.vsembed-btn-secondary {
+  background: transparent;
+  border: none;
+  color: var(--vscode-tab-inactiveForeground);
+  padding: 4px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vsembed-btn-secondary:hover {
+  background-color: var(--vscode-toolbar-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+.vsembed-btn-secondary:active {
+  background-color: var(--vscode-button-background);
+}
+
+/* Scrollbars */
+.vsembed-app ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.vsembed-app ::-webkit-scrollbar-track {
+  background: var(--vscode-scrollbar-shadow);
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb {
+  background: var(--vscode-scrollbarSlider-background);
+  border-radius: 6px;
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb:hover {
+  background: var(--vscode-scrollbarSlider-hoverBackground);
+}
+
+/* Resize handles */
+.vsembed-sidebar:hover {
+  resize: horizontal;
+}
+
+.vsembed-chat-panel:hover {
+  resize: horizontal;
+}
+
+.vsembed-bottom-panel:hover {
   resize: vertical;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .chat-panel {
-    width: 300px;
-    min-width: 250px;
-  }
+/* Focus styles */
+.vsembed-panel-content:focus-within {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
 
-  .preview-panel {
-    width: 300px;
-    min-width: 250px;
+/* Responsive design */
+@media (max-width: 768px) {
+  .vsembed-sidebar {
+    width: 200px;
+    min-width: 150px;
   }
-
-  .sidebar {
-    width: 250px;
+  
+  .vsembed-chat-panel {
+    width: 280px;
     min-width: 200px;
+  }
+  
+  .vsembed-bottom-panel {
+    height: 200px;
+    min-height: 80px;
   }
 }
 
-@media (max-width: 768px) {
-  .editor-container {
+@media (max-width: 480px) {
+  .vsembed-panels {
     flex-direction: column;
   }
-
-  .chat-panel {
+  
+  .vsembed-chat-panel {
     width: 100%;
     height: 200px;
-    min-height: 150px;
-    border-right: none;
-    border-bottom: 1px solid var(--vscode-panel-border);
-    resize: vertical;
-  }
-
-  .preview-panel {
-    width: 100%;
-    height: 200px;
-    min-height: 150px;
     border-left: none;
     border-top: 1px solid var(--vscode-panel-border);
-    resize: vertical;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: 200px;
-    min-height: 150px;
-    border-right: none;
-    border-bottom: 1px solid var(--vscode-sideBar-border);
-    resize: vertical;
-  }
-
-  .main-content {
-    flex-direction: column;
-  }
-
-  .editor-area {
-    flex-direction: column;
   }
 }
 
 /* Animation for panel transitions */
-.sidebar,
-.chat-panel,
-.preview-panel,
-.terminal-panel {
+.vsembed-sidebar,
+.vsembed-chat-panel,
+.vsembed-bottom-panel {
   transition: all 0.2s ease-in-out;
 }
 
-/* Focus styles for accessibility */
-.sidebar:focus-within,
-.chat-panel:focus-within,
-.code-editor:focus-within,
-.preview-panel:focus-within,
-.terminal-panel:focus-within {
-  outline: 2px solid var(--vscode-focusBorder);
-  outline-offset: -2px;
+/* Panel shadows for depth */
+.vsembed-chat-panel,
+.vsembed-bottom-panel {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .sidebar,
-  .chat-panel,
-  .preview-panel,
-  .terminal-panel {
+  .vsembed-sidebar,
+  .vsembed-chat-panel,
+  .vsembed-bottom-panel {
     border-width: 2px;
   }
-}
-
-/* Dark/Light theme adjustments */
-.vscode-dark {
-  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.vscode-light {
-  --panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Panel shadow for depth */
-.chat-panel,
-.preview-panel,
-.terminal-panel {
-  box-shadow: var(--panel-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-/* Scrollbar styling for consistency */
-.sidebar::-webkit-scrollbar,
-.chat-panel::-webkit-scrollbar,
-.preview-panel::-webkit-scrollbar,
-.terminal-panel::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track,
-.chat-panel::-webkit-scrollbar-track,
-.preview-panel::-webkit-scrollbar-track,
-.terminal-panel::-webkit-scrollbar-track {
-  background: var(--vscode-scrollbar-shadow);
-}
-
-.sidebar::-webkit-scrollbar-thumb,
-.chat-panel::-webkit-scrollbar-thumb,
-.preview-panel::-webkit-scrollbar-thumb,
-.terminal-panel::-webkit-scrollbar-thumb {
-  background: var(--vscode-scrollbarSlider-background);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover,
-.chat-panel::-webkit-scrollbar-thumb:hover,
-.preview-panel::-webkit-scrollbar-thumb:hover,
-.terminal-panel::-webkit-scrollbar-thumb:hover {
-  background: var(--vscode-scrollbarSlider-hoverBackground);
-}
-
-/* Panel resize handles */
-.sidebar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  cursor: ew-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.sidebar::after:hover {
-  background: var(--vscode-sash-hoverBorder);
-}
-
-.chat-panel::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  cursor: ew-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.chat-panel::after:hover {
-  background: var(--vscode-sash-hoverBorder);
-}
-
-.terminal-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  cursor: ns-resize;
-  background: transparent;
-  z-index: 1000;
-}
-
-.terminal-panel::before:hover {
-  background: var(--vscode-sash-hoverBorder);
 }

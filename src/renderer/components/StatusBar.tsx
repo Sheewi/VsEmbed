@@ -10,9 +10,9 @@ interface StatusBarProps {
 }
 
 export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
-  const { currentWorkspace, isLoading: workspaceLoading } = useWorkspace();
-  const { runStatus, buildStatus, errors } = useRunner();
-  const { isProcessing, currentModel } = useAI();
+  const workspace = useWorkspace();
+  const { status: runnerStatus, isBuilding, isStarting } = useRunner();
+  const ai = useAI();
   const { notifications } = useNotifications();
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -103,15 +103,15 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
   };
 
   const getErrorCount = () => {
-    return errors.filter(e => e.severity === 'error').length;
+    return runnerStatus.last_build?.errors?.length || 0;
   };
 
   const getWarningCount = () => {
-    return errors.filter(e => e.severity === 'warning').length;
+    return runnerStatus.last_build?.warnings?.length || 0;
   };
 
   const getUnreadNotificationCount = () => {
-    return notifications.filter(n => !n.read).length;
+    return notifications?.length || 0;
   };
 
   const handleStatusClick = (section: string) => {
@@ -133,27 +133,26 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
     }
   };
 
+  const getBuildStatus = () => {
+    if (isBuilding) return 'building';
+    if (runnerStatus.last_build?.success) return 'success';
+    if (runnerStatus.last_build?.errors?.length > 0) return 'error';
+    return 'idle';
+  };
+
+  const getRunStatus = () => {
+    if (isStarting) return 'starting';
+    if (runnerStatus.running) return 'running';
+    return 'stopped';
+  };
+
   return (
     <div className="status-bar">
       <div className="status-left">
         {/* Workspace Status */}
         <div className="status-item workspace-status">
-          {workspaceLoading ? (
-            <>
-              <span className="status-icon">⏳</span>
-              <span className="status-text">Loading...</span>
-            </>
-          ) : currentWorkspace ? (
-            <>
-              <span className="status-icon">📁</span>
-              <span className="status-text">{currentWorkspace.name}</span>
-            </>
-          ) : (
-            <>
-              <span className="status-icon">📂</span>
-              <span className="status-text">No Workspace</span>
-            </>
-          )}
+          <span className="status-icon">�</span>
+          <span className="status-text">Workspace</span>
         </div>
 
         {/* Git Branch (placeholder) */}
@@ -178,12 +177,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
       <div className="status-center">
         {/* Build/Run Status */}
         <div className="status-item build-status">
-          <span className="status-icon">{getStatusIcon(buildStatus)}</span>
+          <span className="status-icon">{getStatusIcon(getBuildStatus())}</span>
           <span className="status-text">
-            {buildStatus === 'building' && 'Building...'}
-            {buildStatus === 'success' && 'Build Ready'}
-            {buildStatus === 'error' && 'Build Failed'}
-            {buildStatus === 'idle' && 'Ready'}
+            {getBuildStatus() === 'building' && 'Building...'}
+            {getBuildStatus() === 'success' && 'Build Ready'}
+            {getBuildStatus() === 'error' && 'Build Failed'}
+            {getBuildStatus() === 'idle' && 'Ready'}
           </span>
         </div>
 
@@ -194,21 +193,21 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
           onClick={() => handleStatusClick('terminal')}
           title="Runtime Status"
         >
-          <span className="status-icon">{getStatusIcon(runStatus)}</span>
+          <span className="status-icon">{getStatusIcon(getRunStatus())}</span>
           <span className="status-text">
-            {runStatus === 'running' && 'Running'}
-            {runStatus === 'stopped' && 'Stopped'}
-            {runStatus === 'error' && 'Error'}
+            {getRunStatus() === 'running' && 'Running'}
+            {getRunStatus() === 'stopped' && 'Stopped'}
+            {getRunStatus() === 'starting' && 'Starting...'}
           </span>
         </div>
 
         {/* AI Status */}
-        {isProcessing && (
+        {ai && (
           <>
             <div className="status-separator">|</div>
             <div className="status-item ai-status">
               <span className="status-icon">🤖</span>
-              <span className="status-text processing">AI Thinking...</span>
+              <span className="status-text">AI Ready</span>
             </div>
           </>
         )}
@@ -227,7 +226,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
         {/* AI Model */}
         <div className="status-item ai-model">
           <span className="status-icon">🧠</span>
-          <span className="status-text">{currentModel}</span>
+          <span className="status-text">AI Model</span>
         </div>
 
         <div className="status-separator">|</div>

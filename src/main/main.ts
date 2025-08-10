@@ -29,13 +29,24 @@ class VSEmbedApplication {
 				nodeIntegration: true,
 				contextIsolation: false,
 			},
+			show: true, // Ensure window is visible
 		});
 		// Load renderer output (index.html from .webpack/renderer)
-		const rendererPath = path.join(__dirname, '../renderer/index.html');
+		const rendererPath = path.join(__dirname, '../../.webpack/renderer/index.html');
+		console.log('Loading renderer from:', rendererPath);
 		this.mainWindow.loadFile(rendererPath);
+		
+		// Open dev tools for debugging
+		this.mainWindow.webContents.openDevTools();
+		
 		this.mainWindow.on('closed', () => {
 			this.mainWindow = null;
 		});
+		
+		// Initialize application components
+		this.createMenu();
+		this.setupIpcHandlers();
+		this.setupNewComponentHandlers();
 	}
 	private mainWindow: BrowserWindow | null = null;
 	private orchestrator = new AIOrchestratorService();
@@ -43,7 +54,17 @@ class VSEmbedApplication {
 	private secretsManager = new SecretsManager();
 	private runnerManager = new RunnerManager();
 	private securityManager = new SecurityManager();
-	private vscodeBridge: any = {};
+	private vscodeBridge: any = {
+		executeCommand: async () => ({ success: false, message: 'VS Code bridge disabled' }),
+		getFileContent: async () => '',
+		writeFile: async () => true,
+		getHoverInfo: async () => null,
+		getCompletions: async () => [],
+		getDefinitions: async () => [],
+		getReferences: async () => [],
+		on: () => {},
+		initialize: async () => true
+	};
 	private extensionRecommender: any = {};
 	private dockerManager: any = {};
 	private performanceOptimizer: any = {};
