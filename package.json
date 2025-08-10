@@ -91,7 +91,7 @@
     "monaco-languageclient": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "rclone": "^2.0.0",
+  "rclone": "^1.2.7",
     "socket.io": "^4.6.0",
     "socket.io-client": "^4.6.0",
     "uuid": "^9.0.0",
