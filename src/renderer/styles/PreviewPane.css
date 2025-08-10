@@ -428,68 +428,68 @@
     overflow-x: auto;
     gap: 1px;
   }
-  
+
   .mode-btn {
     padding: 4px 8px;
     font-size: 11px;
     min-width: 60px;
   }
-  
+
   .mode-name {
     display: none;
   }
-  
+
   .preview-controls {
     flex-direction: column;
     gap: 8px;
     padding: 6px 8px;
   }
-  
+
   .url-controls {
     max-width: none;
   }
-  
+
   .url-display {
     max-width: none;
   }
-  
+
   .action-controls {
     justify-content: center;
     gap: 4px;
   }
-  
+
   .zoom-controls {
     padding: 0 4px;
   }
-  
+
   .preview-container.mobile {
     padding: 10px;
   }
-  
+
   .preview-container.mobile .preview-iframe {
     width: 320px !important;
     height: 568px !important;
     border-width: 4px;
     border-radius: 15px;
   }
-  
+
   .preview-status {
     padding: 3px 8px;
     font-size: 10px;
   }
-  
+
   .preview-info {
     max-width: 120px;
   }
-  
+
   .error-content {
     padding: 20px 10px;
   }
-  
+
   .error-suggestions {
     padding: 12px;
   }
-  
+
   .error-actions {
     flex-direction: column;
     gap: 8px;

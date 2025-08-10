@@ -251,25 +251,25 @@
     font-size: 10px;
     padding: 0 8px;
   }
-  
+
   .status-item {
     padding: 1px 4px;
     gap: 3px;
   }
-  
+
   .status-text {
     font-size: 10px;
     max-width: 80px;
   }
-  
+
   .workspace-status .status-text {
     max-width: 60px;
   }
-  
+
   .ai-model .status-text {
     max-width: 60px;
   }
-  
+
   .status-separator {
     margin: 0 2px;
   }
@@ -282,40 +282,40 @@
     padding: 0 6px;
     gap: 4px;
   }
-  
+
   .status-left,
   .status-center,
   .status-right {
     gap: 4px;
   }
-  
+
   .status-item {
     padding: 1px 3px;
     gap: 2px;
   }
-  
+
   .status-icon {
     font-size: 9px;
     width: 10px;
     height: 10px;
   }
-  
+
   .status-text {
     font-size: 9px;
     max-width: 60px;
   }
-  
+
   /* Hide some items on mobile */
   .git-status,
   .cursor-position,
   .memory-usage {
     display: none;
   }
-  
+
   .time-display .status-text {
     min-width: 30px;
   }
-  
+
   .notification-badge {
     font-size: 7px;
     min-width: 10px;
@@ -341,11 +341,11 @@
   .status-bar {
     border-top: 2px solid var(--vscode-statusBar-border);
   }
-  
+
   .status-item.clickable:hover {
     border: 1px solid var(--vscode-focusBorder);
   }
-  
+
   .notification-badge {
     border: 1px solid white;
   }

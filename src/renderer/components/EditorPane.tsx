@@ -23,13 +23,13 @@ interface EditorTab {
 export const EditorPane: React.FC = () => {
   const { currentWorkspace, openFile, saveFile, createFile } = useWorkspace();
   const { addNotification } = useNotifications();
-  
+
   const [tabs, setTabs] = useState<EditorTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const [isMonacoLoaded, setIsMonacoLoaded] = useState(false);
   const [showNewFileDialog, setShowNewFileDialog] = useState(false);
   const [newFileName, setNewFileName] = useState('');
-  
+
   const editorRef = useRef<HTMLDivElement>(null);
   const monacoEditorRef = useRef<any>(null);
   const electronAPI = (window as any).electronAPI;
@@ -49,10 +49,10 @@ export const EditorPane: React.FC = () => {
         script.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js';
         script.onload = () => {
           const require = (window as any).require;
-          require.config({ 
-            paths: { 
-              vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' 
-            } 
+          require.config({
+            paths: {
+              vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs'
+            }
           });
 
           require(['vs/editor/editor.main'], () => {
@@ -118,9 +118,9 @@ export const EditorPane: React.FC = () => {
       // Handle content changes
       monacoEditorRef.current.onDidChangeModelContent(() => {
         if (activeTabId) {
-          setTabs(prevTabs => 
-            prevTabs.map(tab => 
-              tab.id === activeTabId 
+          setTabs(prevTabs =>
+            prevTabs.map(tab =>
+              tab.id === activeTabId
                 ? { ...tab, content: monacoEditorRef.current.getValue(), isDirty: true }
                 : tab
             )
@@ -208,7 +208,7 @@ export const EditorPane: React.FC = () => {
       const content = await openFile(filePath);
       const fileName = filePath.split('/').pop() || 'untitled';
       const language = getLanguageFromExtension(fileName);
-      
+
       const existingTab = tabs.find(tab => tab.path === filePath);
       if (existingTab) {
         setActiveTabId(existingTab.id);
@@ -243,9 +243,9 @@ export const EditorPane: React.FC = () => {
 
     try {
       await saveFile(tab.path, tab.content);
-      
-      setTabs(prevTabs => 
-        prevTabs.map(t => 
+
+      setTabs(prevTabs =>
+        prevTabs.map(t =>
           t.id === tabId ? { ...t, isDirty: false } : t
         )
       );
@@ -278,7 +278,7 @@ export const EditorPane: React.FC = () => {
 
     setTabs(prevTabs => {
       const newTabs = prevTabs.filter(t => t.id !== tabId);
-      
+
       // If we're closing the active tab, switch to another tab
       if (tabId === activeTabId) {
         const remainingTabs = newTabs;
@@ -291,7 +291,7 @@ export const EditorPane: React.FC = () => {
           }
         }
       }
-      
+
       return newTabs;
     });
   };
@@ -305,7 +305,7 @@ export const EditorPane: React.FC = () => {
 
     try {
       await createFile(filePath, '');
-      
+
       const newTab: EditorTab = {
         id: `tab_${Date.now()}`,
         path: filePath,
@@ -366,7 +366,7 @@ export const EditorPane: React.FC = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="editor-actions">
           <button
             className="action-btn"

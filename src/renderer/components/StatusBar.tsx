@@ -14,12 +14,12 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
   const { runStatus, buildStatus, errors } = useRunner();
   const { isProcessing, currentModel } = useAI();
   const { notifications } = useNotifications();
-  
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'error'>('connected');
   const [memoryUsage, setMemoryUsage] = useState<number>(0);
   const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
-  
+
   const electronAPI = (window as any).electronAPI;
 
   useEffect(() => {
@@ -163,7 +163,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
         </div>
 
         {/* Errors and Warnings */}
-        <div 
+        <div
           className="status-item clickable problems-status"
           onClick={() => handleStatusClick('errors')}
           title="Problems"
@@ -189,7 +189,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
 
         <div className="status-separator">|</div>
 
-        <div 
+        <div
           className="status-item clickable run-status"
           onClick={() => handleStatusClick('terminal')}
           title="Runtime Status"
@@ -233,7 +233,7 @@ export const StatusBar: React.FC<StatusBarProps> = ({ onTogglePanel }) => {
         <div className="status-separator">|</div>
 
         {/* Notifications */}
-        <div 
+        <div
           className="status-item clickable notifications-status"
           onClick={() => handleStatusClick('notifications')}
           title="Notifications"

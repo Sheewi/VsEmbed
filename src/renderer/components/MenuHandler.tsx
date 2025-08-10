@@ -25,11 +25,11 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
   const { runStatus, buildProject, startProject, stopProject } = useRunner();
   const { clearConversation, setModel, availableModels } = useAI();
   const { addNotification } = useNotifications();
-  
+
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [showAbout, setShowAbout] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  
+
   const electronAPI = (window as any).electronAPI;
 
   useEffect(() => {
@@ -63,17 +63,17 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
             break;
         }
       }
-      
+
       if (e.key === 'F5') {
         e.preventDefault();
         handleRunProject();
       }
-      
+
       if (e.key === 'F11') {
         e.preventDefault();
         handleToggleFullscreen();
       }
-      
+
       if (e.key === 'Escape') {
         setActiveMenu(null);
       }
@@ -87,7 +87,7 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
     const handleClickOutside = () => {
       setActiveMenu(null);
     };
-    
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
@@ -150,7 +150,7 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
       });
       return;
     }
-    
+
     try {
       await saveWorkspace();
       addNotification({
@@ -426,8 +426,8 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
                 <h3>VSEmbed AI DevTool</h3>
                 <p className="version">Version 1.0.0</p>
                 <p className="description">
-                  A portable, embeddable developer application where conversational AI agents 
-                  write, execute, debug, and live-preview user projects inside a VS Code engine 
+                  A portable, embeddable developer application where conversational AI agents
+                  write, execute, debug, and live-preview user projects inside a VS Code engine
                   with CLI environment integration.
                 </p>
                 <div className="features">
@@ -479,7 +479,7 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
                     Enable word wrap
                   </label>
                 </div>
-                
+
                 <div className="setting-group">
                   <h4>AI Assistant</h4>
                   <label>
@@ -495,7 +495,7 @@ export const MenuHandler: React.FC<MenuHandlerProps> = ({ onViewToggle }) => {
                     </select>
                   </label>
                 </div>
-                
+
                 <div className="setting-group">
                   <h4>Terminal</h4>
                   <label>

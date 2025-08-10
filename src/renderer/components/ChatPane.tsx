@@ -29,14 +29,14 @@ const ActionPlanView: React.FC<ActionPlanProps> = ({ plan, onApprove, onReject, 
     <div className="action-plan">
       <div className="plan-header">
         <h4>Action Plan</h4>
-        <span 
-          className="risk-badge" 
+        <span
+          className="risk-badge"
           style={{ backgroundColor: getRiskColor(plan.risk_assessment) }}
         >
           {plan.risk_assessment.toUpperCase()} RISK
         </span>
       </div>
-      
+
       <div className="plan-summary">
         <p>{plan.summary}</p>
         <div className="plan-stats">
@@ -50,31 +50,31 @@ const ActionPlanView: React.FC<ActionPlanProps> = ({ plan, onApprove, onReject, 
           <div key={action.id} className={`action-item ${action.approved === true ? 'approved' : action.approved === false ? 'rejected' : 'pending'}`}>
             <div className="action-header">
               <span className="action-type">{action.type}</span>
-              <span 
+              <span
                 className="action-risk"
                 style={{ color: getRiskColor(action.risk_level) }}
               >
                 {action.risk_level}
               </span>
             </div>
-            
+
             <div className="action-description">
               {action.description}
             </div>
-            
+
             <div className="action-preview">
               <code>{action.preview}</code>
             </div>
-            
+
             {action.approved === undefined && (
               <div className="action-buttons">
-                <button 
+                <button
                   className="approve-btn"
                   onClick={() => onApprove(action.id)}
                 >
                   Approve
                 </button>
-                <button 
+                <button
                   className="reject-btn"
                   onClick={() => onReject(action.id)}
                 >
@@ -82,15 +82,15 @@ const ActionPlanView: React.FC<ActionPlanProps> = ({ plan, onApprove, onReject, 
                 </button>
               </div>
             )}
-            
+
             {action.approved === true && (
               <div className="action-status approved">✓ Approved</div>
             )}
-            
+
             {action.approved === false && (
               <div className="action-status rejected">✗ Rejected</div>
             )}
-            
+
             {action.executed && (
               <div className="action-status executed">🚀 Executed</div>
             )}
@@ -100,7 +100,7 @@ const ActionPlanView: React.FC<ActionPlanProps> = ({ plan, onApprove, onReject, 
 
       {approvedActions.length > 0 && !plan.actions.every((a: any) => a.executed) && (
         <div className="plan-actions">
-          <button 
+          <button
             className="execute-plan-btn"
             onClick={onExecute}
           >
@@ -113,21 +113,21 @@ const ActionPlanView: React.FC<ActionPlanProps> = ({ plan, onApprove, onReject, 
 };
 
 export const ChatPane: React.FC = () => {
-  const { 
-    messages, 
-    isProcessing, 
-    currentModel, 
-    availableModels, 
+  const {
+    messages,
+    isProcessing,
+    currentModel,
+    availableModels,
     activePlan,
-    sendMessage, 
-    clearConversation, 
+    sendMessage,
+    clearConversation,
     setModel,
     approveAction,
     rejectAction,
     executeApprovedPlan,
     regenerateResponse
   } = useAI();
-  
+
   const { addNotification } = useNotifications();
   const [inputValue, setInputValue] = useState('');
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -144,12 +144,12 @@ export const ChatPane: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim() || isProcessing) return;
-    
+
     const message = inputValue.trim();
     setInputValue('');
-    
+
     try {
       await sendMessage(message);
     } catch (error) {
@@ -179,7 +179,7 @@ export const ChatPane: React.FC = () => {
 
   const handlePlanAction = (action: 'approve' | 'reject', actionId: string) => {
     if (!activePlan) return;
-    
+
     if (action === 'approve') {
       approveAction(activePlan.id, actionId);
     } else {
@@ -189,7 +189,7 @@ export const ChatPane: React.FC = () => {
 
   const handleExecutePlan = async () => {
     if (!activePlan) return;
-    
+
     try {
       await executeApprovedPlan(activePlan.id);
     } catch (error) {
@@ -207,7 +207,7 @@ export const ChatPane: React.FC = () => {
         <div className="chat-title">
           <h3>AI Assistant</h3>
           <div className="model-selector">
-            <button 
+            <button
               className="current-model"
               onClick={() => setShowModelSelector(!showModelSelector)}
             >
@@ -228,9 +228,9 @@ export const ChatPane: React.FC = () => {
             )}
           </div>
         </div>
-        
+
         <div className="chat-actions">
-          <button 
+          <button
             className="clear-btn"
             onClick={clearConversation}
             title="Clear conversation"
@@ -281,11 +281,11 @@ export const ChatPane: React.FC = () => {
                     </button>
                   )}
                 </div>
-                
+
                 <div className="message-content">
                   <pre>{message.content}</pre>
                 </div>
-                
+
                 {message.plan && (
                   <ActionPlanView
                     plan={message.plan}
@@ -296,7 +296,7 @@ export const ChatPane: React.FC = () => {
                 )}
               </div>
             ))}
-            
+
             {isProcessing && (
               <div className="message assistant processing">
                 <div className="message-header">
@@ -328,8 +328,8 @@ export const ChatPane: React.FC = () => {
             disabled={isProcessing}
             rows={2}
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={!inputValue.trim() || isProcessing}
             className="send-btn"
           >

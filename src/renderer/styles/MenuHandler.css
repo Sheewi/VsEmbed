@@ -323,68 +323,68 @@
     font-size: 12px;
     padding: 0 4px;
   }
-  
+
   .menu-button {
     padding: 0 8px;
   }
-  
+
   .menu-dropdown {
     min-width: 160px;
   }
-  
+
   .menu-item {
     padding: 6px 12px;
     font-size: 12px;
   }
-  
+
   .menu-shortcut {
     display: none;
   }
-  
+
   .modal.about-modal,
   .modal.settings-modal {
     min-width: 320px;
     margin: 20px;
   }
-  
+
   .modal-header {
     padding: 16px 20px;
   }
-  
+
   .modal-header h2 {
     font-size: 16px;
   }
-  
+
   .modal-content {
     padding: 20px;
   }
-  
+
   .modal-footer {
     padding: 12px 20px;
     gap: 8px;
   }
-  
+
   .btn-primary,
   .btn-secondary {
     padding: 6px 16px;
     font-size: 12px;
   }
-  
+
   .about-content h3 {
     font-size: 20px;
   }
-  
+
   .app-icon {
     font-size: 36px;
     margin-bottom: 12px;
   }
-  
+
   .setting-group label {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .setting-group input[type="checkbox"],
   .setting-group select {
     margin-left: 0;
@@ -397,16 +397,16 @@
   .menu-bar {
     border-bottom: 2px solid var(--vscode-menubar-border);
   }
-  
+
   .menu-button:hover,
   .menu-button.active {
     border: 1px solid var(--vscode-focusBorder);
   }
-  
+
   .menu-dropdown {
     border: 2px solid var(--vscode-menu-border);
   }
-  
+
   .modal {
     border: 2px solid var(--vscode-dropdown-border);
   }

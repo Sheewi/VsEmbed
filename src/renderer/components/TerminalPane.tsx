@@ -24,7 +24,7 @@ export const TerminalPane: React.FC = () => {
   const { runStatus, buildStatus, output, executeCommand, buildProject, startProject, stopProject } = useRunner();
   const { currentWorkspace } = useWorkspace();
   const { addNotification } = useNotifications();
-  
+
   const [tabs, setTabs] = useState<TerminalTab[]>([
     {
       id: 'main',
@@ -42,11 +42,11 @@ export const TerminalPane: React.FC = () => {
       currentInput: '',
     }
   ]);
-  
+
   const [activeTabId, setActiveTabId] = useState('main');
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
-  
+
   const terminalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const electronAPI = (window as any).electronAPI;
@@ -233,13 +233,13 @@ export const TerminalPane: React.FC = () => {
 
     setTabs(prevTabs => {
       const newTabs = prevTabs.filter(tab => tab.id !== tabId);
-      
+
       // If closing active tab, switch to first remaining tab
       if (tabId === activeTabId && newTabs.length > 0) {
         setActiveTabId(newTabs[0].id);
         newTabs[0].isActive = true;
       }
-      
+
       return newTabs;
     });
   };
@@ -249,7 +249,7 @@ export const TerminalPane: React.FC = () => {
       prevTabs.map(tab => ({ ...tab, isActive: tab.id === tabId }))
     );
     setActiveTabId(tabId);
-    
+
     // Focus input after tab switch
     setTimeout(() => {
       inputRef.current?.focus();
@@ -307,7 +307,7 @@ export const TerminalPane: React.FC = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="terminal-actions">
           <div className="new-terminal-dropdown">
             <button className="action-btn" title="New Terminal">
@@ -320,7 +320,7 @@ export const TerminalPane: React.FC = () => {
               <button onClick={() => createNewTab('docker')}>🐳 Docker</button>
             </div>
           </div>
-          
+
           <div className="runner-controls">
             <button
               className={`control-btn ${buildStatus === 'building' ? 'active' : ''}`}
@@ -338,7 +338,7 @@ export const TerminalPane: React.FC = () => {
               {runStatus === 'running' ? '⏹️' : '▶️'}
             </button>
           </div>
-          
+
           <button
             className="action-btn"
             onClick={() => {
@@ -372,7 +372,7 @@ export const TerminalPane: React.FC = () => {
                 </span>
               </div>
             ))}
-            
+
             <div className="terminal-input-line">
               <span className="terminal-prompt">{getPrompt(activeTab)}</span>
               <input
@@ -401,7 +401,7 @@ export const TerminalPane: React.FC = () => {
             <span className="status-indicator building">🔨 Building...</span>
           )}
         </div>
-        
+
         <div className="status-right">
           {currentWorkspace && (
             <span className="workspace-info">

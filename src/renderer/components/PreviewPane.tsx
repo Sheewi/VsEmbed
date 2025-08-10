@@ -16,7 +16,7 @@ export const PreviewPane: React.FC = () => {
   const { runStatus, previewUrl } = useRunner();
   const { currentWorkspace } = useWorkspace();
   const { addNotification } = useNotifications();
-  
+
   const [currentMode, setCurrentMode] = useState<PreviewMode>({
     id: 'web',
     name: 'Web Preview',
@@ -24,14 +24,14 @@ export const PreviewPane: React.FC = () => {
     url: previewUrl || 'http://localhost:3000',
     refreshable: true,
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [customUrl, setCustomUrl] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [devTools, setDevTools] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(100);
-  
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const electronAPI = (window as any).electronAPI;
 
@@ -83,10 +83,10 @@ export const PreviewPane: React.FC = () => {
 
   const handleRefresh = () => {
     if (!iframeRef.current) return;
-    
+
     setIsLoading(true);
     setError(null);
-    
+
     try {
       iframeRef.current.src = iframeRef.current.src;
     } catch (err) {
@@ -103,12 +103,12 @@ export const PreviewPane: React.FC = () => {
 
   const handleCustomUrl = () => {
     if (!customUrl.trim()) return;
-    
+
     let url = customUrl.trim();
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'http://' + url;
     }
-    
+
     setCurrentMode({
       id: 'custom',
       name: 'Custom URL',
@@ -116,7 +116,7 @@ export const PreviewPane: React.FC = () => {
       url,
       refreshable: true,
     });
-    
+
     setShowUrlInput(false);
     setCustomUrl('');
     setError(null);
@@ -155,7 +155,7 @@ export const PreviewPane: React.FC = () => {
 
   const handleZoom = (direction: 'in' | 'out' | 'reset') => {
     let newZoom = zoomLevel;
-    
+
     switch (direction) {
       case 'in':
         newZoom = Math.min(200, zoomLevel + 10);
@@ -167,9 +167,9 @@ export const PreviewPane: React.FC = () => {
         newZoom = 100;
         break;
     }
-    
+
     setZoomLevel(newZoom);
-    
+
     if (iframeRef.current) {
       iframeRef.current.style.transform = `scale(${newZoom / 100})`;
       iframeRef.current.style.transformOrigin = 'top left';
@@ -203,7 +203,7 @@ export const PreviewPane: React.FC = () => {
             </button>
           ))}
         </div>
-        
+
         <div className="preview-controls">
           <div className="url-controls">
             <div className="url-display">
@@ -216,7 +216,7 @@ export const PreviewPane: React.FC = () => {
                 ✏️
               </button>
             </div>
-            
+
             {showUrlInput && (
               <div className="url-input-container">
                 <input
@@ -243,7 +243,7 @@ export const PreviewPane: React.FC = () => {
               </div>
             )}
           </div>
-          
+
           <div className="action-controls">
             <button
               className="control-btn"
@@ -253,7 +253,7 @@ export const PreviewPane: React.FC = () => {
             >
               {isLoading ? '⏳' : '🔄'}
             </button>
-            
+
             <button
               className="control-btn"
               onClick={handleOpenExternal}
@@ -261,7 +261,7 @@ export const PreviewPane: React.FC = () => {
             >
               🚀
             </button>
-            
+
             <div className="zoom-controls">
               <button
                 className="control-btn"
@@ -288,7 +288,7 @@ export const PreviewPane: React.FC = () => {
                 🎯
               </button>
             </div>
-            
+
             <button
               className={`control-btn ${devTools ? 'active' : ''}`}
               onClick={handleDevTools}
@@ -319,8 +319,8 @@ export const PreviewPane: React.FC = () => {
                 <button onClick={handleRefresh} className="retry-btn">
                   🔄 Retry
                 </button>
-                <button 
-                  onClick={() => setShowUrlInput(true)} 
+                <button
+                  onClick={() => setShowUrlInput(true)}
                   className="change-url-btn"
                 >
                   🔗 Change URL
@@ -336,7 +336,7 @@ export const PreviewPane: React.FC = () => {
                 <p>Loading preview...</p>
               </div>
             )}
-            
+
             <iframe
               ref={iframeRef}
               src={currentMode.url}
@@ -363,7 +363,7 @@ export const PreviewPane: React.FC = () => {
             {runStatus === 'error' && '🟡 Server Error'}
           </span>
         </div>
-        
+
         <div className="status-right">
           <span className="preview-info">
             {currentMode.name} • {currentMode.url}

@@ -22,7 +22,7 @@ interface ContextMenu {
 export const FileExplorer: React.FC = () => {
   const { currentWorkspace, createFile, createDirectory, deleteFile, renameFile } = useWorkspace();
   const { addNotification } = useNotifications();
-  
+
   const [fileTree, setFileTree] = useState<FileNode[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
@@ -31,7 +31,7 @@ export const FileExplorer: React.FC = () => {
   const [showRenameDialog, setShowRenameDialog] = useState<{ path: string; oldName: string } | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const electronAPI = (window as any).electronAPI;
 
   useEffect(() => {
@@ -46,14 +46,14 @@ export const FileExplorer: React.FC = () => {
     const handleClickOutside = () => {
       setContextMenu(null);
     };
-    
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const loadFileTree = async () => {
     if (!currentWorkspace || !electronAPI) return;
-    
+
     setIsLoading(true);
     try {
       const tree = await electronAPI.workspace.getFileTree(currentWorkspace.path);
@@ -73,7 +73,7 @@ export const FileExplorer: React.FC = () => {
     if (node.type === 'directory') {
       return node.expanded ? '📂' : '📁';
     }
-    
+
     const ext = node.name.split('.').pop()?.toLowerCase();
     const iconMap: Record<string, string> = {
       'js': '🟨',
@@ -101,7 +101,7 @@ export const FileExplorer: React.FC = () => {
       'tar': '📦',
       'gz': '📦',
     };
-    
+
     return iconMap[ext || ''] || '📄';
   };
 
@@ -127,7 +127,7 @@ export const FileExplorer: React.FC = () => {
       await toggleDirectory(node.path);
     } else {
       setSelectedFile(node.path);
-      
+
       // Open file in editor
       if (electronAPI?.workspace?.openFile) {
         try {
@@ -146,7 +146,7 @@ export const FileExplorer: React.FC = () => {
   const handleContextMenu = (e: React.MouseEvent, node: FileNode) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setContextMenu({
       x: e.clientX,
       y: e.clientY,
@@ -155,26 +155,26 @@ export const FileExplorer: React.FC = () => {
   };
 
   const handleNewFile = () => {
-    const parentPath = contextMenu?.target.type === 'directory' 
-      ? contextMenu.target.path 
+    const parentPath = contextMenu?.target.type === 'directory'
+      ? contextMenu.target.path
       : currentWorkspace?.path || '';
-    
+
     setShowNewDialog({ type: 'file', parent: parentPath });
     setContextMenu(null);
   };
 
   const handleNewFolder = () => {
-    const parentPath = contextMenu?.target.type === 'directory' 
-      ? contextMenu.target.path 
+    const parentPath = contextMenu?.target.type === 'directory'
+      ? contextMenu.target.path
       : currentWorkspace?.path || '';
-    
+
     setShowNewDialog({ type: 'folder', parent: parentPath });
     setContextMenu(null);
   };
 
   const handleRename = () => {
     if (!contextMenu) return;
-    
+
     setShowRenameDialog({
       path: contextMenu.target.path,
       oldName: contextMenu.target.name,
@@ -185,16 +185,16 @@ export const FileExplorer: React.FC = () => {
 
   const handleDelete = async () => {
     if (!contextMenu) return;
-    
+
     const confirmed = window.confirm(
       `Are you sure you want to delete "${contextMenu.target.name}"?`
     );
-    
+
     if (confirmed) {
       try {
         await deleteFile(contextMenu.target.path);
         await loadFileTree();
-        
+
         addNotification({
           type: 'success',
           title: 'File Deleted',
@@ -208,30 +208,30 @@ export const FileExplorer: React.FC = () => {
         });
       }
     }
-    
+
     setContextMenu(null);
   };
 
   const handleCreateItem = async () => {
     if (!showNewDialog || !newItemName.trim()) return;
-    
+
     const fullPath = `${showNewDialog.parent}/${newItemName.trim()}`;
-    
+
     try {
       if (showNewDialog.type === 'file') {
         await createFile(fullPath, '');
       } else {
         await createDirectory(fullPath);
       }
-      
+
       await loadFileTree();
-      
+
       addNotification({
         type: 'success',
         title: `${showNewDialog.type === 'file' ? 'File' : 'Folder'} Created`,
         message: `${newItemName} created successfully`,
       });
-      
+
       setShowNewDialog(null);
       setNewItemName('');
     } catch (error) {
@@ -245,22 +245,22 @@ export const FileExplorer: React.FC = () => {
 
   const handleRenameItem = async () => {
     if (!showRenameDialog || !renameValue.trim()) return;
-    
+
     const newPath = showRenameDialog.path.replace(
       showRenameDialog.oldName,
       renameValue.trim()
     );
-    
+
     try {
       await renameFile(showRenameDialog.path, newPath);
       await loadFileTree();
-      
+
       addNotification({
         type: 'success',
         title: 'Item Renamed',
         message: `Renamed to ${renameValue}`,
       });
-      
+
       setShowRenameDialog(null);
       setRenameValue('');
     } catch (error) {
@@ -293,19 +293,19 @@ export const FileExplorer: React.FC = () => {
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = bytes;
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${size.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   };
 
   const renderFileNode = (node: FileNode, depth: number = 0): React.ReactNode => {
     const isSelected = selectedFile === node.path;
     const paddingLeft = depth * 16 + 8;
-    
+
     return (
       <div key={node.path}>
         <div
@@ -320,7 +320,7 @@ export const FileExplorer: React.FC = () => {
             <span className="file-size">{formatFileSize(node.size)}</span>
           )}
         </div>
-        
+
         {node.type === 'directory' && node.expanded && node.children && (
           <div className="directory-children">
             {node.children.map(child => renderFileNode(child, depth + 1))}
@@ -339,7 +339,7 @@ export const FileExplorer: React.FC = () => {
             <span className="workspace-name">{currentWorkspace.name}</span>
           )}
         </div>
-        
+
         <div className="explorer-actions">
           <button
             className="action-btn"

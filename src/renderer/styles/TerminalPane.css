@@ -327,38 +327,38 @@
     min-width: 80px;
     padding: 4px 8px;
   }
-  
+
   .tab-name {
     font-size: 11px;
   }
-  
+
   .terminal-actions {
     gap: 2px;
     padding: 0 4px;
   }
-  
+
   .runner-controls {
     margin: 0 4px;
     padding: 0 4px;
   }
-  
+
   .terminal-content {
     padding: 6px 8px;
   }
-  
+
   .terminal-messages {
     font-size: 12px;
   }
-  
+
   .terminal-input {
     font-size: 12px;
   }
-  
+
   .terminal-status {
     padding: 3px 8px;
     font-size: 10px;
   }
-  
+
   .message-timestamp {
     display: none;
   }
