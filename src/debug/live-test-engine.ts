@@ -49,6 +49,12 @@ export interface TestResult {
 	coverage?: TestCoverage;
 }
 
+export interface LiveTestEvent {
+	type: 'test-start' | 'test-end' | 'test-fail' | 'suite-start' | 'suite-end' | 'coverage-update';
+	timestamp: number;
+	data: any;
+}
+
 export interface TestGenerationRequest {
 	code: string;
 	language: string;
@@ -148,6 +154,7 @@ export class DependencyGraph {
 export class TestFrameworkAdapter {
 	private framework: string;
 	private workspaceRoot: string;
+	private cancellationToken?: vscode.CancellationTokenSource;
 
 	constructor(framework: string, workspaceRoot: string) {
 		this.framework = framework;
@@ -228,215 +235,6 @@ export class TestFrameworkAdapter {
 			output: '',
 			error: error instanceof Error ? error.message : 'Unknown error'
 		};
-	}
-
-export interface LiveTestEvent {
-	type: 'test-start' | 'test-end' | 'test-fail' | 'suite-start' | 'suite-end' | 'coverage-update';
-	timestamp: number;
-	data: any;
-}
-
-export class AITestGenerator {
-	private apiEndpoint = 'https://api.vsembed.ai/v1/generate-tests';
-	private localModel?: any;
-
-	async generateTests(request: TestGenerationRequest): Promise<AIGeneratedTest[]> {
-		try {
-			const response = await this.predict({
-				task: 'generate-tests',
-				code: request.code,
-				language: request.language,
-				framework: request.framework || this.detectFramework(request.language),
-				testType: request.testType,
-				targetCoverage: request.coverage || 80
-			});
-
-			return response.tests || this.generateFallbackTests(request);
-		} catch (error) {
-			console.error('AI test generation failed:', error);
-			return this.generateFallbackTests(request);
-		}
-	}
-
-	async improveTest(test: TestCase, errorMessage?: string): Promise<AIGeneratedTest> {
-		try {
-			const response = await this.predict({
-				task: 'improve-test',
-				test: test.code,
-				inputs: test.inputs,
-				expectedOutputs: test.expectedOutputs,
-				error: errorMessage,
-				framework: test.framework
-			});
-
-			return response.improvedTest || this.createBasicImprovement(test);
-		} catch (error) {
-			console.error('Test improvement failed:', error);
-			return this.createBasicImprovement(test);
-		}
-	}
-
-	async generateMockData(schema: any): Promise<any> {
-		try {
-			const response = await this.predict({
-				task: 'generate-mock-data',
-				schema,
-				count: 10
-			});
-
-			return response.mockData || this.generateBasicMockData(schema);
-		} catch (error) {
-			console.error('Mock data generation failed:', error);
-			return this.generateBasicMockData(schema);
-		}
-	}
-
-	private async predict(request: any): Promise<any> {
-		if (this.localModel) {
-			return await this.localModel.generate(request);
-		}
-
-		const response = await fetch(this.apiEndpoint, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${process.env.VSEMBED_API_KEY}`
-			},
-			body: JSON.stringify(request)
-		});
-
-		return await response.json();
-	}
-
-	private detectFramework(language: string): string {
-		switch (language.toLowerCase()) {
-			case 'javascript':
-			case 'typescript':
-				return 'jest';
-			case 'python':
-				return 'pytest';
-			case 'java':
-				return 'junit';
-			case 'csharp':
-				return 'nunit';
-			default:
-				return 'custom';
-		}
-	}
-
-	private generateFallbackTests(request: TestGenerationRequest): AIGeneratedTest[] {
-		const tests: AIGeneratedTest[] = [];
-
-		// Generate basic positive test case
-		tests.push({
-			name: 'should_work_with_valid_input',
-			description: 'Test with valid input parameters',
-			code: this.generateBasicTestCode(request),
-			inputs: [{}],
-			expectedOutputs: [true],
-			confidence: 0.6,
-			testType: request.testType
-		});
-
-		// Generate edge case test
-		tests.push({
-			name: 'should_handle_edge_cases',
-			description: 'Test with edge case inputs',
-			code: this.generateEdgeCaseTestCode(request),
-			inputs: [null, undefined, '', 0],
-			expectedOutputs: [false],
-			confidence: 0.5,
-			testType: request.testType
-		});
-
-		return tests;
-	}
-
-	private generateBasicTestCode(request: TestGenerationRequest): string {
-		switch (request.language.toLowerCase()) {
-			case 'javascript':
-			case 'typescript':
-				return `
-describe('Generated Test', () => {
-  test('should work with valid input', () => {
-    // TODO: Add test implementation
-    expect(true).toBe(true);
-  });
-});`;
-			case 'python':
-				return `
-def test_should_work_with_valid_input():
-    # TODO: Add test implementation
-    assert True`;
-			default:
-				return '// TODO: Generate test for ' + request.language;
-		}
-	}
-
-	private generateEdgeCaseTestCode(request: TestGenerationRequest): string {
-		switch (request.language.toLowerCase()) {
-			case 'javascript':
-			case 'typescript':
-				return `
-test('should handle edge cases', () => {
-  expect(() => functionUnderTest(null)).not.toThrow();
-  expect(() => functionUnderTest(undefined)).not.toThrow();
-  expect(() => functionUnderTest('')).not.toThrow();
-});`;
-			case 'python':
-				return `
-def test_should_handle_edge_cases():
-    # Test with None
-    result = function_under_test(None)
-    assert result is not None
-
-    # Test with empty string
-    result = function_under_test('')
-    assert result is not None`;
-			default:
-				return '// TODO: Generate edge case test for ' + request.language;
-		}
-	}
-
-	private createBasicImprovement(test: TestCase): AIGeneratedTest {
-		return {
-			name: test.name + '_improved',
-			description: 'Improved version of ' + test.name,
-			code: test.code + '\n// TODO: Add more assertions',
-			inputs: test.inputs,
-			expectedOutputs: test.expectedOutputs,
-			confidence: 0.7,
-			testType: 'unit'
-		};
-	}
-
-	private generateBasicMockData(schema: any): any {
-		if (typeof schema === 'object' && schema !== null) {
-			const mock: any = {};
-			for (const [key, value] of Object.entries(schema)) {
-				if (typeof value === 'string') {
-					mock[key] = `mock_${key}`;
-				} else if (typeof value === 'number') {
-					mock[key] = Math.floor(Math.random() * 100);
-				} else if (typeof value === 'boolean') {
-					mock[key] = Math.random() > 0.5;
-				} else {
-					mock[key] = null;
-				}
-			}
-			return mock;
-		}
-		return {};
-	}
-}
-
-export class TestFrameworkAdapter {
-	private framework: string;
-	private workspaceRoot: string;
-
-	constructor(framework: string, workspaceRoot: string) {
-		this.framework = framework;
-		this.workspaceRoot = workspaceRoot;
 	}
 
 	async runTest(test: TestCase, context: TestExecutionContext): Promise<TestResult> {
@@ -648,6 +446,200 @@ export class TestFrameworkAdapter {
 	}
 }
 
+export class AITestGenerator {
+	private apiEndpoint = 'https://api.vsembed.ai/v1/generate-tests';
+	private localModel?: any;
+
+	async generateTests(request: TestGenerationRequest): Promise<AIGeneratedTest[]> {
+		try {
+			const response = await this.predict({
+				task: 'generate-tests',
+				code: request.code,
+				language: request.language,
+				framework: request.framework || this.detectFramework(request.language),
+				testType: request.testType,
+				targetCoverage: request.coverage || 80
+			});
+
+			return response.tests || this.generateFallbackTests(request);
+		} catch (error) {
+			console.error('AI test generation failed:', error);
+			return this.generateFallbackTests(request);
+		}
+	}
+
+	async improveTest(test: TestCase, errorMessage?: string): Promise<AIGeneratedTest> {
+		try {
+			const response = await this.predict({
+				task: 'improve-test',
+				test: test.code,
+				inputs: test.inputs,
+				expectedOutputs: test.expectedOutputs,
+				error: errorMessage,
+				framework: test.framework
+			});
+
+			return response.improvedTest || this.createBasicImprovement(test);
+		} catch (error) {
+			console.error('Test improvement failed:', error);
+			return this.createBasicImprovement(test);
+		}
+	}
+
+	async generateMockData(schema: any): Promise<any> {
+		try {
+			const response = await this.predict({
+				task: 'generate-mock-data',
+				schema,
+				count: 10
+			});
+
+			return response.mockData || this.generateBasicMockData(schema);
+		} catch (error) {
+			console.error('Mock data generation failed:', error);
+			return this.generateBasicMockData(schema);
+		}
+	}
+
+	private async predict(request: any): Promise<any> {
+		if (this.localModel) {
+			return await this.localModel.generate(request);
+		}
+
+		const response = await fetch(this.apiEndpoint, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${process.env.VSEMBED_API_KEY}`
+			},
+			body: JSON.stringify(request)
+		});
+
+		return await response.json();
+	}
+
+	private detectFramework(language: string): string {
+		switch (language.toLowerCase()) {
+			case 'javascript':
+			case 'typescript':
+				return 'jest';
+			case 'python':
+				return 'pytest';
+			case 'java':
+				return 'junit';
+			case 'csharp':
+				return 'nunit';
+			default:
+				return 'custom';
+		}
+	}
+
+	private generateFallbackTests(request: TestGenerationRequest): AIGeneratedTest[] {
+		const tests: AIGeneratedTest[] = [];
+
+		// Generate basic positive test case
+		tests.push({
+			name: 'should_work_with_valid_input',
+			description: 'Test with valid input parameters',
+			code: this.generateBasicTestCode(request),
+			inputs: [{}],
+			expectedOutputs: [true],
+			confidence: 0.6,
+			testType: request.testType
+		});
+
+		// Generate edge case test
+		tests.push({
+			name: 'should_handle_edge_cases',
+			description: 'Test with edge case inputs',
+			code: this.generateEdgeCaseTestCode(request),
+			inputs: [null, undefined, '', 0],
+			expectedOutputs: [false],
+			confidence: 0.5,
+			testType: request.testType
+		});
+
+		return tests;
+	}
+
+	private generateBasicTestCode(request: TestGenerationRequest): string {
+		switch (request.language.toLowerCase()) {
+			case 'javascript':
+			case 'typescript':
+				return `
+describe('Generated Test', () => {
+  test('should work with valid input', () => {
+    // TODO: Add test implementation
+    expect(true).toBe(true);
+  });
+});`;
+			case 'python':
+				return `
+def test_should_work_with_valid_input():
+    # TODO: Add test implementation
+    assert True`;
+			default:
+				return '// TODO: Generate test for ' + request.language;
+		}
+	}
+
+	private generateEdgeCaseTestCode(request: TestGenerationRequest): string {
+		switch (request.language.toLowerCase()) {
+			case 'javascript':
+			case 'typescript':
+				return `
+test('should handle edge cases', () => {
+  expect(() => functionUnderTest(null)).not.toThrow();
+  expect(() => functionUnderTest(undefined)).not.toThrow();
+  expect(() => functionUnderTest('')).not.toThrow();
+});`;
+			case 'python':
+				return `
+def test_should_handle_edge_cases():
+    # Test with None
+    result = function_under_test(None)
+    assert result is not None
+
+    # Test with empty string
+    result = function_under_test('')
+    assert result is not None`;
+			default:
+				return '// TODO: Generate edge case test for ' + request.language;
+		}
+	}
+
+	private createBasicImprovement(test: TestCase): AIGeneratedTest {
+		return {
+			name: test.name + '_improved',
+			description: 'Improved version of ' + test.name,
+			code: test.code + '\n// TODO: Add more assertions',
+			inputs: test.inputs,
+			expectedOutputs: test.expectedOutputs,
+			confidence: 0.7,
+			testType: 'unit'
+		};
+	}
+
+	private generateBasicMockData(schema: any): any {
+		if (typeof schema === 'object' && schema !== null) {
+			const mock: any = {};
+			for (const [key, value] of Object.entries(schema)) {
+				if (typeof value === 'string') {
+					mock[key] = `mock_${key}`;
+				} else if (typeof value === 'number') {
+					mock[key] = Math.floor(Math.random() * 100);
+				} else if (typeof value === 'boolean') {
+					mock[key] = Math.random() > 0.5;
+				} else {
+					mock[key] = null;
+				}
+			}
+			return mock;
+		}
+		return {};
+	}
+}
+
 export class TestWatcher {
 	private watcher?: vscode.FileSystemWatcher;
 	private config: TestWatchConfig;
@@ -656,6 +648,7 @@ export class TestWatcher {
 	private debounceTimer?: NodeJS.Timeout;
 	private pendingChanges = new Set<string>();
 	private activeTestProcess: AbortController | null = null;
+	private cancellationToken?: vscode.CancellationTokenSource;
 
 	constructor(config: TestWatchConfig) {
 		this.config = config;
