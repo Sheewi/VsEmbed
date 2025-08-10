@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=VSEmbed AI DevTool
+Comment=Portable, embeddable AI-powered development environment
+Exec=npx electron /home/r/Desktop/V3/VsEmbed
+Icon=/home/r/Desktop/V3/VsEmbed/docs/icon.png
+Terminal=false
+Categories=Development;IDE;
