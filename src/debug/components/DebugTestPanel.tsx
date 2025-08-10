@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Play,
   Pause,
-  Stop,
+  SquareStop,
   Bug,
   TestTube,
   Target,
@@ -316,7 +316,7 @@ export const DebugTestPanel: React.FC<DebugTestPanelProps> = ({
               : 'bg-green-600 text-white hover:bg-green-700'
           }`}
         >
-          {isDebugging ? <Stop size={16} /> : <Play size={16} />}
+          {isDebugging ? <SquareStop size={16} /> : <Play size={16} />}
           {isDebugging ? 'Stop Debug' : 'Start Debug'}
         </button>
 
