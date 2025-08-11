@@ -183,7 +183,7 @@ export const GrokChatPanel: React.FC<GrokChatPanelProps> = ({
               ...conv,
               messages: [...conv.messages, {
                 role: 'assistant' as const,
-                content: `Error: ${error.message}`,
+                content: `Error: ${error instanceof Error ? error.message : String(error)}`,
                 timestamp: Date.now(),
               }],
             }

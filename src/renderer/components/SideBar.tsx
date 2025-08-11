@@ -50,6 +50,7 @@ export const SideBar: React.FC<SideBarProps> = ({
       case 'explorer':
         return (
           <div className="sidebar-actions">
+            {/* ...existing explorer action buttons... */}
             <button className="action-btn" title="New File">
               <svg viewBox="0 0 16 16" width="16" height="16">
                 <path fill="currentColor" d="M9.5 1.1l3.4 3.5.1.4v2h-1V6H8V2H3v11h4v1H2.5l-.5-.5v-12l.5-.5h6.7l.3.1zM9 2v3h2.9L9 2zm4 14h-1v-3H9v-1h3V9h1v3h3v1h-3v3z"/>
@@ -74,22 +75,31 @@ export const SideBar: React.FC<SideBarProps> = ({
         );
       case 'search':
         return (
-          <div className="sidebar-actions">
-            <button className="action-btn" title="Clear All">
-              <svg viewBox="0 0 16 16" width="16" height="16">
-                <path fill="currentColor" d="M8 1a6.97 6.97 0 0 1 4.94 2.06l1.06-1.06A8 8 0 1 0 16 8h-1a7 7 0 1 1-7-7z"/>
-              </svg>
-            </button>
-            <button className="action-btn" title="Refresh">
-              <svg viewBox="0 0 16 16" width="16" height="16">
-                <path fill="currentColor" d="M13.451 5.609l-.579-.939-1.068.812-.076.094c-.335.415-.927 1.341-1.124 2.876l-.021.165.033.163.071.345c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3c.95 0 1.796.44 2.343 1.126l.27.344 1.055-.813-.312-.399C9.411 4.35 8.013 3.625 6.5 3.625c-2.309 0-4.125 1.816-4.125 4.125S4.191 11.875 6.5 11.875s4.125-1.816 4.125-4.125c0-.239-.02-.472-.058-.699l.884-1.442zM2.328 8.422l.068-.223L2.359 8.2c-.006-.025-.012-.049-.017-.074L2.328 8.422z"/>
-              </svg>
-            </button>
+          <div className="sidebar-search-header">
+            <input
+              type="text"
+              className="sidebar-search-input"
+              placeholder="Search..."
+              style={{ flex: 1, margin: '0 12px', maxWidth: 220, textAlign: 'center' }}
+            />
+            <div className="sidebar-actions" style={{ marginLeft: 'auto' }}>
+              <button className="action-btn" title="Clear All">
+                <svg viewBox="0 0 16 16" width="16" height="16">
+                  <path fill="currentColor" d="M8 1a6.97 6.97 0 0 1 4.94 2.06l1.06-1.06A8 8 0 1 0 16 8h-1a7 7 0 1 1-7-7z"/>
+                </svg>
+              </button>
+              <button className="action-btn" title="Refresh">
+                <svg viewBox="0 0 16 16" width="16" height="16">
+                  <path fill="currentColor" d="M13.451 5.609l-.579-.939-1.068.812-.076.094c-.335.415-.927 1.341-1.124 2.876l-.021.165.033.163.071.345c0 1.654-1.346 3-3 3s-3-1.346-3-3 1.346-3 3-3c.95 0 1.796.44 2.343 1.126l.27.344 1.055-.813-.312-.399C9.411 4.35 8.013 3.625 6.5 3.625c-2.309 0-4.125 1.816-4.125 4.125S4.191 11.875 6.5 11.875s4.125-1.816 4.125-4.125c0-.239-.02-.472-.058-.699l.884-1.442zM2.328 8.422l.068-.223L2.359 8.2c-.006-.025-.012-.049-.017-.074L2.328 8.422z"/>
+                </svg>
+              </button>
+            </div>
           </div>
         );
       case 'scm':
         return (
           <div className="sidebar-actions">
+            {/* ...existing scm action buttons... */}
             <button className="action-btn" title="View & Sort">
               <svg viewBox="0 0 16 16" width="16" height="16">
                 <path fill="currentColor" d="M4.708 5.578L2.061 8.224l2.647 2.646-.708.708-3-3V7.87l3-3 .708.708zm7-.708L11 5.578l2.647 2.646L11 10.87l.708.708 3-3V7.87l-3-3zM4.908 13l.894.448L9.456 3l-.894-.448L4.908 13z"/>
@@ -183,10 +193,16 @@ export const SideBar: React.FC<SideBarProps> = ({
       style={{ width: `${width}px` }}
     >
       <div className="sidebar-header">
-        <div className="sidebar-title">
-          <h2>{getViewTitle(activeView)}</h2>
-        </div>
-        {getViewActions(activeView)}
+        {activeView === 'search' ? (
+          getViewActions('search')
+        ) : (
+          <>
+            <div className="sidebar-title">
+              <h2>{getViewTitle(activeView)}</h2>
+            </div>
+            {getViewActions(activeView)}
+          </>
+        )}
       </div>
 
       <div className="sidebar-content">
