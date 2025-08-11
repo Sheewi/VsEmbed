@@ -1,0 +1,285 @@
+/* ActivityBar.css - VS Code Activity Bar Styling */
+
+.activity-bar {
+  width: 48px;
+  background-color: var(--vscode-activityBar-background, #2d2d30);
+  border-right: 1px solid var(--vscode-activityBar-border, #3c3c3c);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  flex-shrink: 0;
+  user-select: none;
+  position: relative;
+  z-index: 100;
+}
+
+.activity-bar-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  flex: 1;
+}
+
+.activity-bar-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--vscode-activityBar-border, #3c3c3c);
+}
+
+.activity-bar-item {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--vscode-activityBar-inactiveForeground, #858585);
+  transition: all 0.15s ease;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.activity-bar-item:hover {
+  color: var(--vscode-activityBar-foreground, #ffffff);
+  background-color: var(--vscode-activityBar-hoverBackground, #37373d);
+}
+
+.activity-bar-item:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+}
+
+.activity-bar-item.active {
+  color: var(--vscode-activityBar-activeForeground, #ffffff);
+  background-color: var(--vscode-activityBar-activeBackground, #37373d);
+}
+
+.activity-bar-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.activity-bar-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  display: block;
+}
+
+.activity-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: var(--vscode-activityBarBadge-background, #007acc);
+  color: var(--vscode-activityBarBadge-foreground, #ffffff);
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+.activity-bar-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 24px;
+  background-color: var(--vscode-activityBar-activeBorder, #007acc);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Light theme adjustments */
+@media (prefers-color-scheme: light) {
+  .activity-bar {
+    background-color: var(--vscode-activityBar-background, #f3f3f3);
+    border-right-color: var(--vscode-activityBar-border, #e5e5e5);
+  }
+  
+  .activity-bar-bottom {
+    border-top-color: var(--vscode-activityBar-border, #e5e5e5);
+  }
+  
+  .activity-bar-item {
+    color: var(--vscode-activityBar-inactiveForeground, #6c6c6c);
+  }
+  
+  .activity-bar-item:hover {
+    color: var(--vscode-activityBar-foreground, #000000);
+    background-color: var(--vscode-activityBar-hoverBackground, #e5e5e5);
+  }
+  
+  .activity-bar-item.active {
+    color: var(--vscode-activityBar-activeForeground, #000000);
+    background-color: var(--vscode-activityBar-activeBackground, #e5e5e5);
+  }
+}
+
+/* High contrast theme */
+@media (prefers-contrast: high) {
+  .activity-bar {
+    border-right-width: 2px;
+  }
+  
+  .activity-bar-item:focus-visible {
+    outline-width: 2px;
+  }
+  
+  .activity-bar-indicator {
+    width: 3px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .activity-bar-item {
+    transition: none;
+  }
+}
+
+/* Keyboard navigation */
+.activity-bar-item:focus {
+  outline: none;
+}
+
+.activity-bar-item:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: -1px;
+  border-radius: 0;
+}
+
+/* Badge animations */
+@keyframes badgeAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.activity-badge {
+  animation: badgeAppear 0.2s ease-out;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .activity-bar {
+    width: 40px;
+  }
+  
+  .activity-bar-item {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .activity-bar-icon {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .activity-bar-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .activity-badge {
+    min-width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+}
+
+/* Accessibility improvements */
+.activity-bar-item[aria-pressed="true"] {
+  background-color: var(--vscode-activityBar-activeBackground, #37373d);
+  color: var(--vscode-activityBar-activeForeground, #ffffff);
+}
+
+.activity-bar-item:focus-visible .activity-bar-icon {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+
+/* Animation for indicator */
+.activity-bar-indicator {
+  transition: opacity 0.15s ease;
+}
+
+.activity-bar-item:not(.active) .activity-bar-indicator {
+  opacity: 0;
+}
+
+/* Custom CSS variables for theming */
+:root {
+  --activity-bar-width: 48px;
+  --activity-bar-item-size: 48px;
+  --activity-bar-icon-size: 28px;
+  --activity-bar-svg-size: 24px;
+  --activity-bar-badge-size: 16px;
+  --activity-bar-indicator-width: 2px;
+  --activity-bar-indicator-height: 24px;
+}
+
+/* Dark theme specific overrides */
+[data-theme="dark"] .activity-bar {
+  background-color: #2d2d30;
+  border-right-color: #3c3c3c;
+}
+
+[data-theme="dark"] .activity-bar-item {
+  color: #858585;
+}
+
+[data-theme="dark"] .activity-bar-item:hover {
+  color: #ffffff;
+  background-color: #37373d;
+}
+
+[data-theme="dark"] .activity-bar-item.active {
+  color: #ffffff;
+  background-color: #37373d;
+}
+
+/* Light theme specific overrides */
+[data-theme="light"] .activity-bar {
+  background-color: #f3f3f3;
+  border-right-color: #e5e5e5;
+}
+
+[data-theme="light"] .activity-bar-item {
+  color: #6c6c6c;
+}
+
+[data-theme="light"] .activity-bar-item:hover {
+  color: #000000;
+  background-color: #e5e5e5;
+}
+
+[data-theme="light"] .activity-bar-item.active {
+  color: #000000;
+  background-color: #e5e5e5;
+}

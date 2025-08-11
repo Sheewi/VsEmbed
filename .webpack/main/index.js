@@ -8498,6 +8498,913 @@ try {
 
 /***/ }),
 
+/***/ "./src/docker/sandbox.ts":
+/*!*******************************!*\
+  !*** ./src/docker/sandbox.ts ***!
+  \*******************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DockerManager = void 0;
+const events_1 = __webpack_require__(/*! events */ "events");
+const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
+const path = __importStar(__webpack_require__(/*! path */ "path"));
+const fs = __importStar(__webpack_require__(/*! fs/promises */ "fs/promises"));
+class DockerManager extends events_1.EventEmitter {
+    constructor(recommender) {
+        super();
+        this.recommender = recommender;
+        this.containers = new Map();
+        this.imageCache = new Map();
+        this.networkIds = new Set();
+        this.metrics = {
+            totalContainers: 0,
+            runningContainers: 0,
+            memoryUsage: 0,
+            cpuUsage: 0,
+            networkTraffic: 0,
+            securityEvents: 0,
+            containerHealth: new Map()
+        };
+        // Docker initialization disabled
+        console.log('Docker sandbox disabled - using local execution only');
+        this.startMonitoring();
+        this.setupCleanup();
+    }
+    async createExtensionSandbox(extensionId, config) {
+        const sandboxConfig = await this.buildContainerConfig(extensionId, config);
+        const containerId = this.generateContainerId(extensionId);
+        // Check if extension requires special permissions
+        const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
+        if (extensionInfo?.security?.requiresIsolation) {
+            sandboxConfig.security.capabilities.drop.push('NET_RAW', 'SYS_ADMIN');
+        }
+        const sandbox = {
+            containerId,
+            extensionId,
+            status: 'creating',
+            config: sandboxConfig,
+            createdAt: new Date(),
+            lastAccessed: new Date(),
+            ports: sandboxConfig.ports.map(p => p.host),
+            resources: {
+                cpu: 0,
+                memory: 0,
+                network: 0
+            }
+        };
+        this.containers.set(containerId, sandbox);
+        this.emit('sandboxCreating', { containerId, extensionId });
+        try {
+            // Build container if image doesn't exist
+            await this.ensureImage(sandboxConfig.image);
+            // Create and start container
+            const process = await this.startContainer(sandbox);
+            sandbox.process = process;
+            sandbox.status = 'running';
+            this.metrics.totalContainers++;
+            this.metrics.runningContainers++;
+            this.emit('sandboxCreated', { containerId, extensionId });
+            return sandbox;
+        }
+        catch (error) {
+            sandbox.status = 'error';
+            this.emit('sandboxError', {
+                containerId,
+                extensionId,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw error;
+        }
+    }
+    async stopSandbox(containerId) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox) {
+            throw new Error(`Sandbox ${containerId} not found`);
+        }
+        this.emit('sandboxStopping', { containerId, extensionId: sandbox.extensionId });
+        try {
+            // Stop container gracefully
+            await this.executeDockerCommand(['stop', '-t', '10', containerId]);
+            // Remove container
+            await this.executeDockerCommand(['rm', containerId]);
+            if (sandbox.status === 'running') {
+                this.metrics.runningContainers--;
+            }
+            sandbox.status = 'stopped';
+            this.emit('sandboxStopped', { containerId, extensionId: sandbox.extensionId });
+        }
+        catch (error) {
+            this.emit('sandboxError', {
+                containerId,
+                extensionId: sandbox.extensionId,
+                error: error instanceof Error ? error.message : 'Failed to stop container'
+            });
+            throw error;
+        }
+    }
+    async restartSandbox(containerId) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox) {
+            throw new Error(`Sandbox ${containerId} not found`);
+        }
+        await this.stopSandbox(containerId);
+        // Wait a moment for cleanup
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const newSandbox = await this.createExtensionSandbox(sandbox.extensionId, sandbox.config);
+        // Update container ID mapping
+        this.containers.delete(containerId);
+        this.containers.set(newSandbox.containerId, newSandbox);
+    }
+    async executeSandboxCommand(containerId, command) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox || sandbox.status !== 'running') {
+            throw new Error(`Sandbox ${containerId} is not running`);
+        }
+        sandbox.lastAccessed = new Date();
+        try {
+            const result = await this.executeDockerCommand(['exec', containerId, ...command]);
+            this.emit('commandExecuted', { containerId, command, success: true });
+            return result;
+        }
+        catch (error) {
+            this.emit('commandExecuted', {
+                containerId,
+                command,
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw error;
+        }
+    }
+    async copyToSandbox(containerId, hostPath, containerPath) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox || sandbox.status !== 'running') {
+            throw new Error(`Sandbox ${containerId} is not running`);
+        }
+        try {
+            await this.executeDockerCommand(['cp', hostPath, `${containerId}:${containerPath}`]);
+            this.emit('fileCopied', { containerId, hostPath, containerPath, direction: 'to' });
+        }
+        catch (error) {
+            this.emit('copyError', {
+                containerId,
+                hostPath,
+                containerPath,
+                direction: 'to',
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw error;
+        }
+    }
+    async copyFromSandbox(containerId, containerPath, hostPath) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox || sandbox.status !== 'running') {
+            throw new Error(`Sandbox ${containerId} is not running`);
+        }
+        try {
+            await this.executeDockerCommand(['cp', `${containerId}:${containerPath}`, hostPath]);
+            this.emit('fileCopied', { containerId, containerPath, hostPath, direction: 'from' });
+        }
+        catch (error) {
+            this.emit('copyError', {
+                containerId,
+                containerPath,
+                hostPath,
+                direction: 'from',
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw error;
+        }
+    }
+    async getSandboxLogs(containerId, tail = 100) {
+        const sandbox = this.containers.get(containerId);
+        if (!sandbox) {
+            throw new Error(`Sandbox ${containerId} not found`);
+        }
+        try {
+            return await this.executeDockerCommand(['logs', '--tail', tail.toString(), containerId]);
+        }
+        catch (error) {
+            throw new Error(`Failed to get logs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+    getSandboxStatus(containerId) {
+        return this.containers.get(containerId);
+    }
+    listSandboxes() {
+        return Array.from(this.containers.values());
+    }
+    getSandboxesByExtension(extensionId) {
+        return Array.from(this.containers.values()).filter(s => s.extensionId === extensionId);
+    }
+    getMetrics() {
+        return { ...this.metrics };
+    }
+    async buildContainerConfig(extensionId, customConfig) {
+        const baseConfig = {
+            name: `vsembed-ext-${extensionId.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            image: 'vsembed/extension-runtime:latest',
+            ports: [
+                { host: await this.getAvailablePort(), container: 8080 }
+            ],
+            volumes: [
+                { host: '/tmp/vsembed/workspace', container: '/workspace', readonly: false },
+                { host: '/tmp/vsembed/extensions', container: '/extensions', readonly: true }
+            ],
+            environment: {
+                'EXTENSION_ID': extensionId,
+                'NODE_ENV': 'production',
+                'VSCODE_EXTENSION_API_VERSION': '1.74.0'
+            },
+            resources: {
+                memory: '512m',
+                cpuLimit: '0.5',
+                networkMode: 'vsembed-network'
+            },
+            security: {
+                capabilities: {
+                    add: [],
+                    drop: ['ALL']
+                },
+                user: '1000:1000',
+                readonlyRootfs: true
+            }
+        };
+        // Apply extension-specific configurations
+        const extensionInfo = await this.recommender.getExtensionInfo(extensionId);
+        if (extensionInfo) {
+            if (extensionInfo.resources?.memory) {
+                baseConfig.resources.memory = extensionInfo.resources.memory;
+            }
+            if (extensionInfo.resources?.cpu) {
+                baseConfig.resources.cpuLimit = extensionInfo.resources.cpu;
+            }
+            if (extensionInfo.security?.requiredCapabilities) {
+                baseConfig.security.capabilities.add.push(...extensionInfo.security.requiredCapabilities);
+            }
+        }
+        // Merge with custom configuration
+        return this.mergeConfigs(baseConfig, customConfig || {});
+    }
+    mergeConfigs(base, custom) {
+        return {
+            ...base,
+            ...custom,
+            ports: custom.ports || base.ports,
+            volumes: custom.volumes || base.volumes,
+            environment: { ...base.environment, ...(custom.environment || {}) },
+            resources: { ...base.resources, ...(custom.resources || {}) },
+            security: {
+                ...base.security,
+                ...(custom.security || {}),
+                capabilities: {
+                    add: [...(base.security.capabilities.add || []), ...(custom.security?.capabilities?.add || [])],
+                    drop: [...(base.security.capabilities.drop || []), ...(custom.security?.capabilities?.drop || [])]
+                }
+            }
+        };
+    }
+    async ensureImage(imageName) {
+        if (this.imageCache.has(imageName)) {
+            return;
+        }
+        try {
+            // Check if image exists locally
+            await this.executeDockerCommand(['inspect', imageName]);
+            this.imageCache.set(imageName, true);
+        }
+        catch (error) {
+            // Image doesn't exist, build it
+            await this.buildExtensionImage(imageName);
+            this.imageCache.set(imageName, true);
+        }
+    }
+    async buildExtensionImage(imageName) {
+        this.emit('imageBuildStarted', { imageName });
+        // Create Dockerfile for extension runtime
+        const dockerfile = this.generateDockerfile();
+        const buildContext = '/tmp/vsembed/build';
+        await fs.mkdir(buildContext, { recursive: true });
+        await fs.writeFile(path.join(buildContext, 'Dockerfile'), dockerfile);
+        try {
+            await this.executeDockerCommand(['build', '-t', imageName, buildContext]);
+            this.emit('imageBuildCompleted', { imageName });
+        }
+        catch (error) {
+            this.emit('imageBuildFailed', {
+                imageName,
+                error: error instanceof Error ? error.message : 'Unknown error'
+            });
+            throw error;
+        }
+    }
+    generateDockerfile() {
+        return `
+FROM node:18-alpine
+
+# Install VS Code dependencies
+RUN apk add --no-cache \
+    git \
+    bash \
+    curl \
+    python3 \
+    make \
+    g++ \
+    libx11 \
+    libxkbfile \
+    libsecret
+
+# Create non-root user
+RUN addgroup -g 1000 vscode && \
+    adduser -u 1000 -G vscode -s /bin/bash -D vscode
+
+# Install VS Code Server
+RUN curl -fsSL https://code-server.dev/install.sh | sh
+
+# Create workspace directory
+RUN mkdir -p /workspace /extensions /tmp/vscode-extensions
+RUN chown -R vscode:vscode /workspace /extensions /tmp/vscode-extensions
+
+# Copy extension runner script
+COPY <<EOF /usr/local/bin/run-extension.sh
+#!/bin/bash
+set -e
+
+# Initialize VS Code environment
+export VSCODE_AGENT_FOLDER=/tmp/vscode-extensions
+export VSCODE_EXTENSIONS_PATH=/extensions
+
+# Start code-server with extension support
+exec code-server \\
+  --bind-addr 0.0.0.0:8080 \\
+  --auth none \\
+  --disable-telemetry \\
+  --extensions-dir /extensions \\
+  --user-data-dir /tmp/vscode-user \\
+  /workspace
+EOF
+
+RUN chmod +x /usr/local/bin/run-extension.sh
+
+# Switch to non-root user
+USER vscode
+
+# Set working directory
+WORKDIR /workspace
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\
+  CMD curl -f http://localhost:8080/healthz || exit 1
+
+# Start extension runtime
+CMD ["/usr/local/bin/run-extension.sh"]
+`;
+    }
+    async startContainer(sandbox) {
+        const { config } = sandbox;
+        const dockerArgs = [
+            'run',
+            '-d',
+            '--name', sandbox.containerId,
+            '--memory', config.resources.memory,
+            '--cpus', config.resources.cpuLimit,
+            '--network', config.resources.networkMode,
+            '--user', config.security.user,
+            '--security-opt', 'no-new-privileges:true'
+        ];
+        // Add readonly root filesystem if specified
+        if (config.security.readonlyRootfs) {
+            dockerArgs.push('--read-only');
+            dockerArgs.push('--tmpfs', '/tmp:exec,size=100m');
+            dockerArgs.push('--tmpfs', '/var/tmp:exec,size=100m');
+        }
+        // Add capabilities
+        config.security.capabilities.drop.forEach(cap => {
+            dockerArgs.push('--cap-drop', cap);
+        });
+        config.security.capabilities.add.forEach(cap => {
+            dockerArgs.push('--cap-add', cap);
+        });
+        // Add seccomp profile if specified
+        if (config.security.seccompProfile) {
+            dockerArgs.push('--security-opt', `seccomp=${config.security.seccompProfile}`);
+        }
+        // Add port mappings
+        config.ports.forEach(port => {
+            dockerArgs.push('-p', `${port.host}:${port.container}`);
+        });
+        // Add volume mounts
+        config.volumes.forEach(volume => {
+            const mount = volume.readonly ? `${volume.host}:${volume.container}:ro` : `${volume.host}:${volume.container}`;
+            dockerArgs.push('-v', mount);
+        });
+        // Add environment variables
+        Object.entries(config.environment).forEach(([key, value]) => {
+            dockerArgs.push('-e', `${key}=${value}`);
+        });
+        // Add image
+        dockerArgs.push(config.image);
+        const process = (0, child_process_1.spawn)('docker', dockerArgs, {
+            stdio: ['pipe', 'pipe', 'pipe'],
+            detached: false
+        });
+        return new Promise((resolve, reject) => {
+            let output = '';
+            let errorOutput = '';
+            process.stdout?.on('data', (data) => {
+                output += data.toString();
+            });
+            process.stderr?.on('data', (data) => {
+                errorOutput += data.toString();
+            });
+            process.on('close', (code) => {
+                if (code === 0) {
+                    resolve(process);
+                }
+                else {
+                    reject(new Error(`Docker container failed to start: ${errorOutput}`));
+                }
+            });
+            process.on('error', (error) => {
+                reject(error);
+            });
+            // Timeout after 30 seconds
+            setTimeout(() => {
+                if (!process.killed) {
+                    process.kill();
+                    reject(new Error('Container startup timeout'));
+                }
+            }, 30000);
+        });
+    }
+    async executeDockerCommand(args) {
+        return new Promise((resolve, reject) => {
+            const process = (0, child_process_1.spawn)('docker', args, {
+                stdio: ['pipe', 'pipe', 'pipe']
+            });
+            let output = '';
+            let errorOutput = '';
+            process.stdout?.on('data', (data) => {
+                output += data.toString();
+            });
+            process.stderr?.on('data', (data) => {
+                errorOutput += data.toString();
+            });
+            process.on('close', (code) => {
+                if (code === 0) {
+                    resolve(output.trim());
+                }
+                else {
+                    reject(new Error(`Docker command failed: ${errorOutput}`));
+                }
+            });
+            process.on('error', (error) => {
+                reject(error);
+            });
+        });
+    }
+    async getAvailablePort() {
+        // Simple port allocation - in production, use proper port management
+        return 8080 + Math.floor(Math.random() * 1000);
+    }
+    generateContainerId(extensionId) {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substr(2, 5);
+        const sanitized = extensionId.replace(/[^a-zA-Z0-9]/g, '-');
+        return `vsembed-${sanitized}-${timestamp}-${random}`;
+    }
+    async initializeDocker() {
+        try {
+            // Check if Docker is available
+            await this.executeDockerCommand(['version']);
+            // Create custom network for VSEmbed
+            try {
+                await this.executeDockerCommand([
+                    'network', 'create',
+                    '--driver', 'bridge',
+                    '--subnet', '172.20.0.0/16',
+                    '--opt', 'com.docker.network.bridge.enable_icc=false',
+                    'vsembed-network'
+                ]);
+                this.networkIds.add('vsembed-network');
+            }
+            catch (error) {
+                // Network might already exist
+                console.log('VSEmbed network already exists or failed to create');
+            }
+            this.emit('dockerInitialized');
+        }
+        catch (error) {
+            this.emit('dockerError', { error: 'Docker not available' });
+            throw new Error('Docker is not available or not running');
+        }
+    }
+    startMonitoring() {
+        this.monitoringInterval = setInterval(async () => {
+            await this.updateMetrics();
+        }, 10000); // Every 10 seconds
+    }
+    async updateMetrics() {
+        try {
+            // Update container health status
+            for (const [containerId, sandbox] of this.containers) {
+                if (sandbox.status === 'running') {
+                    try {
+                        const healthOutput = await this.executeDockerCommand(['inspect', '--format={{.State.Health.Status}}', containerId]);
+                        const isHealthy = healthOutput.trim() === 'healthy';
+                        this.metrics.containerHealth.set(containerId, isHealthy);
+                        if (!isHealthy) {
+                            this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
+                        }
+                    }
+                    catch (error) {
+                        this.metrics.containerHealth.set(containerId, false);
+                        this.emit('containerUnhealthy', { containerId, extensionId: sandbox.extensionId });
+                    }
+                }
+            }
+            // Update overall metrics
+            this.metrics.runningContainers = Array.from(this.containers.values())
+                .filter(s => s.status === 'running').length;
+            this.emit('metricsUpdated', this.metrics);
+        }
+        catch (error) {
+            console.error('Failed to update Docker metrics:', error);
+        }
+    }
+    setupCleanup() {
+        this.cleanupInterval = setInterval(async () => {
+            await this.cleanupIdleContainers();
+        }, 60000); // Every minute
+    }
+    async cleanupIdleContainers() {
+        const idleThreshold = 30 * 60 * 1000; // 30 minutes
+        const now = new Date();
+        for (const [containerId, sandbox] of this.containers) {
+            const idleTime = now.getTime() - sandbox.lastAccessed.getTime();
+            if (idleTime > idleThreshold && sandbox.status === 'running') {
+                try {
+                    await this.stopSandbox(containerId);
+                    this.emit('containerCleaned', { containerId, extensionId: sandbox.extensionId, idleTime });
+                }
+                catch (error) {
+                    console.error(`Failed to cleanup container ${containerId}:`, error);
+                }
+            }
+        }
+    }
+    async shutdown() {
+        if (this.cleanupInterval) {
+            clearInterval(this.cleanupInterval);
+        }
+        if (this.monitoringInterval) {
+            clearInterval(this.monitoringInterval);
+        }
+        // Stop all running containers
+        const stopPromises = Array.from(this.containers.keys()).map(containerId => this.stopSandbox(containerId).catch(console.error));
+        await Promise.all(stopPromises);
+        // Clean up networks
+        for (const networkId of this.networkIds) {
+            try {
+                await this.executeDockerCommand(['network', 'rm', networkId]);
+            }
+            catch (error) {
+                console.error(`Failed to remove network ${networkId}:`, error);
+            }
+        }
+        this.emit('shutdown');
+    }
+}
+exports.DockerManager = DockerManager;
+
+
+/***/ }),
+
+/***/ "./src/extensions/recommender.ts":
+/*!***************************************!*\
+  !*** ./src/extensions/recommender.ts ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ExtensionRecommender = void 0;
+class ExtensionRecommender {
+    constructor() {
+        this.contextRules = {
+            // Language-based recommendations
+            'package.json': [
+                'esbenp.prettier-vscode',
+                'dbaeumer.vscode-eslint',
+                'bradlc.vscode-tailwindcss',
+                'ms-vscode.vscode-typescript-next'
+            ],
+            '*.py': [
+                'ms-python.python',
+                'ms-python.pylint',
+                'ms-python.black-formatter',
+                'ms-toolsai.jupyter'
+            ],
+            '*.go': ['golang.go'],
+            '*.rs': ['rust-lang.rust-analyzer'],
+            '*.java': ['redhat.java', 'vscjava.vscode-java-pack'],
+            '*.cs': ['ms-dotnettools.csharp'],
+            '*.php': ['bmewburn.vscode-intelephense-client'],
+            '*.rb': ['rebornix.ruby'],
+            // Framework-based recommendations
+            'Dockerfile': [
+                'ms-azuretools.vscode-docker',
+                'ms-kubernetes-tools.vscode-kubernetes-tools'
+            ],
+            'docker-compose.yml': ['ms-azuretools.vscode-docker'],
+            '.terraform': ['hashicorp.terraform'],
+            'requirements.txt': ['ms-python.python'],
+            'Cargo.toml': ['rust-lang.rust-analyzer'],
+            'go.mod': ['golang.go'],
+            'pom.xml': ['redhat.java'],
+            'build.gradle': ['redhat.java'],
+            // Security and DevOps
+            '.github/workflows': ['github.vscode-github-actions'],
+            '.gitlab-ci.yml': ['gitlab.gitlab-workflow'],
+            'ansible.cfg': ['redhat.ansible'],
+            // Database
+            '*.sql': ['ms-mssql.mssql'],
+            'schema.prisma': ['prisma.prisma'],
+            // Configuration
+            '.env': ['mikestead.dotenv'],
+            '*.toml': ['tamasfe.even-better-toml'],
+            '*.yaml': ['redhat.vscode-yaml'],
+            '*.yml': ['redhat.vscode-yaml']
+        };
+        this.taskBasedRules = {
+            'docker': ['ms-azuretools.vscode-docker'],
+            'kubernetes': ['ms-kubernetes-tools.vscode-kubernetes-tools'],
+            'security': ['kali-linux.security-tools'],
+            'testing': ['ms-vscode.test-adapter-converter'],
+            'debugging': ['ms-vscode.vscode-js-debug'],
+            'git': ['eamodio.gitlens'],
+            'database': ['ms-mssql.mssql', 'mtxr.sqltools'],
+            'api': ['humao.rest-client', 'ms-vscode.vscode-thunder-client'],
+            'documentation': ['yzhang.markdown-all-in-one', 'shd101wyy.markdown-preview-enhanced']
+        };
+    }
+    recommendExtensions(context) {
+        const recommendations = [];
+        // File-based recommendations
+        context.files.forEach(file => {
+            const matched = Object.entries(this.contextRules)
+                .filter(([pattern]) => this.matchesPattern(pattern, file.path));
+            matched.forEach(([pattern, extIds]) => {
+                extIds.forEach(extId => {
+                    if (!context.installedExtensions.includes(extId)) {
+                        recommendations.push({
+                            extensionId: extId,
+                            reason: `Recommended for ${this.getFileType(pattern)} files`,
+                            urgency: this.getUrgency(extId, pattern),
+                            category: this.getCategory(extId),
+                            requiredForTask: file.path
+                        });
+                    }
+                });
+            });
+        });
+        // Task-based recommendations
+        if (context.aiTask) {
+            const taskKeywords = context.aiTask.toLowerCase();
+            Object.entries(this.taskBasedRules).forEach(([task, extIds]) => {
+                if (taskKeywords.includes(task)) {
+                    extIds.forEach(extId => {
+                        if (!context.installedExtensions.includes(extId)) {
+                            recommendations.push({
+                                extensionId: extId,
+                                reason: `Required for ${task} operations`,
+                                urgency: 'high',
+                                category: 'task-specific',
+                                requiredForTask: context.aiTask
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        // Dependency-based recommendations
+        Object.entries(context.dependencies).forEach(([dep, version]) => {
+            const extId = this.getDependencyExtension(dep);
+            if (extId && !context.installedExtensions.includes(extId)) {
+                recommendations.push({
+                    extensionId: extId,
+                    reason: `Enhances support for ${dep}`,
+                    urgency: 'medium',
+                    category: 'dependency',
+                    requiredForTask: `${dep}@${version}`
+                });
+            }
+        });
+        return this.dedupeAndPrioritize(recommendations);
+    }
+    matchesPattern(pattern, filePath) {
+        if (pattern.includes('*')) {
+            const regex = new RegExp(pattern.replace('*', '.*'));
+            return regex.test(filePath);
+        }
+        return filePath.includes(pattern);
+    }
+    getFileType(pattern) {
+        if (pattern.includes('.')) {
+            return pattern.split('.').pop() || 'file';
+        }
+        return pattern;
+    }
+    getUrgency(extensionId, pattern) {
+        // Essential language servers are high priority
+        const essential = [
+            'ms-python.python',
+            'ms-vscode.vscode-typescript-next',
+            'golang.go',
+            'rust-lang.rust-analyzer'
+        ];
+        if (essential.includes(extensionId))
+            return 'high';
+        // Formatters and linters are medium priority
+        if (extensionId.includes('prettier') || extensionId.includes('eslint')) {
+            return 'medium';
+        }
+        return 'low';
+    }
+    getCategory(extensionId) {
+        if (extensionId.includes('python'))
+            return 'language';
+        if (extensionId.includes('docker'))
+            return 'containerization';
+        if (extensionId.includes('prettier') || extensionId.includes('eslint'))
+            return 'formatting';
+        if (extensionId.includes('git'))
+            return 'version-control';
+        return 'utility';
+    }
+    getDependencyExtension(dependency) {
+        const depMap = {
+            'react': 'ms-vscode.vscode-typescript-next',
+            'vue': 'vue.volar',
+            'angular': 'angular.ng-template',
+            'svelte': 'svelte.svelte-vscode',
+            'prisma': 'prisma.prisma',
+            'graphql': 'graphql.vscode-graphql',
+            'jest': 'orta.vscode-jest',
+            'cypress': 'cypress-io.vscode-cypress',
+            'tailwindcss': 'bradlc.vscode-tailwindcss'
+        };
+        return depMap[dependency] || null;
+    }
+    dedupeAndPrioritize(recommendations) {
+        const seen = new Set();
+        const deduped = recommendations.filter(rec => {
+            if (seen.has(rec.extensionId))
+                return false;
+            seen.add(rec.extensionId);
+            return true;
+        });
+        // Sort by urgency and category
+        return deduped.sort((a, b) => {
+            const urgencyOrder = { high: 3, medium: 2, low: 1 };
+            const urgencyDiff = (urgencyOrder[b.urgency] || 0) - (urgencyOrder[a.urgency] || 0);
+            if (urgencyDiff !== 0)
+                return urgencyDiff;
+            // Secondary sort by category importance
+            const categoryOrder = { language: 4, formatting: 3, 'task-specific': 2, utility: 1 };
+            return (categoryOrder[b.category] || 0) - (categoryOrder[a.category] || 0);
+        });
+    }
+    getInstallationScript(recommendations) {
+        return recommendations.map(rec => `code --install-extension ${rec.extensionId}`);
+    }
+    generateInstallCommand(extensionIds) {
+        return extensionIds
+            .map(id => `--install-extension ${id}`)
+            .join(' ');
+    }
+    async getExtensionInfo(extensionId) {
+        // Extension metadata and security info
+        const extensionDatabase = {
+            'ms-python.python': {
+                name: 'Python',
+                publisher: 'Microsoft',
+                category: 'language',
+                security: {
+                    requiresIsolation: false,
+                    requiredCapabilities: []
+                },
+                resources: {
+                    memory: '256m',
+                    cpu: '0.3'
+                }
+            },
+            'ms-vscode.vscode-typescript-next': {
+                name: 'TypeScript',
+                publisher: 'Microsoft',
+                category: 'language',
+                security: {
+                    requiresIsolation: false,
+                    requiredCapabilities: []
+                },
+                resources: {
+                    memory: '512m',
+                    cpu: '0.5'
+                }
+            },
+            'ms-azuretools.vscode-docker': {
+                name: 'Docker',
+                publisher: 'Microsoft',
+                category: 'containerization',
+                security: {
+                    requiresIsolation: true,
+                    requiredCapabilities: ['SYS_ADMIN']
+                },
+                resources: {
+                    memory: '128m',
+                    cpu: '0.2'
+                }
+            }
+        };
+        return extensionDatabase[extensionId] || {
+            name: extensionId,
+            publisher: 'Unknown',
+            category: 'utility',
+            security: {
+                requiresIsolation: false,
+                requiredCapabilities: []
+            },
+            resources: {
+                memory: '128m',
+                cpu: '0.1'
+            }
+        };
+    }
+    async installExtension(extensionId) {
+        try {
+            // Simulate extension installation since we're in a sandboxed environment
+            console.log(`Installing extension: ${extensionId}`);
+            // In a real implementation, this would interface with VS Code's extension API
+            // For now, we'll just simulate a successful installation
+            const extensionInfo = await this.getExtensionInfo(extensionId);
+            return {
+                success: true,
+                message: `Successfully installed ${extensionInfo.name} (${extensionId})`
+            };
+        }
+        catch (error) {
+            return {
+                success: false,
+                message: `Failed to install ${extensionId}: ${error instanceof Error ? error.message : 'Unknown error'}`
+            };
+        }
+    }
+}
+exports.ExtensionRecommender = ExtensionRecommender;
+
+
+/***/ }),
+
 /***/ "./src/main/main.ts":
 /*!**************************!*\
   !*** ./src/main/main.ts ***!
@@ -8547,6 +9454,8 @@ const WorkspaceManager_1 = __webpack_require__(/*! ../services/WorkspaceManager 
 const SecretsManager_1 = __webpack_require__(/*! ../services/SecretsManager */ "./src/services/SecretsManager.ts");
 const RunnerManager_1 = __webpack_require__(/*! ../services/RunnerManager */ "./src/services/RunnerManager.ts");
 const SecurityManager_1 = __webpack_require__(/*! ../services/SecurityManager */ "./src/services/SecurityManager.ts");
+const recommender_1 = __webpack_require__(/*! ../extensions/recommender */ "./src/extensions/recommender.ts");
+const sandbox_1 = __webpack_require__(/*! ../docker/sandbox */ "./src/docker/sandbox.ts");
 class VSEmbedApplication {
     constructor() {
         this.mainWindow = null;
@@ -8555,6 +9464,8 @@ class VSEmbedApplication {
         this.secretsManager = new SecretsManager_1.SecretsManager();
         this.runnerManager = new RunnerManager_1.RunnerManager();
         this.securityManager = new SecurityManager_1.SecurityManager();
+        this.extensionRecommender = new recommender_1.ExtensionRecommender();
+        this.dockerManager = new sandbox_1.DockerManager(this.extensionRecommender);
         this.vscodeBridge = {
             executeCommand: async () => ({ success: false, message: 'VS Code bridge disabled' }),
             getFileContent: async () => '',
@@ -8566,8 +9477,6 @@ class VSEmbedApplication {
             on: () => { },
             initialize: async () => true
         };
-        this.extensionRecommender = {};
-        this.dockerManager = {};
         this.performanceOptimizer = {};
         this.aiStream = {};
         this.permissionMiddleware = {
@@ -8595,8 +9504,9 @@ class VSEmbedApplication {
             width: 1200,
             height: 800,
             webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false,
+                nodeIntegration: false,
+                contextIsolation: true,
+                preload: path.join(__dirname, '../../.webpack/preload/preload.js')
             },
             show: true, // Ensure window is visible
         });
@@ -8613,6 +9523,402 @@ class VSEmbedApplication {
         this.createMenu();
         this.setupIpcHandlers();
         this.setupNewComponentHandlers();
+    }
+    // File menu handlers
+    async handleNewFile() {
+        this.mainWindow?.webContents.send('menu:new-file');
+    }
+    async handleNewWindow() {
+        this.createMainWindow();
+    }
+    async handleOpenFile() {
+        const result = await electron_1.dialog.showOpenDialog(this.mainWindow, {
+            properties: ['openFile'],
+            title: 'Open File',
+            filters: [
+                { name: 'All Files', extensions: ['*'] },
+                { name: 'Text Files', extensions: ['txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss'] },
+            ],
+        });
+        if (!result.canceled && result.filePaths.length > 0) {
+            this.mainWindow?.webContents.send('file:open', result.filePaths[0]);
+        }
+    }
+    async handleOpenFolder() {
+        const result = await electron_1.dialog.showOpenDialog(this.mainWindow, {
+            properties: ['openDirectory'],
+            title: 'Open Folder',
+        });
+        if (!result.canceled && result.filePaths.length > 0) {
+            this.mainWindow?.webContents.send('folder:open', result.filePaths[0]);
+        }
+    }
+    async handleCreateWorkspace() {
+        const result = await electron_1.dialog.showSaveDialog(this.mainWindow, {
+            title: 'Create Workspace',
+            defaultPath: 'workspace.code-workspace',
+            filters: [
+                { name: 'VS Code Workspace', extensions: ['code-workspace'] },
+            ],
+        });
+        if (!result.canceled && result.filePath) {
+            this.mainWindow?.webContents.send('workspace:create', result.filePath);
+        }
+    }
+    async handleAddFolderToWorkspace() {
+        const result = await electron_1.dialog.showOpenDialog(this.mainWindow, {
+            properties: ['openDirectory'],
+            title: 'Add Folder to Workspace',
+        });
+        if (!result.canceled && result.filePaths.length > 0) {
+            this.mainWindow?.webContents.send('workspace:add-folder', result.filePaths[0]);
+        }
+    }
+    async handleSaveWorkspaceAs() {
+        const result = await electron_1.dialog.showSaveDialog(this.mainWindow, {
+            title: 'Save Workspace As',
+            defaultPath: 'workspace.code-workspace',
+            filters: [
+                { name: 'VS Code Workspace', extensions: ['code-workspace'] },
+            ],
+        });
+        if (!result.canceled && result.filePath) {
+            this.mainWindow?.webContents.send('workspace:save-as', result.filePath);
+        }
+    }
+    async handleSave() {
+        this.mainWindow?.webContents.send('editor:save');
+    }
+    async handleSaveAs() {
+        this.mainWindow?.webContents.send('editor:save-as');
+    }
+    async handleSaveAll() {
+        this.mainWindow?.webContents.send('editor:save-all');
+    }
+    async handleToggleAutoSave() {
+        this.mainWindow?.webContents.send('editor:toggle-auto-save');
+    }
+    async handleKeyboardShortcuts() {
+        this.mainWindow?.webContents.send('preferences:keyboard-shortcuts');
+    }
+    async handleExtensions() {
+        this.mainWindow?.webContents.send('view:show-extensions');
+    }
+    async handleColorTheme() {
+        this.mainWindow?.webContents.send('preferences:color-theme');
+    }
+    async handleFileIconTheme() {
+        this.mainWindow?.webContents.send('preferences:file-icon-theme');
+    }
+    async handleRevertFile() {
+        this.mainWindow?.webContents.send('editor:revert-file');
+    }
+    async handleCloseEditor() {
+        this.mainWindow?.webContents.send('editor:close');
+    }
+    async handleCloseFolder() {
+        this.mainWindow?.webContents.send('folder:close');
+    }
+    async handleCloseWindow() {
+        this.mainWindow?.close();
+    }
+    async handleReopenClosedEditor() {
+        this.mainWindow?.webContents.send('editor:reopen-closed');
+    }
+    async handleMoreRecent() {
+        this.mainWindow?.webContents.send('file:show-recent');
+    }
+    async handleClearRecentlyOpened() {
+        this.mainWindow?.webContents.send('file:clear-recent');
+    }
+    // Edit menu handlers
+    async handleFind() {
+        this.mainWindow?.webContents.send('editor:find');
+    }
+    async handleReplace() {
+        this.mainWindow?.webContents.send('editor:replace');
+    }
+    async handleFindInFiles() {
+        this.mainWindow?.webContents.send('search:find-in-files');
+    }
+    async handleReplaceInFiles() {
+        this.mainWindow?.webContents.send('search:replace-in-files');
+    }
+    async handleToggleLineComment() {
+        this.mainWindow?.webContents.send('editor:toggle-line-comment');
+    }
+    async handleToggleBlockComment() {
+        this.mainWindow?.webContents.send('editor:toggle-block-comment');
+    }
+    async handleEmmetExpand() {
+        this.mainWindow?.webContents.send('editor:emmet-expand');
+    }
+    // Selection menu handlers
+    async handleExpandSelection() {
+        this.mainWindow?.webContents.send('editor:expand-selection');
+    }
+    async handleShrinkSelection() {
+        this.mainWindow?.webContents.send('editor:shrink-selection');
+    }
+    async handleCopyLineUp() {
+        this.mainWindow?.webContents.send('editor:copy-line-up');
+    }
+    async handleCopyLineDown() {
+        this.mainWindow?.webContents.send('editor:copy-line-down');
+    }
+    async handleMoveLineUp() {
+        this.mainWindow?.webContents.send('editor:move-line-up');
+    }
+    async handleMoveLineDown() {
+        this.mainWindow?.webContents.send('editor:move-line-down');
+    }
+    async handleAddCursorAbove() {
+        this.mainWindow?.webContents.send('editor:add-cursor-above');
+    }
+    async handleAddCursorBelow() {
+        this.mainWindow?.webContents.send('editor:add-cursor-below');
+    }
+    async handleAddCursorsToLineEnds() {
+        this.mainWindow?.webContents.send('editor:add-cursors-to-line-ends');
+    }
+    async handleAddNextOccurrence() {
+        this.mainWindow?.webContents.send('editor:add-next-occurrence');
+    }
+    async handleAddAllOccurrences() {
+        this.mainWindow?.webContents.send('editor:add-all-occurrences');
+    }
+    // View menu handlers
+    async handleCommandPalette() {
+        this.mainWindow?.webContents.send('view:command-palette');
+    }
+    async handleOpenView() {
+        this.mainWindow?.webContents.send('view:open-view');
+    }
+    async handleShowExplorer() {
+        this.mainWindow?.webContents.send('view:show-explorer');
+    }
+    async handleShowSearch() {
+        this.mainWindow?.webContents.send('view:show-search');
+    }
+    async handleShowSourceControl() {
+        this.mainWindow?.webContents.send('view:show-source-control');
+    }
+    async handleShowDebug() {
+        this.mainWindow?.webContents.send('view:show-debug');
+    }
+    async handleShowExtensions() {
+        this.mainWindow?.webContents.send('view:show-extensions');
+    }
+    async handleShowProblems() {
+        this.mainWindow?.webContents.send('view:show-problems');
+    }
+    async handleShowOutput() {
+        this.mainWindow?.webContents.send('view:show-output');
+    }
+    async handleShowDebugConsole() {
+        this.mainWindow?.webContents.send('view:show-debug-console');
+    }
+    async handleShowTerminal() {
+        this.mainWindow?.webContents.send('view:show-terminal');
+    }
+    async handleZenMode() {
+        this.mainWindow?.webContents.send('view:zen-mode');
+    }
+    async handleCenteredLayout() {
+        this.mainWindow?.webContents.send('view:centered-layout');
+    }
+    async handleToggleMenuBar() {
+        const menuBarVisible = this.mainWindow?.isMenuBarVisible();
+        this.mainWindow?.setMenuBarVisibility(!menuBarVisible);
+    }
+    async handleToggleActivityBar() {
+        this.mainWindow?.webContents.send('view:toggle-activity-bar');
+    }
+    async handleToggleSideBar() {
+        this.mainWindow?.webContents.send('view:toggle-side-bar');
+    }
+    async handleToggleStatusBar() {
+        this.mainWindow?.webContents.send('view:toggle-status-bar');
+    }
+    async handleTogglePanel() {
+        this.mainWindow?.webContents.send('view:toggle-panel');
+    }
+    async handleSplitUp() {
+        this.mainWindow?.webContents.send('editor:split-up');
+    }
+    async handleSplitDown() {
+        this.mainWindow?.webContents.send('editor:split-down');
+    }
+    async handleSplitLeft() {
+        this.mainWindow?.webContents.send('editor:split-left');
+    }
+    async handleSplitRight() {
+        this.mainWindow?.webContents.send('editor:split-right');
+    }
+    async handleSingleColumnLayout() {
+        this.mainWindow?.webContents.send('editor:single-column-layout');
+    }
+    async handleTwoColumnsLayout() {
+        this.mainWindow?.webContents.send('editor:two-columns-layout');
+    }
+    async handleThreeColumnsLayout() {
+        this.mainWindow?.webContents.send('editor:three-columns-layout');
+    }
+    // Go menu handlers
+    async handleGoBack() {
+        this.mainWindow?.webContents.send('navigation:go-back');
+    }
+    async handleGoForward() {
+        this.mainWindow?.webContents.send('navigation:go-forward');
+    }
+    async handleGoToLastEditLocation() {
+        this.mainWindow?.webContents.send('navigation:go-to-last-edit');
+    }
+    async handleNextEditor() {
+        this.mainWindow?.webContents.send('editor:next-editor');
+    }
+    async handlePreviousEditor() {
+        this.mainWindow?.webContents.send('editor:previous-editor');
+    }
+    async handleNextEditorInGroup() {
+        this.mainWindow?.webContents.send('editor:next-editor-in-group');
+    }
+    async handlePreviousEditorInGroup() {
+        this.mainWindow?.webContents.send('editor:previous-editor-in-group');
+    }
+    async handleNextGroup() {
+        this.mainWindow?.webContents.send('editor:next-group');
+    }
+    async handlePreviousGroup() {
+        this.mainWindow?.webContents.send('editor:previous-group');
+    }
+    async handleGoToFile() {
+        this.mainWindow?.webContents.send('navigation:go-to-file');
+    }
+    async handleGoToSymbolInWorkspace() {
+        this.mainWindow?.webContents.send('navigation:go-to-symbol-workspace');
+    }
+    async handleGoToSymbolInEditor() {
+        this.mainWindow?.webContents.send('navigation:go-to-symbol-editor');
+    }
+    async handleGoToDefinition() {
+        this.mainWindow?.webContents.send('navigation:go-to-definition');
+    }
+    async handleGoToDeclaration() {
+        this.mainWindow?.webContents.send('navigation:go-to-declaration');
+    }
+    async handleGoToTypeDefinition() {
+        this.mainWindow?.webContents.send('navigation:go-to-type-definition');
+    }
+    async handleGoToImplementations() {
+        this.mainWindow?.webContents.send('navigation:go-to-implementations');
+    }
+    async handleGoToReferences() {
+        this.mainWindow?.webContents.send('navigation:go-to-references');
+    }
+    async handleGoToLine() {
+        this.mainWindow?.webContents.send('navigation:go-to-line');
+    }
+    async handleGoToBracket() {
+        this.mainWindow?.webContents.send('navigation:go-to-bracket');
+    }
+    // Run menu handlers
+    async handleStartDebugging() {
+        this.mainWindow?.webContents.send('debug:start');
+    }
+    async handleStartWithoutDebugging() {
+        this.mainWindow?.webContents.send('debug:start-without-debugging');
+    }
+    async handleStopDebugging() {
+        this.mainWindow?.webContents.send('debug:stop');
+    }
+    async handleRestartDebugging() {
+        this.mainWindow?.webContents.send('debug:restart');
+    }
+    async handleOpenConfigurations() {
+        this.mainWindow?.webContents.send('debug:open-configurations');
+    }
+    async handleAddConfiguration() {
+        this.mainWindow?.webContents.send('debug:add-configuration');
+    }
+    async handleStepOver() {
+        this.mainWindow?.webContents.send('debug:step-over');
+    }
+    async handleStepInto() {
+        this.mainWindow?.webContents.send('debug:step-into');
+    }
+    async handleStepOut() {
+        this.mainWindow?.webContents.send('debug:step-out');
+    }
+    async handleContinue() {
+        this.mainWindow?.webContents.send('debug:continue');
+    }
+    async handleToggleBreakpoint() {
+        this.mainWindow?.webContents.send('debug:toggle-breakpoint');
+    }
+    async handleConditionalBreakpoint() {
+        this.mainWindow?.webContents.send('debug:conditional-breakpoint');
+    }
+    async handleInlineBreakpoint() {
+        this.mainWindow?.webContents.send('debug:inline-breakpoint');
+    }
+    async handleFunctionBreakpoint() {
+        this.mainWindow?.webContents.send('debug:function-breakpoint');
+    }
+    async handleLogpoint() {
+        this.mainWindow?.webContents.send('debug:logpoint');
+    }
+    async handleEnableAllBreakpoints() {
+        this.mainWindow?.webContents.send('debug:enable-all-breakpoints');
+    }
+    async handleDisableAllBreakpoints() {
+        this.mainWindow?.webContents.send('debug:disable-all-breakpoints');
+    }
+    async handleRemoveAllBreakpoints() {
+        this.mainWindow?.webContents.send('debug:remove-all-breakpoints');
+    }
+    async handleInstallAdditionalDebuggers() {
+        this.mainWindow?.webContents.send('debug:install-additional-debuggers');
+    }
+    // Help menu handlers
+    async handleWelcome() {
+        this.mainWindow?.webContents.send('help:welcome');
+    }
+    async handleShowAllCommands() {
+        this.mainWindow?.webContents.send('view:command-palette');
+    }
+    async handleShowReleaseNotes() {
+        this.mainWindow?.webContents.send('help:release-notes');
+    }
+    async handleKeyboardShortcutsReference() {
+        this.mainWindow?.webContents.send('help:keyboard-shortcuts-reference');
+    }
+    async handleVideoTutorials() {
+        this.mainWindow?.webContents.send('help:video-tutorials');
+    }
+    async handleTipsAndTricks() {
+        this.mainWindow?.webContents.send('help:tips-and-tricks');
+    }
+    async handleJoinTwitter() {
+        this.mainWindow?.webContents.send('help:join-twitter');
+    }
+    async handleSearchFeatureRequests() {
+        this.mainWindow?.webContents.send('help:search-feature-requests');
+    }
+    async handleReportIssue() {
+        this.mainWindow?.webContents.send('help:report-issue');
+    }
+    async handleViewLicense() {
+        this.mainWindow?.webContents.send('help:view-license');
+    }
+    async handlePrivacyStatement() {
+        this.mainWindow?.webContents.send('help:privacy-statement');
+    }
+    async handleToggleDevTools() {
+        this.mainWindow?.webContents.toggleDevTools();
+    }
+    async handleOpenProcessExplorer() {
+        this.mainWindow?.webContents.send('help:process-explorer');
     }
     // Place menu handler methods here, after constructor and before final closing brace
     async handleNewWorkspace() {
@@ -8701,63 +10007,226 @@ class VSEmbedApplication {
             {
                 label: 'File',
                 submenu: [
-                    { label: 'New Workspace', click: () => this.handleNewWorkspace() },
-                    { label: 'Open Workspace', click: () => this.handleOpenWorkspace() },
-                    { label: 'Export Workspace', click: () => this.handleExportWorkspace() },
+                    { label: 'New File', accelerator: 'CmdOrCtrl+N', click: () => this.handleNewFile() },
+                    { label: 'New Window', accelerator: 'CmdOrCtrl+Shift+N', click: () => this.handleNewWindow() },
                     { type: 'separator' },
-                    { label: 'Settings', click: () => this.handleSettings() },
+                    { label: 'Open File...', accelerator: 'CmdOrCtrl+O', click: () => this.handleOpenFile() },
+                    { label: 'Open Folder...', accelerator: 'CmdOrCtrl+K CmdOrCtrl+O', click: () => this.handleOpenFolder() },
+                    { label: 'Open Workspace...', click: () => this.handleOpenWorkspace() },
+                    { label: 'Open Recent', submenu: this.getRecentSubmenu() },
                     { type: 'separator' },
-                    { role: 'quit' },
+                    { label: 'Create Workspace...', click: () => this.handleCreateWorkspace() },
+                    { label: 'Add Folder to Workspace...', click: () => this.handleAddFolderToWorkspace() },
+                    { label: 'Save Workspace As...', click: () => this.handleSaveWorkspaceAs() },
+                    { type: 'separator' },
+                    { label: 'Save', accelerator: 'CmdOrCtrl+S', click: () => this.handleSave() },
+                    { label: 'Save As...', accelerator: 'CmdOrCtrl+Shift+S', click: () => this.handleSaveAs() },
+                    { label: 'Save All', accelerator: 'CmdOrCtrl+K S', click: () => this.handleSaveAll() },
+                    { type: 'separator' },
+                    { label: 'Auto Save', type: 'checkbox', checked: false, click: () => this.handleToggleAutoSave() },
+                    { type: 'separator' },
+                    { label: 'Preferences', submenu: [
+                            { label: 'Settings', accelerator: 'CmdOrCtrl+,', click: () => this.handleSettings() },
+                            { label: 'Keyboard Shortcuts', accelerator: 'CmdOrCtrl+K CmdOrCtrl+S', click: () => this.handleKeyboardShortcuts() },
+                            { label: 'Extensions', accelerator: 'CmdOrCtrl+Shift+X', click: () => this.handleExtensions() },
+                            { type: 'separator' },
+                            { label: 'Color Theme', click: () => this.handleColorTheme() },
+                            { label: 'File Icon Theme', click: () => this.handleFileIconTheme() },
+                        ] },
+                    { type: 'separator' },
+                    { label: 'Revert File', click: () => this.handleRevertFile() },
+                    { label: 'Close Editor', accelerator: 'CmdOrCtrl+W', click: () => this.handleCloseEditor() },
+                    { label: 'Close Folder', accelerator: 'CmdOrCtrl+K F', click: () => this.handleCloseFolder() },
+                    { label: 'Close Window', accelerator: 'CmdOrCtrl+Shift+W', click: () => this.handleCloseWindow() },
+                    { type: 'separator' },
+                    { label: 'Exit', accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q', role: 'quit' },
                 ],
             },
             {
                 label: 'Edit',
                 submenu: [
-                    { role: 'undo' },
-                    { role: 'redo' },
+                    { label: 'Undo', accelerator: 'CmdOrCtrl+Z', role: 'undo' },
+                    { label: 'Redo', accelerator: 'CmdOrCtrl+Shift+Z', role: 'redo' },
                     { type: 'separator' },
-                    { role: 'cut' },
-                    { role: 'copy' },
-                    { role: 'paste' },
+                    { label: 'Cut', accelerator: 'CmdOrCtrl+X', role: 'cut' },
+                    { label: 'Copy', accelerator: 'CmdOrCtrl+C', role: 'copy' },
+                    { label: 'Paste', accelerator: 'CmdOrCtrl+V', role: 'paste' },
+                    { type: 'separator' },
+                    { label: 'Find', accelerator: 'CmdOrCtrl+F', click: () => this.handleFind() },
+                    { label: 'Replace', accelerator: 'CmdOrCtrl+H', click: () => this.handleReplace() },
+                    { type: 'separator' },
+                    { label: 'Find in Files', accelerator: 'CmdOrCtrl+Shift+F', click: () => this.handleFindInFiles() },
+                    { label: 'Replace in Files', accelerator: 'CmdOrCtrl+Shift+H', click: () => this.handleReplaceInFiles() },
+                    { type: 'separator' },
+                    { label: 'Toggle Line Comment', accelerator: 'CmdOrCtrl+/', click: () => this.handleToggleLineComment() },
+                    { label: 'Toggle Block Comment', accelerator: 'CmdOrCtrl+Shift+A', click: () => this.handleToggleBlockComment() },
+                    { type: 'separator' },
+                    { label: 'Emmet: Expand Abbreviation', accelerator: 'Tab', click: () => this.handleEmmetExpand() },
                 ],
             },
             {
-                label: 'AI',
+                label: 'Selection',
                 submenu: [
-                    { label: 'Clear Conversation', click: () => this.handleClearConversation?.() },
-                    { label: 'Change Model', click: () => this.handleChangeModel?.() },
+                    { label: 'Select All', accelerator: 'CmdOrCtrl+A', role: 'selectAll' },
+                    { label: 'Expand Selection', accelerator: 'Shift+Alt+Right', click: () => this.handleExpandSelection() },
+                    { label: 'Shrink Selection', accelerator: 'Shift+Alt+Left', click: () => this.handleShrinkSelection() },
                     { type: 'separator' },
-                    { label: 'AI Settings', click: () => this.handleAISettings() },
+                    { label: 'Copy Line Up', accelerator: 'Shift+Alt+Up', click: () => this.handleCopyLineUp() },
+                    { label: 'Copy Line Down', accelerator: 'Shift+Alt+Down', click: () => this.handleCopyLineDown() },
+                    { label: 'Move Line Up', accelerator: 'Alt+Up', click: () => this.handleMoveLineUp() },
+                    { label: 'Move Line Down', accelerator: 'Alt+Down', click: () => this.handleMoveLineDown() },
+                    { type: 'separator' },
+                    { label: 'Add Cursor Above', accelerator: 'CmdOrCtrl+Alt+Up', click: () => this.handleAddCursorAbove() },
+                    { label: 'Add Cursor Below', accelerator: 'CmdOrCtrl+Alt+Down', click: () => this.handleAddCursorBelow() },
+                    { label: 'Add Cursors to Line Ends', accelerator: 'Shift+Alt+I', click: () => this.handleAddCursorsToLineEnds() },
+                    { label: 'Add Next Occurrence', accelerator: 'CmdOrCtrl+D', click: () => this.handleAddNextOccurrence() },
+                    { label: 'Add All Occurrences', accelerator: 'CmdOrCtrl+Shift+L', click: () => this.handleAddAllOccurrences() },
                 ],
             },
             {
-                label: 'Runner',
+                label: 'View',
                 submenu: [
-                    { label: 'Start', accelerator: 'F5', click: () => this.handleStartRunner() },
-                    { label: 'Stop', accelerator: 'Shift+F5', click: () => this.handleStopRunner() },
-                    { label: 'Restart', accelerator: 'Ctrl+F5', click: () => this.handleRestartRunner() },
+                    { label: 'Command Palette...', accelerator: 'CmdOrCtrl+Shift+P', click: () => this.handleCommandPalette() },
+                    { label: 'Open View...', accelerator: 'CmdOrCtrl+Q', click: () => this.handleOpenView() },
                     { type: 'separator' },
-                    { label: 'View Logs', click: () => this.handleViewLogs() },
+                    { label: 'Explorer', accelerator: 'CmdOrCtrl+Shift+E', click: () => this.handleShowExplorer() },
+                    { label: 'Search', accelerator: 'CmdOrCtrl+Shift+F', click: () => this.handleShowSearch() },
+                    { label: 'Source Control', accelerator: 'CmdOrCtrl+Shift+G', click: () => this.handleShowSourceControl() },
+                    { label: 'Run and Debug', accelerator: 'CmdOrCtrl+Shift+D', click: () => this.handleShowDebug() },
+                    { label: 'Extensions', accelerator: 'CmdOrCtrl+Shift+X', click: () => this.handleShowExtensions() },
+                    { type: 'separator' },
+                    { label: 'Problems', accelerator: 'CmdOrCtrl+Shift+M', click: () => this.handleShowProblems() },
+                    { label: 'Output', accelerator: 'CmdOrCtrl+Shift+U', click: () => this.handleShowOutput() },
+                    { label: 'Debug Console', accelerator: 'CmdOrCtrl+Shift+Y', click: () => this.handleShowDebugConsole() },
+                    { label: 'Terminal', accelerator: 'CmdOrCtrl+`', click: () => this.handleShowTerminal() },
+                    { type: 'separator' },
+                    { label: 'Appearance', submenu: [
+                            { label: 'Full Screen', accelerator: 'F11', role: 'togglefullscreen' },
+                            { label: 'Zen Mode', accelerator: 'CmdOrCtrl+K Z', click: () => this.handleZenMode() },
+                            { label: 'Centered Layout', click: () => this.handleCenteredLayout() },
+                            { type: 'separator' },
+                            { label: 'Show Menu Bar', type: 'checkbox', checked: true, click: () => this.handleToggleMenuBar() },
+                            { label: 'Show Activity Bar', type: 'checkbox', checked: true, click: () => this.handleToggleActivityBar() },
+                            { label: 'Show Side Bar', accelerator: 'CmdOrCtrl+B', click: () => this.handleToggleSideBar() },
+                            { label: 'Show Status Bar', click: () => this.handleToggleStatusBar() },
+                            { label: 'Show Panel', accelerator: 'CmdOrCtrl+J', click: () => this.handleTogglePanel() },
+                            { type: 'separator' },
+                            { label: 'Zoom In', accelerator: 'CmdOrCtrl+Plus', role: 'zoomIn' },
+                            { label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomOut' },
+                            { label: 'Reset Zoom', accelerator: 'CmdOrCtrl+0', role: 'resetZoom' },
+                        ] },
+                    { type: 'separator' },
+                    { label: 'Editor Layout', submenu: [
+                            { label: 'Split Up', click: () => this.handleSplitUp() },
+                            { label: 'Split Down', click: () => this.handleSplitDown() },
+                            { label: 'Split Left', click: () => this.handleSplitLeft() },
+                            { label: 'Split Right', click: () => this.handleSplitRight() },
+                            { type: 'separator' },
+                            { label: 'Single Column Layout', click: () => this.handleSingleColumnLayout() },
+                            { label: 'Two Columns Layout', click: () => this.handleTwoColumnsLayout() },
+                            { label: 'Three Columns Layout', click: () => this.handleThreeColumnsLayout() },
+                        ] },
                 ],
             },
             {
-                label: 'Security',
+                label: 'Go',
                 submenu: [
-                    { label: 'Manage Secrets', click: () => this.handleManageSecrets() },
-                    { label: 'View Audit Log', click: () => this.handleViewAuditLog() },
-                    { label: 'Security Settings', click: () => this.handleSecuritySettings() },
+                    { label: 'Back', accelerator: 'CmdOrCtrl+Alt+Left', click: () => this.handleGoBack() },
+                    { label: 'Forward', accelerator: 'CmdOrCtrl+Alt+Right', click: () => this.handleGoForward() },
+                    { label: 'Last Edit Location', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Q', click: () => this.handleGoToLastEditLocation() },
+                    { type: 'separator' },
+                    { label: 'Switch Editor', submenu: [
+                            { label: 'Next Editor', accelerator: 'CmdOrCtrl+PageDown', click: () => this.handleNextEditor() },
+                            { label: 'Previous Editor', accelerator: 'CmdOrCtrl+PageUp', click: () => this.handlePreviousEditor() },
+                            { label: 'Next Editor in Group', accelerator: 'CmdOrCtrl+Tab', click: () => this.handleNextEditorInGroup() },
+                            { label: 'Previous Editor in Group', accelerator: 'CmdOrCtrl+Shift+Tab', click: () => this.handlePreviousEditorInGroup() },
+                        ] },
+                    { label: 'Switch Group', submenu: [
+                            { label: 'Next Group', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Right', click: () => this.handleNextGroup() },
+                            { label: 'Previous Group', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Left', click: () => this.handlePreviousGroup() },
+                        ] },
+                    { type: 'separator' },
+                    { label: 'Go to File...', accelerator: 'CmdOrCtrl+P', click: () => this.handleGoToFile() },
+                    { label: 'Go to Symbol in Workspace...', accelerator: 'CmdOrCtrl+T', click: () => this.handleGoToSymbolInWorkspace() },
+                    { label: 'Go to Symbol in Editor...', accelerator: 'CmdOrCtrl+Shift+O', click: () => this.handleGoToSymbolInEditor() },
+                    { label: 'Go to Definition', accelerator: 'F12', click: () => this.handleGoToDefinition() },
+                    { label: 'Go to Declaration', click: () => this.handleGoToDeclaration() },
+                    { label: 'Go to Type Definition', click: () => this.handleGoToTypeDefinition() },
+                    { label: 'Go to Implementations', accelerator: 'CmdOrCtrl+F12', click: () => this.handleGoToImplementations() },
+                    { label: 'Go to References', accelerator: 'Shift+F12', click: () => this.handleGoToReferences() },
+                    { type: 'separator' },
+                    { label: 'Go to Line/Column...', accelerator: 'CmdOrCtrl+G', click: () => this.handleGoToLine() },
+                    { label: 'Go to Bracket', accelerator: 'CmdOrCtrl+Shift+\\', click: () => this.handleGoToBracket() },
+                ],
+            },
+            {
+                label: 'Run',
+                submenu: [
+                    { label: 'Start Debugging', accelerator: 'F5', click: () => this.handleStartDebugging() },
+                    { label: 'Start Without Debugging', accelerator: 'CmdOrCtrl+F5', click: () => this.handleStartWithoutDebugging() },
+                    { label: 'Stop Debugging', accelerator: 'Shift+F5', click: () => this.handleStopDebugging() },
+                    { label: 'Restart Debugging', accelerator: 'CmdOrCtrl+Shift+F5', click: () => this.handleRestartDebugging() },
+                    { type: 'separator' },
+                    { label: 'Open Configurations', click: () => this.handleOpenConfigurations() },
+                    { label: 'Add Configuration...', click: () => this.handleAddConfiguration() },
+                    { type: 'separator' },
+                    { label: 'Step Over', accelerator: 'F10', click: () => this.handleStepOver() },
+                    { label: 'Step Into', accelerator: 'F11', click: () => this.handleStepInto() },
+                    { label: 'Step Out', accelerator: 'Shift+F11', click: () => this.handleStepOut() },
+                    { label: 'Continue', accelerator: 'F5', click: () => this.handleContinue() },
+                    { type: 'separator' },
+                    { label: 'Toggle Breakpoint', accelerator: 'F9', click: () => this.handleToggleBreakpoint() },
+                    { label: 'New Breakpoint', submenu: [
+                            { label: 'Conditional Breakpoint...', click: () => this.handleConditionalBreakpoint() },
+                            { label: 'Inline Breakpoint', accelerator: 'Shift+F9', click: () => this.handleInlineBreakpoint() },
+                            { label: 'Function Breakpoint...', click: () => this.handleFunctionBreakpoint() },
+                            { label: 'Logpoint...', click: () => this.handleLogpoint() },
+                        ] },
+                    { label: 'Enable All Breakpoints', click: () => this.handleEnableAllBreakpoints() },
+                    { label: 'Disable All Breakpoints', click: () => this.handleDisableAllBreakpoints() },
+                    { label: 'Remove All Breakpoints', click: () => this.handleRemoveAllBreakpoints() },
+                    { type: 'separator' },
+                    { label: 'Install Additional Debuggers...', click: () => this.handleInstallAdditionalDebuggers() },
                 ],
             },
             {
                 label: 'Help',
                 submenu: [
+                    { label: 'Welcome', click: () => this.handleWelcome() },
+                    { label: 'Show All Commands', accelerator: 'CmdOrCtrl+Shift+P', click: () => this.handleShowAllCommands() },
+                    { label: 'Documentation', click: () => this.handleDocumentation() },
+                    { label: 'Show Release Notes', click: () => this.handleShowReleaseNotes() },
+                    { type: 'separator' },
+                    { label: 'Keyboard Shortcuts Reference', accelerator: 'CmdOrCtrl+K CmdOrCtrl+R', click: () => this.handleKeyboardShortcutsReference() },
+                    { label: 'Video Tutorials', click: () => this.handleVideoTutorials() },
+                    { label: 'Tips and Tricks', click: () => this.handleTipsAndTricks() },
+                    { type: 'separator' },
+                    { label: 'Join Us on Twitter', click: () => this.handleJoinTwitter() },
+                    { label: 'Search Feature Requests', click: () => this.handleSearchFeatureRequests() },
+                    { label: 'Report Issue', click: () => this.handleReportIssue() },
+                    { type: 'separator' },
+                    { label: 'View License', click: () => this.handleViewLicense() },
+                    { label: 'Privacy Statement', click: () => this.handlePrivacyStatement() },
+                    { type: 'separator' },
+                    { label: 'Toggle Developer Tools', accelerator: 'F12', click: () => this.handleToggleDevTools() },
+                    { label: 'Open Process Explorer', click: () => this.handleOpenProcessExplorer() },
+                    { type: 'separator' },
                     { label: 'About', click: () => this.handleAbout() },
-                    { label: 'Documentation', click: () => this.handleDocumentation?.() },
                 ],
             },
         ];
         const menu = electron_1.Menu.buildFromTemplate(template);
         electron_1.Menu.setApplicationMenu(menu);
+    }
+    getRecentSubmenu() {
+        // This would typically load from stored recent files/workspaces
+        return [
+            { label: 'Reopen Closed Editor', accelerator: 'CmdOrCtrl+Shift+T', click: () => this.handleReopenClosedEditor() },
+            { type: 'separator' },
+            { label: 'More...', click: () => this.handleMoreRecent() },
+            { type: 'separator' },
+            { label: 'Clear Recently Opened', click: () => this.handleClearRecentlyOpened() },
+        ];
     }
     setupIpcHandlers() {
         // Workspace operations

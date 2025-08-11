@@ -1,0 +1,261 @@
+/* VsEmbed AI Development Tool Styles */
+
+:root {
+  /* VS Code Color Theme */
+  --vscode-editor-background: #1e1e1e;
+  --vscode-editor-foreground: #cccccc;
+  --vscode-sideBar-background: #252526;
+  --vscode-activityBar-background: #333333;
+  --vscode-statusBar-background: #007acc;
+  --vscode-terminal-background: #1e1e1e;
+  --vscode-panel-background: #1e1e1e;
+  
+  /* Button colors */
+  --vscode-button-background: #0e639c;
+  --vscode-button-foreground: #ffffff;
+  --vscode-button-hoverBackground: #1177bb;
+  
+  /* Input colors */
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-foreground: #cccccc;
+  --vscode-input-border: #3c3c3c;
+  
+  /* Focus colors */
+  --vscode-focusBorder: #007acc;
+  
+  /* List colors */
+  --vscode-list-activeSelectionBackground: #094771;
+  --vscode-list-hoverBackground: #2a2d2e;
+  
+  /* Badge colors */
+  --vscode-badge-background: #4d4d4d;
+  --vscode-badge-foreground: #ffffff;
+
+  /* VsEmbed specific */
+  --vsembed-border: #3c3c3c;
+  --vsembed-hover: #2a2d2e;
+  --vsembed-active: #094771;
+}
+
+/* Main Application Container */
+.vsembed-app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+/* Layout Components */
+.vsembed-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.vsembed-sidebar {
+  width: 250px;
+  background: var(--vscode-sideBar-background);
+  border-right: 1px solid var(--vsembed-border);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: 400px;
+  resize: horizontal;
+  overflow: auto;
+}
+
+.vsembed-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vsembed-panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.vsembed-editor-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vsembed-chat-panel {
+  width: 350px;
+  background: var(--vscode-panel-background);
+  border-left: 1px solid var(--vsembed-border);
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  max-width: 600px;
+  resize: horizontal;
+  overflow: hidden;
+}
+
+.vsembed-bottom-panel {
+  height: 250px;
+  background: var(--vscode-terminal-background);
+  border-top: 1px solid var(--vsembed-border);
+  min-height: 150px;
+  max-height: 400px;
+  resize: vertical;
+  overflow: hidden;
+}
+
+/* Buttons */
+.vsembed-btn {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s;
+}
+
+.vsembed-btn:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+.vsembed-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vsembed-btn-secondary {
+  background: transparent;
+  color: var(--vscode-editor-foreground);
+  border: 1px solid var(--vsembed-border);
+}
+
+.vsembed-btn-secondary:hover {
+  background: var(--vsembed-hover);
+}
+
+/* Inputs */
+.vsembed-input {
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  padding: 6px 8px;
+  border-radius: 2px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.vsembed-input:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
+
+/* Panel Headers */
+.vsembed-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--vscode-sideBar-background);
+  border-bottom: 1px solid var(--vsembed-border);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vsembed-panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+}
+
+/* Scrollbars */
+.vsembed-app ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.vsembed-app ::-webkit-scrollbar-track {
+  background: var(--vscode-editor-background);
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb {
+  background: var(--vsembed-border);
+  border-radius: 5px;
+}
+
+.vsembed-app ::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+/* Status indicators */
+.vsembed-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.vsembed-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4a4a4a;
+}
+
+.vsembed-status-dot.running {
+  background: #00bc00;
+}
+
+.vsembed-status-dot.error {
+  background: #ff3333;
+}
+
+.vsembed-status-dot.warning {
+  background: #ffcc00;
+}
+
+/* Utility classes */
+.vsembed-flex {
+  display: flex;
+}
+
+.vsembed-flex-col {
+  flex-direction: column;
+}
+
+.vsembed-flex-1 {
+  flex: 1;
+}
+
+.vsembed-gap {
+  gap: 8px;
+}
+
+.vsembed-p {
+  padding: 8px;
+}
+
+.vsembed-m {
+  margin: 8px;
+}
+
+.vsembed-border {
+  border: 1px solid var(--vsembed-border);
+}
+
+.vsembed-rounded {
+  border-radius: 2px;
+}

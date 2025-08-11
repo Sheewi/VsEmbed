@@ -1,0 +1,308 @@
+/* SideBar.css - VS Code Sidebar Styling */
+
+.sidebar {
+  background-color: var(--vscode-sideBar-background, #252526);
+  border-right: 1px solid var(--vscode-sideBar-border, #3c3c3c);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 200px;
+  max-width: 600px;
+  position: relative;
+  user-select: none;
+}
+
+.sidebar-header {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 0 20px;
+  background-color: var(--vscode-sideBarSectionHeader-background, #2d2d30);
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-border, #3c3c3c);
+  flex-shrink: 0;
+}
+
+.sidebar-title h2 {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vscode-sideBarSectionHeader-foreground, #cccccc);
+  margin: 0;
+}
+
+.sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  color: var(--vscode-icon-foreground, #cccccc);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--vscode-toolbar-hoverBackground, #5a5d5e);
+}
+
+.action-btn:active {
+  background-color: var(--vscode-toolbar-activeBackground, #505050);
+}
+
+.action-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--vscode-sideBar-background, #252526);
+}
+
+.sidebar-placeholder {
+  padding: 20px;
+  text-align: center;
+  color: var(--vscode-descriptionForeground, #a6a6a6);
+  font-size: 13px;
+}
+
+.sidebar-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 1000;
+}
+
+.sidebar-resize-handle:hover {
+  background-color: var(--vscode-sash-hoverBorder, #007acc);
+}
+
+.sidebar-resize-handle:active {
+  background-color: var(--vscode-sash-activeBorder, #007acc);
+}
+
+/* Panel content styling */
+.sidebar-content .panel-content {
+  padding: 16px;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.sidebar-content .panel-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vscode-foreground, #cccccc);
+}
+
+.sidebar-content .panel-content p {
+  margin: 8px 0;
+  font-size: 13px;
+  color: var(--vscode-descriptionForeground, #a6a6a6);
+  line-height: 1.4;
+}
+
+.sidebar-content .panel-content button {
+  background-color: var(--vscode-button-background, #0e639c);
+  border: none;
+  color: var(--vscode-button-foreground, #ffffff);
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-content .panel-content button:hover {
+  background-color: var(--vscode-button-hoverBackground, #1177bb);
+}
+
+.sidebar-content .panel-content button:disabled {
+  background-color: var(--vscode-button-background, #0e639c);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+.sidebar-content::-webkit-scrollbar {
+  width: 14px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background-color: var(--vscode-scrollbarSlider-background, #79797966);
+  border-radius: 7px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--vscode-scrollbarSlider-hoverBackground, #646464b3);
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:active {
+  background-color: var(--vscode-scrollbarSlider-activeBackground, #bfbfbf66);
+}
+
+/* Light theme adjustments */
+@media (prefers-color-scheme: light) {
+  .sidebar {
+    background-color: var(--vscode-sideBar-background, #f3f3f3);
+    border-right-color: var(--vscode-sideBar-border, #e5e5e5);
+  }
+
+  .sidebar-header {
+    background-color: var(--vscode-sideBarSectionHeader-background, #e8e8e8);
+    border-bottom-color: var(--vscode-sideBarSectionHeader-border, #e5e5e5);
+  }
+
+  .sidebar-title h2 {
+    color: var(--vscode-sideBarSectionHeader-foreground, #333333);
+  }
+
+  .action-btn {
+    color: var(--vscode-icon-foreground, #424242);
+  }
+
+  .action-btn:hover {
+    background-color: var(--vscode-toolbar-hoverBackground, #c8c8c8);
+  }
+
+  .sidebar-content {
+    background-color: var(--vscode-sideBar-background, #f3f3f3);
+  }
+
+  .sidebar-content .panel-content {
+    color: var(--vscode-foreground, #333333);
+  }
+
+  .sidebar-content .panel-content h3 {
+    color: var(--vscode-foreground, #333333);
+  }
+
+  .sidebar-content .panel-content p {
+    color: var(--vscode-descriptionForeground, #6c6c6c);
+  }
+}
+
+/* High contrast theme */
+@media (prefers-contrast: high) {
+  .sidebar {
+    border-right-width: 2px;
+  }
+
+  .sidebar-header {
+    border-bottom-width: 2px;
+  }
+
+  .action-btn:focus {
+    outline: 2px solid var(--vscode-focusBorder, #f38518);
+    outline-offset: 1px;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    min-width: 180px;
+  }
+
+  .sidebar-header {
+    padding: 0 12px 0 16px;
+  }
+
+  .action-btn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Animation for sidebar show/hide */
+.sidebar {
+  transition: width 0.2s ease, margin-left 0.2s ease;
+}
+
+/* Focus and accessibility */
+.sidebar:focus-within {
+  border-right-color: var(--vscode-focusBorder, #007acc);
+}
+
+.action-btn:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder, #007acc);
+  outline-offset: 1px;
+}
+
+/* Custom properties for theming */
+:root {
+  --sidebar-min-width: 200px;
+  --sidebar-max-width: 600px;
+  --sidebar-header-height: 35px;
+  --sidebar-action-size: 24px;
+  --sidebar-resize-handle-width: 4px;
+}
+
+/* Dark theme specific */
+[data-theme="dark"] .sidebar {
+  background-color: #252526;
+  border-right-color: #3c3c3c;
+}
+
+[data-theme="dark"] .sidebar-header {
+  background-color: #2d2d30;
+  border-bottom-color: #3c3c3c;
+}
+
+[data-theme="dark"] .sidebar-title h2 {
+  color: #cccccc;
+}
+
+[data-theme="dark"] .action-btn {
+  color: #cccccc;
+}
+
+/* Light theme specific */
+[data-theme="light"] .sidebar {
+  background-color: #f3f3f3;
+  border-right-color: #e5e5e5;
+}
+
+[data-theme="light"] .sidebar-header {
+  background-color: #e8e8e8;
+  border-bottom-color: #e5e5e5;
+}
+
+[data-theme="light"] .sidebar-title h2 {
+  color: #333333;
+}
+
+[data-theme="light"] .action-btn {
+  color: #424242;
+}

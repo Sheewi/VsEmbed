@@ -1,11 +1,15 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
 	mode: process.env.NODE_ENV || 'development',
 	entry: './src/renderer/index.tsx',
 	target: 'electron-renderer',
-	devtool: process.env.NODE_ENV === 'production' ? false : 'source-map',
+	devtool: isProduction ? false : 'source-map',
 	module: {
 		rules: [
 			{
@@ -23,11 +27,47 @@ module.exports = {
 			},
 			{
 				test: /\.css$/i,
-				use: ['style-loader', 'css-loader'],
+				use: [
+					isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							importLoaders: 1,
+							sourceMap: !isProduction
+						}
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							sourceMap: !isProduction
+						}
+					}
+				],
 			},
 			{
 				test: /\.s[ac]ss$/i,
-				use: ['style-loader', 'css-loader', 'sass-loader']
+				use: [
+					isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							importLoaders: 3,
+							sourceMap: !isProduction
+						}
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							sourceMap: !isProduction
+						}
+					},
+					{
+						loader: 'sass-loader',
+						options: {
+							sourceMap: !isProduction
+						}
+					}
+				]
 			},
 			{
 				test: /\.(png|jpe?g|gif|svg|ico)$/,
@@ -64,12 +104,22 @@ module.exports = {
 			template: './src/renderer/index.html',
 			minify: process.env.NODE_ENV === 'production'
 		}),
+		...(isProduction ? [
+			new MiniCssExtractPlugin({
+				filename: 'styles/[name].[contenthash].css',
+				chunkFilename: 'styles/[id].[contenthash].css',
+			})
+		] : [])
 	],
 	externals: {
 		'vscode': 'commonjs2 vscode'
 	},
 	optimization: {
 		minimize: process.env.NODE_ENV === 'production',
+		minimizer: [
+			'...',
+			...(isProduction ? [new CssMinimizerPlugin()] : [])
+		],
 		splitChunks: {
 			chunks: 'all',
 			cacheGroups: {
@@ -77,7 +127,13 @@ module.exports = {
 					test: /[\\/]node_modules[\\/]/,
 					name: 'vendors',
 					chunks: 'all'
-				}
+				},
+				styles: {
+					name: 'styles',
+					type: 'css/mini-extract',
+					chunks: 'all',
+					enforce: true,
+				},
 			}
 		}
 	},

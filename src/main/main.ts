@@ -5,6 +5,8 @@ import { WorkspaceManager } from '../services/WorkspaceManager';
 import { SecretsManager } from '../services/SecretsManager';
 import { RunnerManager } from '../services/RunnerManager';
 import { SecurityManager } from '../services/SecurityManager';
+import { ExtensionRecommender } from '../extensions/recommender';
+import { DockerManager } from '../docker/sandbox';
 class VSEmbedApplication {
 	constructor() {
 		app.on('ready', this.createMainWindow.bind(this));
@@ -26,8 +28,9 @@ class VSEmbedApplication {
 			width: 1200,
 			height: 800,
 			webPreferences: {
-				nodeIntegration: true,
-				contextIsolation: false,
+				nodeIntegration: false,
+				contextIsolation: true,
+				preload: path.join(__dirname, '../../.webpack/preload/preload.js')
 			},
 			show: true, // Ensure window is visible
 		});
@@ -54,6 +57,8 @@ class VSEmbedApplication {
 	private secretsManager = new SecretsManager();
 	private runnerManager = new RunnerManager();
 	private securityManager = new SecurityManager();
+	private extensionRecommender = new ExtensionRecommender();
+	private dockerManager = new DockerManager(this.extensionRecommender);
 	private vscodeBridge: any = {
 		executeCommand: async () => ({ success: false, message: 'VS Code bridge disabled' }),
 		getFileContent: async () => '',
@@ -65,8 +70,6 @@ class VSEmbedApplication {
 		on: () => {},
 		initialize: async () => true
 	};
-	private extensionRecommender: any = {};
-	private dockerManager: any = {};
 	private performanceOptimizer: any = {};
 	private aiStream: any = {};
 	private permissionMiddleware: any = { 
@@ -77,6 +80,523 @@ class VSEmbedApplication {
 		getAuditLog: () => [] 
 	};
 
+
+	// File menu handlers
+	private async handleNewFile(): Promise<void> {
+		this.mainWindow?.webContents.send('menu:new-file');
+	}
+
+	private async handleNewWindow(): Promise<void> {
+		this.createMainWindow();
+	}
+
+	private async handleOpenFile(): Promise<void> {
+		const result = await dialog.showOpenDialog(this.mainWindow!, {
+			properties: ['openFile'],
+			title: 'Open File',
+			filters: [
+				{ name: 'All Files', extensions: ['*'] },
+				{ name: 'Text Files', extensions: ['txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss'] },
+			],
+		});
+
+		if (!result.canceled && result.filePaths.length > 0) {
+			this.mainWindow?.webContents.send('file:open', result.filePaths[0]);
+		}
+	}
+
+	private async handleOpenFolder(): Promise<void> {
+		const result = await dialog.showOpenDialog(this.mainWindow!, {
+			properties: ['openDirectory'],
+			title: 'Open Folder',
+		});
+
+		if (!result.canceled && result.filePaths.length > 0) {
+			this.mainWindow?.webContents.send('folder:open', result.filePaths[0]);
+		}
+	}
+
+	private async handleCreateWorkspace(): Promise<void> {
+		const result = await dialog.showSaveDialog(this.mainWindow!, {
+			title: 'Create Workspace',
+			defaultPath: 'workspace.code-workspace',
+			filters: [
+				{ name: 'VS Code Workspace', extensions: ['code-workspace'] },
+			],
+		});
+
+		if (!result.canceled && result.filePath) {
+			this.mainWindow?.webContents.send('workspace:create', result.filePath);
+		}
+	}
+
+	private async handleAddFolderToWorkspace(): Promise<void> {
+		const result = await dialog.showOpenDialog(this.mainWindow!, {
+			properties: ['openDirectory'],
+			title: 'Add Folder to Workspace',
+		});
+
+		if (!result.canceled && result.filePaths.length > 0) {
+			this.mainWindow?.webContents.send('workspace:add-folder', result.filePaths[0]);
+		}
+	}
+
+	private async handleSaveWorkspaceAs(): Promise<void> {
+		const result = await dialog.showSaveDialog(this.mainWindow!, {
+			title: 'Save Workspace As',
+			defaultPath: 'workspace.code-workspace',
+			filters: [
+				{ name: 'VS Code Workspace', extensions: ['code-workspace'] },
+			],
+		});
+
+		if (!result.canceled && result.filePath) {
+			this.mainWindow?.webContents.send('workspace:save-as', result.filePath);
+		}
+	}
+
+	private async handleSave(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:save');
+	}
+
+	private async handleSaveAs(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:save-as');
+	}
+
+	private async handleSaveAll(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:save-all');
+	}
+
+	private async handleToggleAutoSave(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:toggle-auto-save');
+	}
+
+	private async handleKeyboardShortcuts(): Promise<void> {
+		this.mainWindow?.webContents.send('preferences:keyboard-shortcuts');
+	}
+
+	private async handleExtensions(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-extensions');
+	}
+
+	private async handleColorTheme(): Promise<void> {
+		this.mainWindow?.webContents.send('preferences:color-theme');
+	}
+
+	private async handleFileIconTheme(): Promise<void> {
+		this.mainWindow?.webContents.send('preferences:file-icon-theme');
+	}
+
+	private async handleRevertFile(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:revert-file');
+	}
+
+	private async handleCloseEditor(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:close');
+	}
+
+	private async handleCloseFolder(): Promise<void> {
+		this.mainWindow?.webContents.send('folder:close');
+	}
+
+	private async handleCloseWindow(): Promise<void> {
+		this.mainWindow?.close();
+	}
+
+	private async handleReopenClosedEditor(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:reopen-closed');
+	}
+
+	private async handleMoreRecent(): Promise<void> {
+		this.mainWindow?.webContents.send('file:show-recent');
+	}
+
+	private async handleClearRecentlyOpened(): Promise<void> {
+		this.mainWindow?.webContents.send('file:clear-recent');
+	}
+
+	// Edit menu handlers
+	private async handleFind(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:find');
+	}
+
+	private async handleReplace(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:replace');
+	}
+
+	private async handleFindInFiles(): Promise<void> {
+		this.mainWindow?.webContents.send('search:find-in-files');
+	}
+
+	private async handleReplaceInFiles(): Promise<void> {
+		this.mainWindow?.webContents.send('search:replace-in-files');
+	}
+
+	private async handleToggleLineComment(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:toggle-line-comment');
+	}
+
+	private async handleToggleBlockComment(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:toggle-block-comment');
+	}
+
+	private async handleEmmetExpand(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:emmet-expand');
+	}
+
+	// Selection menu handlers
+	private async handleExpandSelection(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:expand-selection');
+	}
+
+	private async handleShrinkSelection(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:shrink-selection');
+	}
+
+	private async handleCopyLineUp(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:copy-line-up');
+	}
+
+	private async handleCopyLineDown(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:copy-line-down');
+	}
+
+	private async handleMoveLineUp(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:move-line-up');
+	}
+
+	private async handleMoveLineDown(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:move-line-down');
+	}
+
+	private async handleAddCursorAbove(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:add-cursor-above');
+	}
+
+	private async handleAddCursorBelow(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:add-cursor-below');
+	}
+
+	private async handleAddCursorsToLineEnds(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:add-cursors-to-line-ends');
+	}
+
+	private async handleAddNextOccurrence(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:add-next-occurrence');
+	}
+
+	private async handleAddAllOccurrences(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:add-all-occurrences');
+	}
+
+	// View menu handlers
+	private async handleCommandPalette(): Promise<void> {
+		this.mainWindow?.webContents.send('view:command-palette');
+	}
+
+	private async handleOpenView(): Promise<void> {
+		this.mainWindow?.webContents.send('view:open-view');
+	}
+
+	private async handleShowExplorer(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-explorer');
+	}
+
+	private async handleShowSearch(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-search');
+	}
+
+	private async handleShowSourceControl(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-source-control');
+	}
+
+	private async handleShowDebug(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-debug');
+	}
+
+	private async handleShowExtensions(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-extensions');
+	}
+
+	private async handleShowProblems(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-problems');
+	}
+
+	private async handleShowOutput(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-output');
+	}
+
+	private async handleShowDebugConsole(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-debug-console');
+	}
+
+	private async handleShowTerminal(): Promise<void> {
+		this.mainWindow?.webContents.send('view:show-terminal');
+	}
+
+	private async handleZenMode(): Promise<void> {
+		this.mainWindow?.webContents.send('view:zen-mode');
+	}
+
+	private async handleCenteredLayout(): Promise<void> {
+		this.mainWindow?.webContents.send('view:centered-layout');
+	}
+
+	private async handleToggleMenuBar(): Promise<void> {
+		const menuBarVisible = this.mainWindow?.isMenuBarVisible();
+		this.mainWindow?.setMenuBarVisibility(!menuBarVisible);
+	}
+
+	private async handleToggleActivityBar(): Promise<void> {
+		this.mainWindow?.webContents.send('view:toggle-activity-bar');
+	}
+
+	private async handleToggleSideBar(): Promise<void> {
+		this.mainWindow?.webContents.send('view:toggle-side-bar');
+	}
+
+	private async handleToggleStatusBar(): Promise<void> {
+		this.mainWindow?.webContents.send('view:toggle-status-bar');
+	}
+
+	private async handleTogglePanel(): Promise<void> {
+		this.mainWindow?.webContents.send('view:toggle-panel');
+	}
+
+	private async handleSplitUp(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:split-up');
+	}
+
+	private async handleSplitDown(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:split-down');
+	}
+
+	private async handleSplitLeft(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:split-left');
+	}
+
+	private async handleSplitRight(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:split-right');
+	}
+
+	private async handleSingleColumnLayout(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:single-column-layout');
+	}
+
+	private async handleTwoColumnsLayout(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:two-columns-layout');
+	}
+
+	private async handleThreeColumnsLayout(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:three-columns-layout');
+	}
+
+	// Go menu handlers
+	private async handleGoBack(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-back');
+	}
+
+	private async handleGoForward(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-forward');
+	}
+
+	private async handleGoToLastEditLocation(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-last-edit');
+	}
+
+	private async handleNextEditor(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:next-editor');
+	}
+
+	private async handlePreviousEditor(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:previous-editor');
+	}
+
+	private async handleNextEditorInGroup(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:next-editor-in-group');
+	}
+
+	private async handlePreviousEditorInGroup(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:previous-editor-in-group');
+	}
+
+	private async handleNextGroup(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:next-group');
+	}
+
+	private async handlePreviousGroup(): Promise<void> {
+		this.mainWindow?.webContents.send('editor:previous-group');
+	}
+
+	private async handleGoToFile(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-file');
+	}
+
+	private async handleGoToSymbolInWorkspace(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-symbol-workspace');
+	}
+
+	private async handleGoToSymbolInEditor(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-symbol-editor');
+	}
+
+	private async handleGoToDefinition(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-definition');
+	}
+
+	private async handleGoToDeclaration(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-declaration');
+	}
+
+	private async handleGoToTypeDefinition(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-type-definition');
+	}
+
+	private async handleGoToImplementations(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-implementations');
+	}
+
+	private async handleGoToReferences(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-references');
+	}
+
+	private async handleGoToLine(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-line');
+	}
+
+	private async handleGoToBracket(): Promise<void> {
+		this.mainWindow?.webContents.send('navigation:go-to-bracket');
+	}
+
+	// Run menu handlers
+	private async handleStartDebugging(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:start');
+	}
+
+	private async handleStartWithoutDebugging(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:start-without-debugging');
+	}
+
+	private async handleStopDebugging(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:stop');
+	}
+
+	private async handleRestartDebugging(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:restart');
+	}
+
+	private async handleOpenConfigurations(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:open-configurations');
+	}
+
+	private async handleAddConfiguration(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:add-configuration');
+	}
+
+	private async handleStepOver(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:step-over');
+	}
+
+	private async handleStepInto(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:step-into');
+	}
+
+	private async handleStepOut(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:step-out');
+	}
+
+	private async handleContinue(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:continue');
+	}
+
+	private async handleToggleBreakpoint(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:toggle-breakpoint');
+	}
+
+	private async handleConditionalBreakpoint(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:conditional-breakpoint');
+	}
+
+	private async handleInlineBreakpoint(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:inline-breakpoint');
+	}
+
+	private async handleFunctionBreakpoint(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:function-breakpoint');
+	}
+
+	private async handleLogpoint(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:logpoint');
+	}
+
+	private async handleEnableAllBreakpoints(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:enable-all-breakpoints');
+	}
+
+	private async handleDisableAllBreakpoints(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:disable-all-breakpoints');
+	}
+
+	private async handleRemoveAllBreakpoints(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:remove-all-breakpoints');
+	}
+
+	private async handleInstallAdditionalDebuggers(): Promise<void> {
+		this.mainWindow?.webContents.send('debug:install-additional-debuggers');
+	}
+
+	// Help menu handlers
+	private async handleWelcome(): Promise<void> {
+		this.mainWindow?.webContents.send('help:welcome');
+	}
+
+	private async handleShowAllCommands(): Promise<void> {
+		this.mainWindow?.webContents.send('view:command-palette');
+	}
+
+	private async handleShowReleaseNotes(): Promise<void> {
+		this.mainWindow?.webContents.send('help:release-notes');
+	}
+
+	private async handleKeyboardShortcutsReference(): Promise<void> {
+		this.mainWindow?.webContents.send('help:keyboard-shortcuts-reference');
+	}
+
+	private async handleVideoTutorials(): Promise<void> {
+		this.mainWindow?.webContents.send('help:video-tutorials');
+	}
+
+	private async handleTipsAndTricks(): Promise<void> {
+		this.mainWindow?.webContents.send('help:tips-and-tricks');
+	}
+
+	private async handleJoinTwitter(): Promise<void> {
+		this.mainWindow?.webContents.send('help:join-twitter');
+	}
+
+	private async handleSearchFeatureRequests(): Promise<void> {
+		this.mainWindow?.webContents.send('help:search-feature-requests');
+	}
+
+	private async handleReportIssue(): Promise<void> {
+		this.mainWindow?.webContents.send('help:report-issue');
+	}
+
+	private async handleViewLicense(): Promise<void> {
+		this.mainWindow?.webContents.send('help:view-license');
+	}
+
+	private async handlePrivacyStatement(): Promise<void> {
+		this.mainWindow?.webContents.send('help:privacy-statement');
+	}
+
+	private async handleToggleDevTools(): Promise<void> {
+		this.mainWindow?.webContents.toggleDevTools();
+	}
+
+	private async handleOpenProcessExplorer(): Promise<void> {
+		this.mainWindow?.webContents.send('help:process-explorer');
+	}
 
 	// Place menu handler methods here, after constructor and before final closing brace
 	private async handleNewWorkspace(): Promise<void> {
@@ -185,63 +705,228 @@ class VSEmbedApplication {
 			{
 				label: 'File',
 				submenu: [
-					{ label: 'New Workspace', click: () => this.handleNewWorkspace() },
-					{ label: 'Open Workspace', click: () => this.handleOpenWorkspace() },
-					{ label: 'Export Workspace', click: () => this.handleExportWorkspace() },
+					{ label: 'New File', accelerator: 'CmdOrCtrl+N', click: () => this.handleNewFile() },
+					{ label: 'New Window', accelerator: 'CmdOrCtrl+Shift+N', click: () => this.handleNewWindow() },
 					{ type: 'separator' },
-					{ label: 'Settings', click: () => this.handleSettings() },
+					{ label: 'Open File...', accelerator: 'CmdOrCtrl+O', click: () => this.handleOpenFile() },
+					{ label: 'Open Folder...', accelerator: 'CmdOrCtrl+K CmdOrCtrl+O', click: () => this.handleOpenFolder() },
+					{ label: 'Open Workspace...', click: () => this.handleOpenWorkspace() },
+					{ label: 'Open Recent', submenu: this.getRecentSubmenu() },
 					{ type: 'separator' },
-					{ role: 'quit' },
+					{ label: 'Create Workspace...', click: () => this.handleCreateWorkspace() },
+					{ label: 'Add Folder to Workspace...', click: () => this.handleAddFolderToWorkspace() },
+					{ label: 'Save Workspace As...', click: () => this.handleSaveWorkspaceAs() },
+					{ type: 'separator' },
+					{ label: 'Save', accelerator: 'CmdOrCtrl+S', click: () => this.handleSave() },
+					{ label: 'Save As...', accelerator: 'CmdOrCtrl+Shift+S', click: () => this.handleSaveAs() },
+					{ label: 'Save All', accelerator: 'CmdOrCtrl+K S', click: () => this.handleSaveAll() },
+					{ type: 'separator' },
+					{ label: 'Auto Save', type: 'checkbox', checked: false, click: () => this.handleToggleAutoSave() },
+					{ type: 'separator' },
+					{ label: 'Preferences', submenu: [
+						{ label: 'Settings', accelerator: 'CmdOrCtrl+,', click: () => this.handleSettings() },
+						{ label: 'Keyboard Shortcuts', accelerator: 'CmdOrCtrl+K CmdOrCtrl+S', click: () => this.handleKeyboardShortcuts() },
+						{ label: 'Extensions', accelerator: 'CmdOrCtrl+Shift+X', click: () => this.handleExtensions() },
+						{ type: 'separator' },
+						{ label: 'Color Theme', click: () => this.handleColorTheme() },
+						{ label: 'File Icon Theme', click: () => this.handleFileIconTheme() },
+					]},
+					{ type: 'separator' },
+					{ label: 'Revert File', click: () => this.handleRevertFile() },
+					{ label: 'Close Editor', accelerator: 'CmdOrCtrl+W', click: () => this.handleCloseEditor() },
+					{ label: 'Close Folder', accelerator: 'CmdOrCtrl+K F', click: () => this.handleCloseFolder() },
+					{ label: 'Close Window', accelerator: 'CmdOrCtrl+Shift+W', click: () => this.handleCloseWindow() },
+					{ type: 'separator' },
+					{ label: 'Exit', accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q', role: 'quit' },
 				],
 			},
 			{
 				label: 'Edit',
 				submenu: [
-					{ role: 'undo' },
-					{ role: 'redo' },
+					{ label: 'Undo', accelerator: 'CmdOrCtrl+Z', role: 'undo' },
+					{ label: 'Redo', accelerator: 'CmdOrCtrl+Shift+Z', role: 'redo' },
 					{ type: 'separator' },
-					{ role: 'cut' },
-					{ role: 'copy' },
-					{ role: 'paste' },
+					{ label: 'Cut', accelerator: 'CmdOrCtrl+X', role: 'cut' },
+					{ label: 'Copy', accelerator: 'CmdOrCtrl+C', role: 'copy' },
+					{ label: 'Paste', accelerator: 'CmdOrCtrl+V', role: 'paste' },
+					{ type: 'separator' },
+					{ label: 'Find', accelerator: 'CmdOrCtrl+F', click: () => this.handleFind() },
+					{ label: 'Replace', accelerator: 'CmdOrCtrl+H', click: () => this.handleReplace() },
+					{ type: 'separator' },
+					{ label: 'Find in Files', accelerator: 'CmdOrCtrl+Shift+F', click: () => this.handleFindInFiles() },
+					{ label: 'Replace in Files', accelerator: 'CmdOrCtrl+Shift+H', click: () => this.handleReplaceInFiles() },
+					{ type: 'separator' },
+					{ label: 'Toggle Line Comment', accelerator: 'CmdOrCtrl+/', click: () => this.handleToggleLineComment() },
+					{ label: 'Toggle Block Comment', accelerator: 'CmdOrCtrl+Shift+A', click: () => this.handleToggleBlockComment() },
+					{ type: 'separator' },
+					{ label: 'Emmet: Expand Abbreviation', accelerator: 'Tab', click: () => this.handleEmmetExpand() },
 				],
 			},
 			{
-				label: 'AI',
+				label: 'Selection',
 				submenu: [
-					{ label: 'Clear Conversation', click: () => this.handleClearConversation?.() },
-					{ label: 'Change Model', click: () => this.handleChangeModel?.() },
+					{ label: 'Select All', accelerator: 'CmdOrCtrl+A', role: 'selectAll' },
+					{ label: 'Expand Selection', accelerator: 'Shift+Alt+Right', click: () => this.handleExpandSelection() },
+					{ label: 'Shrink Selection', accelerator: 'Shift+Alt+Left', click: () => this.handleShrinkSelection() },
 					{ type: 'separator' },
-					{ label: 'AI Settings', click: () => this.handleAISettings() },
+					{ label: 'Copy Line Up', accelerator: 'Shift+Alt+Up', click: () => this.handleCopyLineUp() },
+					{ label: 'Copy Line Down', accelerator: 'Shift+Alt+Down', click: () => this.handleCopyLineDown() },
+					{ label: 'Move Line Up', accelerator: 'Alt+Up', click: () => this.handleMoveLineUp() },
+					{ label: 'Move Line Down', accelerator: 'Alt+Down', click: () => this.handleMoveLineDown() },
+					{ type: 'separator' },
+					{ label: 'Add Cursor Above', accelerator: 'CmdOrCtrl+Alt+Up', click: () => this.handleAddCursorAbove() },
+					{ label: 'Add Cursor Below', accelerator: 'CmdOrCtrl+Alt+Down', click: () => this.handleAddCursorBelow() },
+					{ label: 'Add Cursors to Line Ends', accelerator: 'Shift+Alt+I', click: () => this.handleAddCursorsToLineEnds() },
+					{ label: 'Add Next Occurrence', accelerator: 'CmdOrCtrl+D', click: () => this.handleAddNextOccurrence() },
+					{ label: 'Add All Occurrences', accelerator: 'CmdOrCtrl+Shift+L', click: () => this.handleAddAllOccurrences() },
 				],
 			},
 			{
-				label: 'Runner',
+				label: 'View',
 				submenu: [
-					{ label: 'Start', accelerator: 'F5', click: () => this.handleStartRunner() },
-					{ label: 'Stop', accelerator: 'Shift+F5', click: () => this.handleStopRunner() },
-					{ label: 'Restart', accelerator: 'Ctrl+F5', click: () => this.handleRestartRunner() },
+					{ label: 'Command Palette...', accelerator: 'CmdOrCtrl+Shift+P', click: () => this.handleCommandPalette() },
+					{ label: 'Open View...', accelerator: 'CmdOrCtrl+Q', click: () => this.handleOpenView() },
 					{ type: 'separator' },
-					{ label: 'View Logs', click: () => this.handleViewLogs() },
+					{ label: 'Explorer', accelerator: 'CmdOrCtrl+Shift+E', click: () => this.handleShowExplorer() },
+					{ label: 'Search', accelerator: 'CmdOrCtrl+Shift+F', click: () => this.handleShowSearch() },
+					{ label: 'Source Control', accelerator: 'CmdOrCtrl+Shift+G', click: () => this.handleShowSourceControl() },
+					{ label: 'Run and Debug', accelerator: 'CmdOrCtrl+Shift+D', click: () => this.handleShowDebug() },
+					{ label: 'Extensions', accelerator: 'CmdOrCtrl+Shift+X', click: () => this.handleShowExtensions() },
+					{ type: 'separator' },
+					{ label: 'Problems', accelerator: 'CmdOrCtrl+Shift+M', click: () => this.handleShowProblems() },
+					{ label: 'Output', accelerator: 'CmdOrCtrl+Shift+U', click: () => this.handleShowOutput() },
+					{ label: 'Debug Console', accelerator: 'CmdOrCtrl+Shift+Y', click: () => this.handleShowDebugConsole() },
+					{ label: 'Terminal', accelerator: 'CmdOrCtrl+`', click: () => this.handleShowTerminal() },
+					{ type: 'separator' },
+					{ label: 'Appearance', submenu: [
+						{ label: 'Full Screen', accelerator: 'F11', role: 'togglefullscreen' },
+						{ label: 'Zen Mode', accelerator: 'CmdOrCtrl+K Z', click: () => this.handleZenMode() },
+						{ label: 'Centered Layout', click: () => this.handleCenteredLayout() },
+						{ type: 'separator' },
+						{ label: 'Show Menu Bar', type: 'checkbox', checked: true, click: () => this.handleToggleMenuBar() },
+						{ label: 'Show Activity Bar', type: 'checkbox', checked: true, click: () => this.handleToggleActivityBar() },
+						{ label: 'Show Side Bar', accelerator: 'CmdOrCtrl+B', click: () => this.handleToggleSideBar() },
+						{ label: 'Show Status Bar', click: () => this.handleToggleStatusBar() },
+						{ label: 'Show Panel', accelerator: 'CmdOrCtrl+J', click: () => this.handleTogglePanel() },
+						{ type: 'separator' },
+						{ label: 'Zoom In', accelerator: 'CmdOrCtrl+Plus', role: 'zoomIn' },
+						{ label: 'Zoom Out', accelerator: 'CmdOrCtrl+-', role: 'zoomOut' },
+						{ label: 'Reset Zoom', accelerator: 'CmdOrCtrl+0', role: 'resetZoom' },
+					]},
+					{ type: 'separator' },
+					{ label: 'Editor Layout', submenu: [
+						{ label: 'Split Up', click: () => this.handleSplitUp() },
+						{ label: 'Split Down', click: () => this.handleSplitDown() },
+						{ label: 'Split Left', click: () => this.handleSplitLeft() },
+						{ label: 'Split Right', click: () => this.handleSplitRight() },
+						{ type: 'separator' },
+						{ label: 'Single Column Layout', click: () => this.handleSingleColumnLayout() },
+						{ label: 'Two Columns Layout', click: () => this.handleTwoColumnsLayout() },
+						{ label: 'Three Columns Layout', click: () => this.handleThreeColumnsLayout() },
+					]},
 				],
 			},
 			{
-				label: 'Security',
+				label: 'Go',
 				submenu: [
-					{ label: 'Manage Secrets', click: () => this.handleManageSecrets() },
-					{ label: 'View Audit Log', click: () => this.handleViewAuditLog() },
-					{ label: 'Security Settings', click: () => this.handleSecuritySettings() },
+					{ label: 'Back', accelerator: 'CmdOrCtrl+Alt+Left', click: () => this.handleGoBack() },
+					{ label: 'Forward', accelerator: 'CmdOrCtrl+Alt+Right', click: () => this.handleGoForward() },
+					{ label: 'Last Edit Location', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Q', click: () => this.handleGoToLastEditLocation() },
+					{ type: 'separator' },
+					{ label: 'Switch Editor', submenu: [
+						{ label: 'Next Editor', accelerator: 'CmdOrCtrl+PageDown', click: () => this.handleNextEditor() },
+						{ label: 'Previous Editor', accelerator: 'CmdOrCtrl+PageUp', click: () => this.handlePreviousEditor() },
+						{ label: 'Next Editor in Group', accelerator: 'CmdOrCtrl+Tab', click: () => this.handleNextEditorInGroup() },
+						{ label: 'Previous Editor in Group', accelerator: 'CmdOrCtrl+Shift+Tab', click: () => this.handlePreviousEditorInGroup() },
+					]},
+					{ label: 'Switch Group', submenu: [
+						{ label: 'Next Group', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Right', click: () => this.handleNextGroup() },
+						{ label: 'Previous Group', accelerator: 'CmdOrCtrl+K CmdOrCtrl+Left', click: () => this.handlePreviousGroup() },
+					]},
+					{ type: 'separator' },
+					{ label: 'Go to File...', accelerator: 'CmdOrCtrl+P', click: () => this.handleGoToFile() },
+					{ label: 'Go to Symbol in Workspace...', accelerator: 'CmdOrCtrl+T', click: () => this.handleGoToSymbolInWorkspace() },
+					{ label: 'Go to Symbol in Editor...', accelerator: 'CmdOrCtrl+Shift+O', click: () => this.handleGoToSymbolInEditor() },
+					{ label: 'Go to Definition', accelerator: 'F12', click: () => this.handleGoToDefinition() },
+					{ label: 'Go to Declaration', click: () => this.handleGoToDeclaration() },
+					{ label: 'Go to Type Definition', click: () => this.handleGoToTypeDefinition() },
+					{ label: 'Go to Implementations', accelerator: 'CmdOrCtrl+F12', click: () => this.handleGoToImplementations() },
+					{ label: 'Go to References', accelerator: 'Shift+F12', click: () => this.handleGoToReferences() },
+					{ type: 'separator' },
+					{ label: 'Go to Line/Column...', accelerator: 'CmdOrCtrl+G', click: () => this.handleGoToLine() },
+					{ label: 'Go to Bracket', accelerator: 'CmdOrCtrl+Shift+\\', click: () => this.handleGoToBracket() },
+				],
+			},
+			{
+				label: 'Run',
+				submenu: [
+					{ label: 'Start Debugging', accelerator: 'F5', click: () => this.handleStartDebugging() },
+					{ label: 'Start Without Debugging', accelerator: 'CmdOrCtrl+F5', click: () => this.handleStartWithoutDebugging() },
+					{ label: 'Stop Debugging', accelerator: 'Shift+F5', click: () => this.handleStopDebugging() },
+					{ label: 'Restart Debugging', accelerator: 'CmdOrCtrl+Shift+F5', click: () => this.handleRestartDebugging() },
+					{ type: 'separator' },
+					{ label: 'Open Configurations', click: () => this.handleOpenConfigurations() },
+					{ label: 'Add Configuration...', click: () => this.handleAddConfiguration() },
+					{ type: 'separator' },
+					{ label: 'Step Over', accelerator: 'F10', click: () => this.handleStepOver() },
+					{ label: 'Step Into', accelerator: 'F11', click: () => this.handleStepInto() },
+					{ label: 'Step Out', accelerator: 'Shift+F11', click: () => this.handleStepOut() },
+					{ label: 'Continue', accelerator: 'F5', click: () => this.handleContinue() },
+					{ type: 'separator' },
+					{ label: 'Toggle Breakpoint', accelerator: 'F9', click: () => this.handleToggleBreakpoint() },
+					{ label: 'New Breakpoint', submenu: [
+						{ label: 'Conditional Breakpoint...', click: () => this.handleConditionalBreakpoint() },
+						{ label: 'Inline Breakpoint', accelerator: 'Shift+F9', click: () => this.handleInlineBreakpoint() },
+						{ label: 'Function Breakpoint...', click: () => this.handleFunctionBreakpoint() },
+						{ label: 'Logpoint...', click: () => this.handleLogpoint() },
+					]},
+					{ label: 'Enable All Breakpoints', click: () => this.handleEnableAllBreakpoints() },
+					{ label: 'Disable All Breakpoints', click: () => this.handleDisableAllBreakpoints() },
+					{ label: 'Remove All Breakpoints', click: () => this.handleRemoveAllBreakpoints() },
+					{ type: 'separator' },
+					{ label: 'Install Additional Debuggers...', click: () => this.handleInstallAdditionalDebuggers() },
 				],
 			},
 			{
 				label: 'Help',
 				submenu: [
+					{ label: 'Welcome', click: () => this.handleWelcome() },
+					{ label: 'Show All Commands', accelerator: 'CmdOrCtrl+Shift+P', click: () => this.handleShowAllCommands() },
+					{ label: 'Documentation', click: () => this.handleDocumentation() },
+					{ label: 'Show Release Notes', click: () => this.handleShowReleaseNotes() },
+					{ type: 'separator' },
+					{ label: 'Keyboard Shortcuts Reference', accelerator: 'CmdOrCtrl+K CmdOrCtrl+R', click: () => this.handleKeyboardShortcutsReference() },
+					{ label: 'Video Tutorials', click: () => this.handleVideoTutorials() },
+					{ label: 'Tips and Tricks', click: () => this.handleTipsAndTricks() },
+					{ type: 'separator' },
+					{ label: 'Join Us on Twitter', click: () => this.handleJoinTwitter() },
+					{ label: 'Search Feature Requests', click: () => this.handleSearchFeatureRequests() },
+					{ label: 'Report Issue', click: () => this.handleReportIssue() },
+					{ type: 'separator' },
+					{ label: 'View License', click: () => this.handleViewLicense() },
+					{ label: 'Privacy Statement', click: () => this.handlePrivacyStatement() },
+					{ type: 'separator' },
+					{ label: 'Toggle Developer Tools', accelerator: 'F12', click: () => this.handleToggleDevTools() },
+					{ label: 'Open Process Explorer', click: () => this.handleOpenProcessExplorer() },
+					{ type: 'separator' },
 					{ label: 'About', click: () => this.handleAbout() },
-					{ label: 'Documentation', click: () => this.handleDocumentation?.() },
 				],
 			},
 		];
+
 		const menu = Menu.buildFromTemplate(template);
 		Menu.setApplicationMenu(menu);
+	}
+
+	private getRecentSubmenu(): Electron.MenuItemConstructorOptions[] {
+		// This would typically load from stored recent files/workspaces
+		return [
+			{ label: 'Reopen Closed Editor', accelerator: 'CmdOrCtrl+Shift+T', click: () => this.handleReopenClosedEditor() },
+			{ type: 'separator' },
+			{ label: 'More...', click: () => this.handleMoreRecent() },
+			{ type: 'separator' },
+			{ label: 'Clear Recently Opened', click: () => this.handleClearRecentlyOpened() },
+		];
 	}
 
 	private setupIpcHandlers(): void {

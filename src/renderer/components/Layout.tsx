@@ -1,169 +1,76 @@
 import React, { useState } from 'react';
-import { MenuHandler } from './MenuHandler';
-import { ChatPane } from './ChatPane';
+import { TopBar } from './TopBar';
+import { ActivityBar } from './ActivityBar';
+import { SideBar } from './SideBar';
 import { EditorPane } from './EditorPane';
-import { TerminalPane } from './TerminalPane';
-import { PreviewPane } from './PreviewPane';
-import { FileExplorer } from './FileExplorer';
 import { StatusBar } from './StatusBar';
-import { ModelSettings } from './ModelSettings';
-import { PermissionRequestManager } from './PermissionRequestDialog';
 import '../styles/Layout.css';
 
-interface LayoutProps {
-  children?: React.ReactNode;
-}
+export const Layout: React.FC = () => {
+  const [sideBarVisible, setSideBarVisible] = useState(true);
+  const [panelVisible, setPanelVisible] = useState(true);
+  const [activityBarVisible, setActivityBarVisible] = useState(true);
+  const [statusBarVisible, setStatusBarVisible] = useState(true);
+  const [activeView, setActiveView] = useState('explorer');
 
-export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [sidebarVisible, setSidebarVisible] = useState(true);
-  const [terminalVisible, setTerminalVisible] = useState(true);
-  const [chatVisible, setChatVisible] = useState(true);
-  const [showModelSettings, setShowModelSettings] = useState(false);
+  const toggleSideBar = () => setSideBarVisible(!sideBarVisible);
+  const togglePanel = () => setPanelVisible(!panelVisible);
+  const toggleActivityBar = () => setActivityBarVisible(!activityBarVisible);
+  const toggleStatusBar = () => setStatusBarVisible(!statusBarVisible);
 
-  const handleViewToggle = (view: string) => {
-    switch (view) {
-      case 'sidebar':
-        setSidebarVisible(!sidebarVisible);
-        break;
-      case 'terminal':
-        setTerminalVisible(!terminalVisible);
-        break;
-      case 'chat':
-        setChatVisible(!chatVisible);
-        break;
-      case 'settings':
-        setShowModelSettings(true);
-        break;
-    }
-  };
-
-  const handlePanelToggle = (panel: string) => {
-    switch (panel) {
-      case 'terminal':
-        setTerminalVisible(!terminalVisible);
-        break;
-      default:
-        break;
+  const handleViewChange = (view: string) => {
+    setActiveView(view);
+    if (!sideBarVisible) {
+      setSideBarVisible(true);
     }
   };
 
   return (
-    <PermissionRequestManager>
-      <div className="vsembed-app">
-        {/* Menu Bar */}
-        <MenuHandler onViewToggle={handleViewToggle} />
-
-        {/* Main Content Area */}
-        <div className="vsembed-main">
-          {/* Sidebar */}
-          {sidebarVisible && (
-            <div className="vsembed-sidebar">
-              <div className="vsembed-panel-header">
-                <span>Explorer</span>
-                <button 
-                  className="vsembed-btn-secondary"
-                  onClick={() => setSidebarVisible(false)}
-                  title="Hide Sidebar"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="vsembed-panel-content">
-                <FileExplorer />
-              </div>
-            </div>
+    <div className="layout">
+      <TopBar 
+        onToggleSideBar={toggleSideBar}
+        onTogglePanel={togglePanel}
+        sideBarVisible={sideBarVisible}
+        panelVisible={panelVisible}
+      />
+      
+      <div className="layout-body">
+        {activityBarVisible && (
+          <ActivityBar 
+            activeView={activeView}
+            onViewChange={handleViewChange}
+            onToggleSideBar={toggleSideBar}
+          />
+        )}
+        
+        <div className="layout-main">
+          {sideBarVisible && (
+            <SideBar 
+              activeView={activeView}
+              isVisible={sideBarVisible}
+              onToggle={toggleSideBar}
+            />
           )}
-
-          {/* Content Area */}
-          <div className="vsembed-content">
-            {/* Editor and Preview */}
-            <div className="vsembed-panels">
-              {/* Editor Area */}
-              <div className="vsembed-editor-area">
-                <div className="vsembed-panel-header">
-                  <span>Editor</span>
-                  <div className="vsembed-flex vsembed-gap">
-                    {!sidebarVisible && (
-                      <button 
-                        className="vsembed-btn-secondary"
-                        onClick={() => setSidebarVisible(true)}
-                        title="Show Explorer"
-                      >
-                        📁
-                      </button>
-                    )}
-                    <button 
-                      className="vsembed-btn-secondary"
-                      onClick={() => setChatVisible(!chatVisible)}
-                      title={chatVisible ? "Hide AI Chat" : "Show AI Chat"}
-                    >
-                      🤖
-                    </button>
-                  </div>
-                </div>
-                <div className="vsembed-panel-content" style={{ padding: 0 }}>
-                  <div style={{ display: 'flex', height: '100%' }}>
-                    <div style={{ flex: 1 }}>
-                      <EditorPane />
-                    </div>
-                    <div style={{ width: '50%', borderLeft: '1px solid var(--vsembed-border)' }}>
-                      <PreviewPane />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Chat Panel */}
-              {chatVisible && (
-                <div className="vsembed-chat-panel">
-                  <div className="vsembed-panel-header">
-                    <span>🤖 AI Assistant</span>
-                    <button 
-                      className="vsembed-btn-secondary"
-                      onClick={() => setChatVisible(false)}
-                      title="Hide AI Chat"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div className="vsembed-panel-content" style={{ padding: 0 }}>
-                    <ChatPane />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Terminal */}
-            {terminalVisible && (
-              <div className="vsembed-bottom-panel">
-                <div className="vsembed-panel-header">
+          
+          <div className="layout-content">
+            <EditorPane />
+            {panelVisible && (
+              <div className="panel">
+                <div className="panel-header">
                   <span>Terminal</span>
-                  <div className="vsembed-flex vsembed-gap">
-                    <button 
-                      className="vsembed-btn-secondary"
-                      onClick={() => setTerminalVisible(false)}
-                      title="Hide Terminal"
-                    >
-                      ✕
-                    </button>
-                  </div>
                 </div>
-                <div className="vsembed-panel-content" style={{ padding: 0 }}>
-                  <TerminalPane />
+                <div className="panel-content">
+                  <div>Terminal content goes here</div>
                 </div>
               </div>
             )}
           </div>
         </div>
-
-        {/* Status Bar */}
-        <StatusBar onTogglePanel={handlePanelToggle} />
-
-        {/* Model Settings Dialog */}
-        {showModelSettings && (
-          <ModelSettings onClose={() => setShowModelSettings(false)} />
-        )}
       </div>
-    </PermissionRequestManager>
+      
+      {statusBarVisible && (
+        <StatusBar />
+      )}
+    </div>
   );
 };
