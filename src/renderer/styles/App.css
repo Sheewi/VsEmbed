@@ -1,0 +1,251 @@
+/* App Styles */
+.app {
+  height: 100vh;
+  width: 100vw;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 7px;
+  border: 3px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f4f4f;
+}
+
+::-webkit-scrollbar-corner {
+  background: #1e1e1e;
+}
+
+/* Button Reset */
+button {
+  font-family: inherit;
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
+}
+
+/* Input Reset */
+input, textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+input:focus, textarea:focus {
+  outline: 2px solid #007acc;
+  outline-offset: 1px;
+}
+
+/* Focus Styles */
+.focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  border-top-color: #007acc;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error States */
+.error {
+  color: #f14c4c;
+}
+
+.error-background {
+  background: rgba(241, 76, 76, 0.1);
+  border: 1px solid rgba(241, 76, 76, 0.3);
+}
+
+/* Success States */
+.success {
+  color: #89d185;
+}
+
+.success-background {
+  background: rgba(137, 209, 133, 0.1);
+  border: 1px solid rgba(137, 209, 133, 0.3);
+}
+
+/* Warning States */
+.warning {
+  color: #f1c232;
+}
+
+.warning-background {
+  background: rgba(241, 194, 50, 0.1);
+  border: 1px solid rgba(241, 194, 50, 0.3);
+}
+
+/* Theme Variables */
+:root {
+  /* Colors */
+  --vscode-foreground: #d4d4d4;
+  --vscode-background: #1e1e1e;
+  --vscode-sidebar-background: #252526;
+  --vscode-panel-background: #252526;
+  --vscode-border: #333333;
+  --vscode-focus-border: #007acc;
+  --vscode-selection-background: #094771;
+  --vscode-hover-background: #2a2d2e;
+  --vscode-button-background: #007acc;
+  --vscode-button-hover-background: #005a9e;
+  --vscode-input-background: #3c3c3c;
+  --vscode-input-border: #555555;
+  --vscode-error-foreground: #f14c4c;
+  --vscode-warning-foreground: #f1c232;
+  --vscode-success-foreground: #89d185;
+  
+  /* Typography */
+  --vscode-font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --vscode-font-size: 13px;
+  --vscode-font-weight: 400;
+  --vscode-line-height: 1.4;
+  
+  /* Spacing */
+  --vscode-padding-small: 4px;
+  --vscode-padding-medium: 8px;
+  --vscode-padding-large: 12px;
+  --vscode-padding-xl: 16px;
+  --vscode-margin-small: 4px;
+  --vscode-margin-medium: 8px;
+  --vscode-margin-large: 12px;
+  --vscode-margin-xl: 16px;
+  
+  /* Layout */
+  --vscode-border-radius: 4px;
+  --vscode-border-width: 1px;
+  
+  /* Animations */
+  --vscode-transition-duration: 0.2s;
+  --vscode-transition-timing: ease;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --vscode-foreground: #d4d4d4;
+  --vscode-background: #1e1e1e;
+  --vscode-sidebar-background: #252526;
+  --vscode-panel-background: #252526;
+  --vscode-border: #333333;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --vscode-foreground: #333333;
+  --vscode-background: #ffffff;
+  --vscode-sidebar-background: #f3f3f3;
+  --vscode-panel-background: #f3f3f3;
+  --vscode-border: #e1e1e1;
+}
+
+/* High Contrast Theme */
+[data-theme="high-contrast"] {
+  --vscode-foreground: #ffffff;
+  --vscode-background: #000000;
+  --vscode-sidebar-background: #000000;
+  --vscode-panel-background: #000000;
+  --vscode-border: #ffffff;
+  --vscode-focus-border: #f38518;
+}
+
+/* Print Styles */
+@media print {
+  .ai-interface-manager {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .ai-sidebar,
+  .ai-chat-panel,
+  .ai-bottom-panel {
+    display: none !important;
+  }
+  
+  .ai-page-content {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

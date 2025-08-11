@@ -1,0 +1,372 @@
+/* AIWorkspaceManager Styles */
+.ai-workspace-manager {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e;
+  color: #d4d4d4;
+}
+
+.workspace-header {
+  padding: 20px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.workspace-header h2 {
+  margin: 0;
+  color: #d4d4d4;
+  font-size: 18px;
+}
+
+.workspace-stats {
+  display: flex;
+  gap: 20px;
+  font-size: 13px;
+  color: #888;
+}
+
+.workspace-content {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.workspace-sidebar {
+  width: 300px;
+  background: #252526;
+  border-right: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace-list {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.workspace-list h3 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.workspace-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: background-color 0.15s ease;
+}
+
+.workspace-item:hover {
+  background: #2a2d2e;
+}
+
+.workspace-item.active {
+  background: #094771;
+}
+
+.workspace-icon {
+  font-size: 20px;
+}
+
+.workspace-info {
+  flex: 1;
+}
+
+.workspace-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.workspace-info p {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #888;
+}
+
+.workspace-info small {
+  font-size: 11px;
+  color: #666;
+}
+
+.workspace-actions {
+  padding: 15px;
+  border-top: 1px solid #333;
+}
+
+.create-workspace-btn {
+  width: 100%;
+  padding: 10px;
+  background: #007acc;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.create-workspace-btn:hover {
+  background: #005a9e;
+}
+
+.workspace-main {
+  flex: 1;
+  background: #1e1e1e;
+  overflow: auto;
+}
+
+.workspace-details {
+  padding: 20px;
+}
+
+.workspace-header-details {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.workspace-header-details h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #d4d4d4;
+}
+
+.workspace-type {
+  background: #007acc;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.workspace-tabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #333;
+}
+
+.tab {
+  padding: 10px 15px;
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+}
+
+.tab:hover {
+  color: #d4d4d4;
+}
+
+.tab.active {
+  color: #007acc;
+  border-bottom-color: #007acc;
+}
+
+.workspace-content-area {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+}
+
+.file-explorer {
+  background: #252526;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.explorer-header {
+  padding: 15px;
+  background: #2d2d30;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+}
+
+.explorer-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.add-file-btn {
+  padding: 6px 12px;
+  background: #007acc;
+  border: none;
+  border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.add-file-btn:hover {
+  background: #005a9e;
+}
+
+.file-tree {
+  padding: 15px;
+}
+
+.empty-workspace {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+}
+
+.empty-workspace button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #007acc;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.file-item:hover {
+  background: #2a2d2e;
+}
+
+.file-icon {
+  font-size: 14px;
+}
+
+.file-name {
+  flex: 1;
+  font-size: 13px;
+  color: #d4d4d4;
+}
+
+.ai-analysis-indicator {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.complexity,
+.errors {
+  background: #333;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.ai-config-panel {
+  background: #252526;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.ai-config-panel h4 {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  color: #d4d4d4;
+}
+
+.ai-features,
+.ai-models {
+  margin-bottom: 15px;
+}
+
+.ai-features h5,
+.ai-models h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #888;
+}
+
+.feature-tag,
+.model-tag {
+  display: inline-block;
+  background: #007acc;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin: 2px 4px 2px 0;
+}
+
+.no-workspace-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #888;
+  text-align: center;
+}
+
+.no-workspace-selected h3 {
+  margin: 0 0 10px 0;
+  color: #d4d4d4;
+}
+
+.ai-workspace-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #d4d4d4;
+}
+
+.ai-workspace-loading .loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #333;
+  border-top: 2px solid #007acc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 1024px) {
+  .workspace-content-area {
+    grid-template-columns: 1fr;
+  }
+  
+  .workspace-sidebar {
+    width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workspace-content {
+    flex-direction: column;
+  }
+  
+  .workspace-sidebar {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .workspace-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
